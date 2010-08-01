@@ -17,8 +17,13 @@
 			color: white;
 			background-color: black;
 		}
-		a:ACTIVE, a:HOVER, a:VISITED {
-			color:white;
+		.button {
+			border: 5px solid black; 
+			padding: 5px; 
+			vertical-align: top;
+		}
+		a, a:ACTIVE, a:HOVER, a:VISITED {
+			color: white;
 			text-decoration: none;
 		}
 	</style>
@@ -32,7 +37,12 @@
   		</tr>
   		<tr>
   			<td style="height: 600px; vertical-align: top;" class="black">
-				<div style="text-align: right;margin-top: 0;padding-top: 0"><img style="margin-left: 10px" alt="king white" src="img/koenig_black.png"></div>
+				<div style="text-align: right;margin-top: 0;padding-top: 0">
+					<span class="button"><a style="color:black;" href="SchachenHilfe.pdf">1) Regeln lesen</a></span>
+					<span class="button"><a style="color:black;" href="chessit/">2) Online testen</a></span>
+					<span class="button"><a style="color:black;" href="mailto:schachen@db12.de">3) Spiel kaufen</a></span>
+					<img style="margin-left: 10px" alt="king white" src="img/koenig_black.png">
+					</div>
   				<ul style="margin-left: 20%">
   				<li><h2>wie Schach ohne Brett</h2></li>
   				<li><h2>nach original Schachregeln</h2></li>
@@ -45,10 +55,11 @@
 				<img style="margin-left: 10px" alt="king white" src="img/koenig_white.png">
 				<ul style="list-style: none">
 				<li><h3>Links</h3></li>
-				<li><a>Info</a></li>
-				<li><a>Online Demo</a></li>
-				<li><a>Offline Spiel</a></li>
-				<li><a>Kontakt</a></li>
+				<li><a href="#">Info</a></li>
+				<li><a href="SchachenHilfe.pdf">Regeln</a></li>
+				<li><a href="chessit/">Online Demo</a></li>
+				<li><a href="mailto:schachen@db12.de">Offline Spiel</a></li>
+				<li><a href="mailto:schachen@db12.de">Kontakt</a></li>
 				</ul>
 				<ul style="list-style: none">
 				<li><h3>Autoren</h3></li>

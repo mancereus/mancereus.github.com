@@ -1,0 +1,20 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../lib/voice-elements/dist/voice-player.html">
+
+<polymer-element name="game-help" attributes="text"  >
+<template>
+	<voice-player id="player" accent="de-DE" text="{{ text }}"></voice-player>
+	<paper-icon-button icon="polymer" size="140" on-click="{{talk}}"></paper-icon-button>
+
+</template>
+<script>
+Polymer("game-help", {	
+		text: "",
+		talk: function() {
+			this.$.player.cancel();
+			this.$.player.speak();			
+		}
+	});
+</script>
+</polymer-element>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+    <title>Hello, World</title>
+    <meta name="viewport"content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="lib/platform/platform.min.js"> </script>
+
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.min.css">
+    <link rel="import" href="components/game-card.html">
+    <script src="lib/angular/angular.min.js"></script>
+    <script src="lib/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="js/index.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Hello, World</a>
+        </div>
+    </nav>
+    <div class="container">
+        <game-card>
+            <img src="img/dolomites_bridge.jpg" width="70" height="70">
+            <h2>Start</h2>
+            <h3>Ihr landet mit dem Fallschirm im undurchdringlichen Dschungel.</h3>
+        </game-card>
+        <div ng-controller="Hello">
+            <label>Name sdsd sdsd:</label>
+            <input type="text" ng-model="yourName" placeholder="Enter a name here">
+            <h1>{{msg}}</h1>
+        </div>
+    </div>
+</body>
+</html>

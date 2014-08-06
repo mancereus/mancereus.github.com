@@ -1,0 +1,52 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/core-pages/core-pages.html">
+<link rel="import" href="../lib/paper-ripple/paper-ripple.html">
+<link rel="import" href="../lib/paper-shadow/paper-shadow.html">
+<polymer-element name="game-show-details" attributes="symbol imgSrc text titleText"  on-show-card="{{showCard}}">
+<template>
+	<style>
+		:host {
+			display: block;
+			position: relative;
+			background-color: white;
+			padding: 2px;
+			margin: 5px;
+			width: 500px;
+			height: 800px;
+			font-size: 1em;
+			font-weight: 300;
+		}
+		h2 {
+			margin: 0;
+			font-size: 1.8rem;
+			font-weight: 300;
+		}
+		.picture {
+			width: 70px;
+			border-radius: 50%;
+			margin: 10px;
+		}
+	</style>
+	<div class="card-header">
+		<div layout vertical center>
+			<h2 style="font-size:42px">{{titleText}}</h2>
+			<img class="picture" src="img/{{imgSrc}}.png" style="width:60%;height:300px"/>
+
+			<div style="font-size:42px"><p>{{text}}</p></div>
+		</div>
+	</div>
+	<paper-shadow z="2"></paper-shadow>
+</template>
+<script>
+	Polymer('game-show-details', {
+		imgSrc: "Jack",
+		ready: function() {
+		},
+		show: function(details) {
+			//alert ("okDetails");
+			this.imgSrc = details.card.name;
+			this.text = details.card.Aktion;
+			this.titleText = details.card.name;
+		}
+	});</script>
+</polymer-element>

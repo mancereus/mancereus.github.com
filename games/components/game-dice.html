@@ -1,0 +1,44 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/core-icon/core-icon.html">
+<link rel="import" href="../lib/paper-ripple/paper-ripple.html">
+<polymer-element name="game-dice" attributes="charSet"  >
+<template>
+	<style>
+		:host {
+			overflow: hidden;
+			cursor: move;
+			z-index: 2000;
+		}
+		h1 {
+			width: 112px;
+			height: 112px;
+			border-radius: 10%;
+			color: black;
+			background-color: white;
+			border: 3px solid black;
+			font-size: 64pt;
+			text-align: center;
+			vertical-align: middle;			
+		}
+	</style>
+	<div  name="dice" draggable="true" on-click="{{clicker}}">
+		<h1>{{diceValue}}</h1>	
+	</div>
+</template>
+<script>
+	Polymer("game-dice", {	
+		diceValue: "",
+		charSet: "ABCDEF",
+		clicker: function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation(); 
+			return false; 
+		},
+		ready: function() {
+			console.log("game-dice ready ");
+			var draggie = new Draggabilly( this );
+			this.diceValue = this.charSet.charAt(Math.floor(Math.random() * this.charSet.length));
+		}
+	});
+</script>
+</polymer-element>

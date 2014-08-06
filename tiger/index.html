@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tiger</title>
+    <meta name="viewport"content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="../lib/platform/platform.js"> </script>
+    <script src="../js/draggabilly.pkgd.js"></script>
+
+    <link rel="import" href="../lib/font-roboto/roboto.html">
+    <link rel="import" href="../lib/core-header-panel/core-header-panel.html">
+    <link rel="import" href="../lib/core-toolbar/core-toolbar.html">
+    <link rel="import" href="../lib/core-icons/core-icons.html">
+    <link rel="import" href="../components/game-board.html">
+    <link rel="import" href="../components/game-help.html">
+    <link rel="import" href="../components/game-dice.html">
+    <link rel="import" href="../components/game-meeple.html">
+    <link rel="import" href="../components/game-show-details.html">
+
+    <link rel="stylesheet" href="../css/main.min.css">
+
+</head>
+<body unresolved touch-action="auto">
+ <core-header-panel>
+ <core-toolbar>
+ <h2>Die grüne Hölle</h2>
+ <select id="akt">
+     <option value="1">Akt 1</option>
+     <option value="2">Akt 2</option>
+     <option value="3">Akt 3</option>
+ </select>
+ <!-- <voice-player id="player" accent="de-DE" autoplay text="Willkommen in Dschungel. Die grüne Hölle erwartet dich."></voice-player> -->
+</core-toolbar>
+<div class="container" layout horizontal center>
+
+  <div layout horizontal start>
+    <game-board/>
+</div>
+<div layout vertical>
+    <h2>Akt 1: Zugweite 2 + Anzahl aufgeckter Eckfelder</h2>
+    <h2>Akt 2: Zugweite 3 + Anzahl aufgeckter Eckfelder.</h2>
+    <game-help text="Du bist Jack der Dschungelführer. Die Spielfigur kannst du mit der Maus bewegen. Die Nachbarfelder von Jack kannst per Klick aufdecken. Dort findest du auch Gegenstände, die du mit Jack einsammeln kannst. Über Dschungelwände darfst du nicht ziehen. "> </game-help>
+    <div id="inv" style="background-color:gray; border: 2px solid black; height:500px; width: 600px">
+      <h2>Inventory</h2>
+      <div layout horizontal>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+      </div>
+      <h2>Rucksack</h2>
+      <div layout horizontal>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: white;border-radius: 50%">
+            <img src="../img/Rucksack.png" style="opacity: 0.6;width:100px;height:100px""/>
+          </div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+      </div>
+  </div>
+  <div id="bigCard"style="background-color:white; border: 2px solid black; height:800px; width: 500px">
+    <game-show-details id="details" ></game-show-details>
+  </div>
+</div>
+</div>
+</div>
+<game-meeple imgSrc="Jack" top="1060" left="800"></game-meeple>
+<game-meeple imgSrc="Jane2" top="120" left="1600"></game-meeple>
+</core-header-panel>
+</body>
+</html>

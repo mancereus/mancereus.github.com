@@ -1,26 +1,25 @@
 <link rel="import" href="../lib/polymer/polymer.html">
 <link rel="import" href="game-card.html">
 
-<polymer-element name="game-board" attributes="cards"  on-show-card="{{showCard}}">
+<polymer-element name="game-board" attributes="cards width"  on-show-card="{{showCard}}">
 <template>
   <style>
     :host {
       display: block;
-      width: 1480px;
     }
     game-card {
       margin: 3px;
     }
   </style>
 
-  <div layout horizontal wrap center >
+  <div id="field" layout horizontal wrap center >
     <template repeat="{{ card, cardIndex in cards}}">
-      <game-card horiz="{{card.hor}}" vertic="{{card.ver}}" symbol="{{card.imgclass}}" imgSrc="{{card.name}}" titleText="{{card.name}}" text="{{card.Aktion}}" cardData="{{card}}" selected="{{cardIndex}}"> 
+      <game-card imgSrc="{{card.name}}" cardData="{{card}}"> 
     </game-card>
   </template>
 </div>
 </template>
-<script src="../js/data2.js"></script>
+<script src="../js/data1.js"></script>
 <script>
   StopIteration = function () {};
   StopIteration.prototype = new Error();
@@ -53,6 +52,7 @@
   };
   Polymer('game-board', {
       // initialize the element's model
+      width: "1480px",
       created: function() {
 
         var actions = shuffle(initActions);
@@ -64,11 +64,22 @@
         this.cards.splice(42, 0, actionIter.next());
         this.cards.splice(48, 0, actionIter.next());
       },
-      openCard:  function(idx) {
-        var open = [2,7,12];
-        if (open.contains(idx))
-          return 1;
-        return 0;
+      ready: function() {
+          this.style.width = this.width;
+          this.$.field.children[9].show();
+          this.$.field.children[13].show();
+          this.$.field.children[17].show();
+          this.$.field.children[19].show();
+          this.$.field.children[25].show();
+          this.$.field.children[31].show();
+          this.$.field.children[33].show();
+          this.$.field.children[41].show();
+          this.$.field.children[37].show();
+      },
+      openAll:  function() {
+        for (var i=0; i<49; i++) {
+          this.$.field.children[i].show();
+        }
       },
       showCard:  function(e, details, sender) {
         //alert ("ok");

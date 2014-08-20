@@ -2,7 +2,7 @@
 <link rel="import" href="../lib/core-pages/core-pages.html">
 <link rel="import" href="../lib/paper-ripple/paper-ripple.html">
 <link rel="import" href="../lib/paper-shadow/paper-shadow.html">
-<polymer-element name="game-show-details" attributes="symbol imgSrc text titleText"  on-show-card="{{showCard}}">
+<polymer-element name="game-show-details" attributes="cardData symbol imgSrc text titleText"  on-show-card="{{showCard}}">
 <template>
 	<style>
 		:host {
@@ -21,18 +21,22 @@
 			font-size: 1.8rem;
 			font-weight: 300;
 		}
-		.picture {
+		.card-header .picture {
 			width: 70px;
-			border-radius: 50%;
 			margin: 10px;
+		}
+		.card-header .picture.symbol {
+			border-radius: 50%;
+			border: 2px solid green;
+			opacity: 0.5;
 		}
 	</style>
 	<div class="card-header">
 		<div layout vertical center>
 			<h2 style="font-size:42px">{{titleText}}</h2>
-			<img class="picture" src="../img/{{imgSrc}}.png" style="width:60%;height:300px"/>
+			<img class="picture {{cardData.imgclass}}" src="../img/{{imgSrc}}.png" style="width:60%;height:300px"/>
 
-			<div style="font-size:42px"><p>{{text}}</p></div>
+			<div style="font-size:36px">{{text}}</div>
 		</div>
 	</div>
 	<paper-shadow z="2"></paper-shadow>

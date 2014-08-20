@@ -6,12 +6,16 @@
 	<style>
 		:host {
 			overflow: hidden;
-			cursor: move;
+			/*cursor: move;*/
+			 float: left;
 			z-index: 2000;
+			width: 33%;
+			max-width: 120px;
+			margin: 1% 1%;
 		}
 		h1 {
-			width: 112px;
-			height: 112px;
+			width: 90%;
+			height: 18%;
 			border-radius: 10%;
 			color: black;
 			background-color: white;
@@ -36,7 +40,7 @@
 		},
 		ready: function() {
 			console.log("game-dice ready ");
-			var draggie = new Draggabilly( this );
+			// var draggie = new Draggabilly( this );
 			this.diceValue = this.charSet.charAt(Math.floor(Math.random() * this.charSet.length));
 		}
 	});

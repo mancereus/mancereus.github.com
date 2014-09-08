@@ -14,13 +14,41 @@
 
   <div id="field" layout horizontal wrap center >
     <template repeat="{{ card, cardIndex in cards}}">
-      <game-card imgSrc="{{card.name}}" cardData="{{card}}"> 
+      <game-card imgSrc="{{card.name}}" cardData="{{card}}" item="{{card.imgclass}}"> 
     </game-card>
   </template>
 </div>
 </template>
-<script src="../js/data1.js"></script>
+<script src="../js/base.js"></script>
 <script>
+  function get(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+    return decodeURIComponent(name[1]);
+  }
+  function loadjscssfile(filename, filetype){
+   if (filetype=="js"){ //if filename is a external JavaScript file
+    var fileref=document.createElement('script')
+    fileref.setAttribute("type","text/javascript")
+    fileref.setAttribute("src", filename)
+  }
+   else if (filetype=="css"){ //if filename is an external CSS file
+    var fileref=document.createElement("link")
+    fileref.setAttribute("rel", "stylesheet")
+    fileref.setAttribute("type", "text/css")
+    fileref.setAttribute("href", filename)
+  }
+  if (typeof fileref!="undefined")
+    document.getElementsByTagName("head")[0].appendChild(fileref)
+  }
+
+  var akt = get("akt");
+  if (akt == undefined) {
+    akt = 1;
+  }
+  loadjscssfile("../js/data" + akt+ ".js", "js") 
+</script>
+<script>
+
   StopIteration = function () {};
   StopIteration.prototype = new Error();
   StopIteration.name = 'StopIteration';
@@ -54,6 +82,7 @@
       // initialize the element's model
       width: "1480px",
       created: function() {
+        initcards.push.apply(initcards,actcards);
 
         var actions = shuffle(initActions);
         this.cards = shuffle(initcards);
@@ -65,16 +94,33 @@
         this.cards.splice(48, 0, actionIter.next());
       },
       ready: function() {
-          this.style.width = this.width;
-          this.$.field.children[9].show();
-          this.$.field.children[13].show();
-          this.$.field.children[17].show();
-          this.$.field.children[19].show();
-          this.$.field.children[25].show();
-          this.$.field.children[31].show();
-          this.$.field.children[33].show();
-          this.$.field.children[41].show();
-          this.$.field.children[37].show();
+        this.style.width = this.width;
+        this.$.field.children[9].show();
+        this.$.field.children[13].show();
+        this.$.field.children[17].show();
+        this.$.field.children[19].show();
+        this.$.field.children[25].show();
+        this.$.field.children[31].show();
+        this.$.field.children[33].show();
+        this.$.field.children[41].show();
+        this.$.field.children[37].show();
+        var startarr = [9,13,17,19,25,31,33,41,37];
+        var questarr = [1,7,43,49];
+        for (var i=1; i <= 49; i++) {
+          if (startarr.contains(i)) {
+            this.$.field.children[i].show();
+            this.$.field.children[i].fix();
+          } else {
+            if (!questarr.contains(i)) {
+              this.$.field.children[i].move();
+            } else {
+              this.$.field.children[i].fix();
+
+            }
+          }
+
+        }
+
       },
       openAll:  function() {
         for (var i=0; i<49; i++) {

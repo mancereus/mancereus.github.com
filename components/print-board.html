@@ -12,17 +12,35 @@
     }
   </style>
 
-  <div id="gameTable" layout horizontal wrap center >
+  <div id="gameTable" layout horizontal wrap center > <!--style="padding-top: 220px">-->
     <template repeat="{{ card, cardIndex in cards}}">
-      <game-card horiz="{{card.hor}}" selected="1" vertic="{{card.ver}}" symbol="{{card.imgclass}}" imgSrc="{{card.name}}" titleText="{{card.name}}" text="{{card.Aktion}}" cardData="{{card}}" > 
+     <template if="{{ card.imgclass}}">
+        <game-piece style="margin: 2px;" img="../img/{{card.name}}.png" imgclass="{{card.imgclass}}"></game-piece>
+    </template>
+<!--       <game-card horiz="{{card.hor}}" selected="1" vertic="{{card.ver}}" symbol="{{card.imgclass}}" imgSrc="{{card.name}}" titleText="{{card.name}}" text="{{card.Aktion}}" cardData="{{card}}" > 
+
     </game-card>
       <template if="{{ (cardIndex+1) % 9 == 0 }}">
-      <div class="pagebreak" style="height: 100px;width: 600px;">page-break</div>
-      </template>
+      <div class="pagebreak" style="height: 88px;width: 600px;">page-break</div>
+      </template> -->
   </template>
 </div>
 </template>
+<script src="../js/base.js"></script>
+<!-- <script>        var initcards=[];</script>-->
+<script src="../js/data1.js"></script>
+<script>        initcards.push.apply(initcards,actcards);</script>
 <script src="../js/data2.js"></script>
+<script>        initcards.push.apply(initcards,actcards);</script>
+<script src="../js/data3.js"></script>
+<script>        initcards.push.apply(initcards,actcards);</script>
+<!--<script>        var initcards=[];</script>-->
+<script src="../js/data1.js"></script>
+<script>        initcards.push.apply(initcards,initActions);</script>
+<script src="../js/data2.js"></script>
+<script>        initcards.push.apply(initcards,initActions);</script>
+<script src="../js/data3.js"></script>
+<script>        initcards.push.apply(initcards,initActions);</script>
 <script>
   StopIteration = function () {};
   StopIteration.prototype = new Error();
@@ -58,14 +76,8 @@
       width: "1480px",
       created: function() {
 
-        var actions = shuffle(initActions);
-        this.cards = shuffle(initcards);
-        var actionIter = arrayLikeIterator(actions);
-        this.cards.splice(0, 0, actionIter.next());
-        this.cards.splice(6, 0, actionIter.next());
-        this.cards.splice(24, 0, start);
-        this.cards.splice(42, 0, actionIter.next());
-        this.cards.splice(48, 0, actionIter.next());
+        var actions = initActions;
+        this.cards = initcards;
       },
       ready: function() {
           this.style.width = this.width;

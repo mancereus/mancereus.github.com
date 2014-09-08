@@ -23,29 +23,34 @@
 <body unresolved touch-action="auto">
  <core-header-panel>
      <core-toolbar>
-     <h2>Mommel - Neue Wörter</h2>
+     <h2>Mommel - das Wortspiel</h2>
     </core-toolbar>
   <div class="container" style="margin: 2px;width: 100%" layout vertical center>
 
     <div id="dicerow" style="width: 100%">
-      <game-dice charSet="FHBYTR"></game-dice>
-      <game-dice charSet="VWHBNS"></game-dice>
-      <game-dice charSet="PCNGLR"></game-dice>
-      <game-dice charSet="RDLKMW"></game-dice>
-      <game-dice charSet="AUEÄOI"></game-dice>
-      <game-dice charSet="PDMXTS"></game-dice>
-      <game-dice charSet="AUEÖOI"></game-dice>
-      <game-dice charSet="GZQFSL"></game-dice>
-      <game-dice charSet="KZJNST"></game-dice>
-      <game-dice charSet="AOUIÜE"></game-dice>
+      <game-dice charSet="QIACOS"></game-dice>
+      <game-dice charSet="FIAMHR"></game-dice>
+      <game-dice charSet="UTNJEO"></game-dice>
+      <game-dice charSet="NEGKDX"></game-dice>
+      <game-dice charSet="NORFEL"></game-dice>
+      <game-dice charSet="GUPNEL"></game-dice>
+      <game-dice charSet="IÄYUHB"></game-dice>
+      <game-dice charSet="TWIARD"></game-dice>
+      <game-dice charSet="NBSZEV"></game-dice>
+      <game-dice charSet="IKMEDS"></game-dice>
     </div>
     <div id="diceout"><span id="shuffler"></span></div>
     <div layout vertical center>
-      
-      <core-input pattern=".*A-Za-z.*" style="background-color: white;font-size: 32pt; width: 45%" max="10" maxlength="10" label="Erfinde ein Wort zur Kategorie..." autofocus="true"></core-input>
+      <span layout horizontal center><h2> Kategorie: </h2> <h2 id="category"></h2></span>
+      <core-input id="wordInput" pattern=".*A-Za-z.*" style="background-color: white;font-size: 32pt; width: 45%" max="10" maxlength="10" label="Erfinde ein Wort zur Kategorie..." autofocus="true"></core-input>
     </div>
   </div>
 </core-header-panel>
+<script>var categories = ["Fastfood-Kette", "Sportwagenmarke", "James-Bond Bösewicht", "Märchenfigur", "neu entdeckter Planet", "skandinavisches Möbelstück", "Zahnpasta", "Waschmittel", "Herrenmodenmarke", "Damenmodenmarke", "Schokoriegel", "Stadt in Sibirien", "Präsident von Uganda", "Stadt in den USA", "Kosename für Partner/in", "Tankstellen Marke", "süßer Brotaufstrich", "Heavy Metal Band", "Programmiersprache", "abstraktes Brettspiel", "neumodischer Mädchenname", "neumodischer Jungenname", "Krankheit", "Schmerz Medikament", "Fantasy Heldenfigur", "neue Trendsportart", "Jugendwort für 'super'", "Supermarktkette", "Energiekonzern", "kleines, sparsames Stadtauto", "Hundefutter", "neumodische Beleidigung (Jugendsprache)", "Joghurt-Marke", "neue Flirt-App", "neues Smartphone", "Erfrischungs- getränk", "Schuhmarke", "König von Thailand", "scharfes indisches Gericht", "Fußball-Nationalspieler im Jahr 2025", "Parfüm", "Künstlername für Damen in der Erotikbranche", "seltene Pflanze", "fernöstliche Kampfsportart", "Eingeborenen- stamm in Zentralafrika", "Comicfigur", "türkische Vorspeise", "neuer Frischkäse", "Maßeinheit", "tropische Frucht", "Babywindeln", "Babynahrung", "Putzmittel", "Softdrink", "finnischer  Vorname", "chemisches  Element", "neuer Tanzstil", "Boyband", "Teesorte", "Indische Gottheit", "Farbe", "Deo Marke", "Shampoo ", "Jugendwort  für 'Doof'", "Eissorte", "Spielkonsole", "Brasilianischer  Fussballer", "Zwerg bei  Schneewittchen", "Hunderasse", "Pokemon Figur", "afrikanisches Gemüse", "neue  TV Show", "Star Wars Figur", "neuartiges  Baumaterial", "neue  Partydroge", "Energydrink", "neues  Hipster Getränk", "vegetarischer Burger"];
+  var idx = Math.floor(Math.random() * categories.length);
+  var cat = document.getElementById("category");
+  cat.innerText = categories[idx];
+</script>
 // <script>
 // var shuffleKeys = function() {
 //   var vk = document.getElementById("diceout");

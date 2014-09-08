@@ -34,6 +34,8 @@
 		diceValue: "",
 		charSet: "ABCDEF",
 		clicker: function(ev) {
+			 var input = document.getElementById("wordInput");
+			 input.value = input.value + this.diceValue;
 			ev.preventDefault();
 			ev.stopPropagation(); 
 			return false; 

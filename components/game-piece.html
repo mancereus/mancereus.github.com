@@ -47,6 +47,22 @@
 		ready: function() {
 			console.log("game-piece ready ");
 			var draggie = new Draggabilly( this );
+			draggie.on( 'dragStart', function( draggieInstance, event, pointer ) {
+				
+				event.preventDefault();
+          		event.stopPropagation(); 
+          		return false; 
+          	});
+			draggie.on( 'dragMove', function( draggieInstance, event, pointer ) {
+				event.preventDefault();
+          		event.stopPropagation(); 
+          		return false; 
+          	});
+			draggie.on( 'dragStop', function( draggieInstance, event, pointer ) {
+				event.preventDefault();
+          		event.stopPropagation(); 
+          		return false; 
+          	});
 		}
 	});
 </script>

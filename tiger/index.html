@@ -24,7 +24,7 @@
  <core-header-panel>
  <core-toolbar>
  <h2>Die grüne Hölle</h2>
- <select id="akt">
+ <select id="akt" onchange="document.location.href = '/tiger/index.html?akt=' + this.value">
      <option value="1">Akt 1</option>
      <option value="2">Akt 2</option>
      <option value="3">Akt 3</option>
@@ -40,7 +40,7 @@
     <h2>Zugweite 2 + Anzahl aufgedeckter Eckfelder</h2>
     <h2>Am Ende des Aktes einen Gegenstand in den nächsten Akt mitnehmen.</h2>
     <game-help text="Du bist Jack der Dschungelführer. Die Spielfigur kannst du mit der Maus bewegen. Die Nachbarfelder von Jack kannst per Klick aufdecken. Dort findest du auch Gegenstände, die du mit Jack einsammeln kannst. Über Dschungelwände darfst du nicht ziehen. "> </game-help>
-    <div id="inv" style="background-color:gray; border: 2px solid black; height:700px; width: 600px">
+    <div id="inv" style="padding-left: 10px;background-color:#eee; border: 2px solid black; height:700px; width: 600px">
       <h2>Inventar</h2>
       <div layout horizontal>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: white;border-radius: 50%">
@@ -69,7 +69,7 @@
   </div>
   <div id="bigCard"style="background-color:white; border: 2px solid black; height:800px; width: 500px">
     <game-show-details id="details" ></game-show-details>
-    <
+    
   </div>
 </div>
 </div>

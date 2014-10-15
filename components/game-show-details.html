@@ -37,6 +37,10 @@
 			<img class="picture {{cardData.imgclass}}" src="../img/{{imgSrc}}.png" style="width:60%;height:300px"/>
 
 			<div style="font-size:36px">{{text}}</div>
+			<template if="{{ cardData.flavour }}">
+				<div class="handle" style="width:90%; font-size: 36px;margin: 1px 32px 1px 15px;font-style:italic;">{{cardData.flavour}}</div>
+			</template>
+
 		</div>
 	</div>
 	<paper-shadow z="2"></paper-shadow>

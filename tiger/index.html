@@ -36,17 +36,16 @@
   <div layout horizontal start>
     <game-board id="board"/>
 </div>
-<div layout vertical>
-    <h2>Zugweite 2 + Anzahl aufgedeckter Eckfelder</h2>
-    <h2>Am Ende des Aktes einen Gegenstand in den nächsten Akt mitnehmen.</h2>
-    <game-help text="Du bist Jack der Dschungelführer. Die Spielfigur kannst du mit der Maus bewegen. Die Nachbarfelder von Jack kannst per Klick aufdecken. Dort findest du auch Gegenstände, die du mit Jack einsammeln kannst. Über Dschungelwände darfst du nicht ziehen. "> </game-help>
-    <div id="inv" style="padding-left: 10px;background-color:#eee; border: 2px solid black; height:700px; width: 600px">
-      <h2>Inventar</h2>
+<div layout vertical style="margin-top: 150px;">
+    <div id="inv" style="padding-left: 10px;background-color:#eee; border: 2px solid black; height:800px; width: 450px">
+      <h2>Kurzregeln:</h2>
+      <p>Zugweite: 2 + Anzahl aufgedeckter Eckfelder</p>
+      <p>Am Ende des Aktes Rucksack und Fackel abgeben. Sonst Dinge, die du tragen kannst, in den nächsten Akt mitnehmen.</p>
+      <h2>Jack</h2>
       <div layout horizontal>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: white;border-radius: 50%">
             <img src="../img/Jack.png" style="border-radius: 50%;width:100px;height:100px; margin-top: 10px;margin-left: 10px;"/>
           </div>
-          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
       </div>
@@ -56,7 +55,9 @@
             <img src="../img/Jane2.png" style="border-radius: 50%;width:100px;height:100px;margin-top: 10px;margin-left: 10px;"/>
           </div>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
+          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
       </div>
+
       <h2>Rucksack</h2>
       <div layout horizontal>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: white;border-radius: 50%">
@@ -64,9 +65,9 @@
           </div>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
           <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
-          <div style="width: 120px; height:120px; border: 1px solid black; background-color: #aaa;border-radius: 50%"></div>
       </div>
   </div>
+    <game-help text="Du bist Jack der Dschungelführer. Die Spielfigur kannst du mit der Maus bewegen. Die Nachbarfelder von Jack kannst du per Klick aufdecken. Dort findest du auch Gegenstände, die du mit Jack einsammeln kannst. Über Dschungelwände darfst du nicht ziehen. "> </game-help>
   <div id="bigCard"style="background-color:white; border: 2px solid black; height:800px; width: 500px">
     <game-show-details id="details" ></game-show-details>
     

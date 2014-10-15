@@ -23,6 +23,8 @@ html,body {
     <script>
       function addPageBreak() {
         var boxes = document.getElementById('gameTable');
+        if (boxes == null) 
+          return;
         var i = boxes.length;
 
         while(i--) {

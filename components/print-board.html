@@ -28,15 +28,33 @@
 </template>
 <script>
  var initcards =  [
+ {name: "Heissluftballon", color : "H", imgclass:"symbol", akt: "3", Aktion: "Ihr findet einen alten Heissluftballon. Er scheint noch zu funktionieren, hat aber keine Luft.", warn:"Boot", bgc:"blue"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte nur 1 Gegenstand liegt. Sonst fangen und töten Sie euch.", warn:"Edelstein"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte nur 1 Gegenstand liegt. Sonst fangen und töten Sie euch.", warn:"Edelstein", pagebreak: "pagebreak"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte nur 1 Gegenstand liegt. Sonst fangen und töten Sie euch.", warn:"Edelstein"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte nur 1 Gegenstand liegt. Sonst fangen und töten Sie euch.", warn:"Edelstein"},
+ {name: "Weg", level: "normal", Aktion: "",flavour: "Jack: 'Pause.'",ver: "true",hor: "true"},
+ {name: "Fels", level: "normal", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen."},
+ {name: "Fels", level: "normal", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen."},
 
 ];
- var initActions =  [
+ var initActions = [
+ {name: "Ureinwohner", akt: "3a", Aktion: "Der Großwildjäger wurde von den Ureinwohner getötet. Falls Jane gefangen wurde, soll Sie als nächstes sterben. Nur wenn du das Idol abgibst oder Gura Gora besiegst, lassen Sie Jane frei. Die Ureinwohner lassen euch nun ungehindert vorbeiziehen.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true},
+ {name: "Ureinwohner", akt: "3a", color : "H", Aktion: "Jane hat die Ureinwohner überzeugt, dass ihre friedliche Absichten habt. Falls sie Jane gefangen hielten, kommt Sie nun mit dir mit. Die Ureinwohner lassen euch nun überall ungehindert vorbeiziehen.", win:"Jane2", bgcwin:"green", task: true},
+ {name: "Ureinwohner", akt: "3a", color : "H", Aktion: "Die Ureinwohner sehen in Jane die Inkarnation einer Göttin. Falls Jane gefangen wurde, ist sie nun mit Kostüm und Goldschmuck bekleidet. Mit Dynamit oder Pistole kannst du Sie befreien.", win:"Jane2", bgcwin:"green", task: true},
+ {name: "Gura Gora", akt: "3", Aktion: "Die Ureinwohner werden vom Affendämon Gura Gora zu Menschenopfern gezwungen. Er hat euch entdeckt. Nach jedem Zug zieht Gura Gora 1 Feld waagrecht oder senkrecht in eure Richtung. Wenn er euch erreicht, tötet er euch.",win:"Fluss", bgcwin:"blue", warn:"Jane2", bgc:"orange", imgclass:"symbol", task: true},
+ {name: "Prof Hampton", akt: "3c", order: "4", Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Wenn du ihm beide Kugeln bringst, verlässt er mit euch das Tal.", imgclass:"symbol", task: true},
+ {name: "Prof Hampton", akt: "3c", order: "4", Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Er ist seinen Verletzungen erlegen, und vor 2 Tagen gestorben. Er hat Jane einen Abschiedsbrief hinterlassen. Jane weint bitterlich in Jacks Armen.", imgclass:"symbol", task: true},
+ {name: "Prof Hampton", akt: "3c", order: "4", Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Er ist völlig entkräftet. Er kommt mit euch, muss aber getragen werden und kann selbst keine Gegenstände tragen.", imgclass:"symbol", task: true},
+ {name: "Fluss", akt: "3d", Aktion: "Jack, Jane und Prof. Hampton können mit dem Boot am Fluss das Abenteuer erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true},
+ {name: "Heisse Quelle", akt: "3d", Aktion: "Ihr könnt den Heissluftballon hier mit heisser Luft füllen. Jack, Jane und Prof. Hampton können das Abenteuer hier erfolgreich beenden. Ihr fliegt mit dem Ballon aus dem versteckten Tal in die Freiheit.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true},
+ {name: "Schatzkammer", akt: "3d", Aktion: "Ihr habt die goldene Schatz-kammer der Ureinwohner gefunden. Mit den beiden Kugeln öffnet ihr hier ein Portal, dass euch aus dem Dschungel teleportiert. Jack, Jane und Prof. Hampton können das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true}
  ];
 </script>
-<!-- <script src="../js/base.js"></script> -->
- <script>        var initcards=[];</script>
- <script src="../js/data3.js"></script>
-<script>        initcards.push.apply(initcards,actcards);</script>
+<!-- <script src="../js/base.js"></script>
+  <script>        var initcards=[];</script>
+  <script src="../js/data3.js"></script>
+ <script>        initcards.push.apply(initcards,actcards);</script> -->
 <!--
 <script src="../js/data2.js"></script>
 <script>        initcards.push.apply(initcards,actcards);</script>
@@ -49,7 +67,7 @@
 <script>        initcards.push.apply(initcards,initActions);</script>
 <script src="../js/data3.js"></script>-->
 <script>        initcards.push.apply(initcards,initActions);</script>
-<script>        initcards.push(start);</script>
+<!--<script>        initcards.push(start);</script> -->
 <script>
   StopIteration = function () {};
   StopIteration.prototype = new Error();

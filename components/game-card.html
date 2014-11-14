@@ -59,7 +59,7 @@
 			<template if="{{ cardData.akt }}">
 				<div fit style="left: 5px;top: 12px">
 				<template if="{{ cardData.task }}"><img src="../img/Stern.png" style="width:30px;height: 30px;"alt=""> 
-				</template>					 <span style="padding: 2px 4px;border-radius: 50%; border: 1px solid black;background-color: white; ">{{cardData.akt}}</span>
+				</template>					 <span style="padding: 2px 4px;border-radius: 50%; border: 1px solid black;background-color: white; ">{{cardData.akt}}{{cardData.variant}}</span>
 				</div>
 			</template>
 			<img class="picture {{cardData.imgclass}}" src="../img/{{cardData.name}}.png" style="width:60%;height:100px"/>
@@ -68,6 +68,7 @@
 			<template if="{{ cardData.flavour }}">
 			<div class="handle" style="width:90%; font-size: 13px;margin: 1px 32px 1px 15px;font-style:italic;">{{cardData.flavour}}</div>
 			</template>
+			<div class="handle" style="width:90%; font-size: 9px;margin: 1px 32px 1px 15px;">{{ cardData.type }} ({{ cardData.akt }} {{cardData.level}})</div>
 			<template if="{{ cardData.ver }}">
 				<div fit style="left: 168px;"><img src="../img/vertic.jpg" style="width:30px;height: 296px;"alt=""></div>
 			</template>

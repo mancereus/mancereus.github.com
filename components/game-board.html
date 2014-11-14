@@ -82,6 +82,7 @@
       // initialize the element's model
       width: "1480px",
       created: function() {
+        initcards.push.apply(initcards,normal);
         initcards.push.apply(initcards,actcards);
 
         var actions = shuffle(initActions);

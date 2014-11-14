@@ -1,27 +1,40 @@
  var actcards =  [
- {name: "Boot", akt: "3", Aktion: "Bring das Boot zum Fluss, um das Abenteuer zu beenden.", hor: true, imgclass:"bigsymbol"},
- {name: "Dynamit", akt: "3", Aktion: "Mit dem Dynamit kannst du einen Felsen sprengen. Lege das Dynamit dazu auf den Felsen.", imgclass:"symbol"},
- {name: "Fels", akt: "3", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen. Mit Dynamit und Gura Gora auf einem Felsen, kannst du diesen sprengen und Gura Gora begraben."},
- {name: "Fluss", color : "H", akt: "3", Aktion: "Jack, Jane und Prof. Hampton können mit dem Boot am Fluss das Abenteuer hier erfolgreich beenden.", warn:"Boot", bgc:"blue"},
- {name: "Kannibale", akt: "3", Aktion: "Die Ureinwohner werden von Gura Gora zu Menschenopfern gezwungen. Du hast das Idol, sonst töten sie dich.", warn:"Edelstein"},
- {name: "Kannibale", akt: "3", Aktion: "Die Ureinwohner werden von Gura Gora zu Menschenopfern gezwungen. Du hast das Idol, sonst töten sie dich.", warn:"Edelstein", pagebreak: "pagebreak"},
- {name: "Kannibale", akt: "3", Aktion: "Die Ureinwohner werden von Gura Gora zu Menschenopfern gezwungen. Du hast das Idol, sonst töten sie dich.", warn:"Edelstein"},
- {name: "Kannibale", akt: "3", Aktion: "Die Ureinwohner werden von Gura Gora zu Menschenopfern gezwungen. Du hast das Idol, sonst töten sie dich.", warn:"Edelstein"},
- {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit auf ein offenes Feld springen.",hor: "true",ver: "true", imgclass:"symbol"},
- {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit auf ein offenes Feld springen.",hor: "true",ver: "true", imgclass:"symbol"},
- {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit auf ein offenes Feld springen.",ver: "true", imgclass:"symbol"},
- {name: "Machete", akt: "3", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.",hor: "true", imgclass:"symbol"},
- {name: "Machete", akt: "3", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.",hor: "true",imgclass:"symbol"},
- {name: "Schw. Kugel", akt: "3", Aktion: "Die schwarze Kugel ist faustgross und aus einem unbekannten Material. Sie scheint von innen heraus zu leuchten.", imgclass:"symbol",ver: "true"},
- {name: "Weiße Kugel", akt: "3", Aktion: "Die weisse Kugel ist faustgross und aus einem unbekannten Material. Sie scheint von innen heraus zu leuchten.", imgclass:"symbol",hor: "true"}
+ {name: "Boot", akt: "3", Aktion: "Wenn du das Boot zum Fluss brinsgt, kannst du mit Jack, Jane und Prof. Hampton das Abenteuer erfolgreich beenden.", hor: true, imgclass:"symbol",type: "Feldkarte"},
+ {name: "Dynamit", akt: "3", Aktion: "Mit dem Dynamit kannst du einen Felsen sprengen. Lege das Dynamit dazu von einem Nachbarfeld ohne Wand dazwischen auf den Felsen.", imgclass:"symbol",type: "Feldkarte"},
+ {name: "Fels", akt: "3", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen. Mit Dynamit und Gura Gora auf einem Felsen, kannst du diesen sprengen und Gura Gora begraben.",type: "Feldkarte"},
+ {name: "Heissluftballon", color : "H", akt: "3", imgclass:"symbol", Aktion: "Ihr findet einen alten Heissluftballon. Er scheint noch zu funktionieren, hat aber keine Luft.", warn:"Boot", bgc:"blue",type: "Feldkarte"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte 1 Feld frei ist. Sonst fangen und töten Sie euch.",type: "Feldkarte"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte 1 Feld frei ist. Sonst fangen und töten Sie euch.",type: "Feldkarte"},
+ {name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte 1 Feld frei ist. Sonst fangen und töten Sie euch.",type: "Feldkarte"},
+ {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen.",hor: "true",ver: "true", imgclass:"symbol",type: "Feldkarte"},
+ {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen.",hor: "true",ver: "true", imgclass:"symbol",type: "Feldkarte"},
+ {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen.",hor: "true",ver: "true", imgclass:"symbol",type: "Feldkarte"},
+ {name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen.",ver: "true", imgclass:"symbol",type: "Feldkarte"},
+ {name: "Machete", akt: "3", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.",hor: "true", imgclass:"symbol",type: "Feldkarte"},
+ {name: "Machete", akt: "3", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.",hor: "true",imgclass:"symbol",type: "Feldkarte"},
+ {name: "Schw. Kugel", akt: "3", Aktion: "Die schwarze Kugel ist faustgross und aus einem unbekannten Material. Sie scheint von innen heraus zu leuchten.", imgclass:"symbol",ver: "true",type: "Feldkarte"},
+ {name: "Weiße Kugel", akt: "3", Aktion: "Die weisse Kugel ist faustgross und aus einem unbekannten Material. Sie scheint von innen heraus zu leuchten.", imgclass:"symbol",hor: "true",type: "Feldkarte"}
  ];
 
  var initActions = [
- {name: "Jäger", akt: "3", Aktion: "Der Großwildjäger hat versucht den Schatz der Ureinwohner zu stehlen und diesen Frevel mit seinem Leben bezahlt. Die Ureinwohner sind jetzt sehr wütend und töten jeden, dem Sie begegnen.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true},
- {name: "Ureinwohner", akt: "3", color : "H", Aktion: "Die Ureinwohner sind eigentlich friedliebend und wollen euch helfen. Du kannst ungehindert an Ihnen vorbeilaufen. Falls sie Jane gefangen halten, kommt Sie mit dir mit.", win:"Jane2", bgcwin:"green", task: true},
- {name: "Gura Gora", akt: "3", Aktion: "Der Affendämon Gura Gora hat euch entdeckt. Nach jedem Zug zieht Gura Gora 1 Feld waagrecht oder senkrecht in eure Richtung. Wenn er euch erreicht, tötet er euch.",win:"Fluss", bgcwin:"blue", warn:"Jane2", bgc:"orange", imgclass:"symbol", task: true},
- {name: "Prof Hampton", akt: "3", order: "4", Aktion: "Janes Vater hat sich bei den Ureinwohner vor Gura Gora versteckt. Wenn du ihm beide Kugeln bringst, verlässt er mit euch das Tal.",hor: "true", imgclass:"symbol", task: true}
+ {name: "Ureinwohner", akt: "3", color : "H", Aktion: "Jane hat die Ureinwohner überzeugt, dass Ihr friedliche Absichten habt. Falls sie Jane gefangen hielten, kommt Sie nun mit dir mit. Die Ureinwohner lassen euch nun ungehindert vorbeiziehen.", win:"Jane2", bgcwin:"green", task: true,type: "Aktionskarte"},
+ {name: "Gura Gora", akt: "3", Aktion: "Der Affendämon Gura Gora hat euch entdeckt. Nach jedem Zug zieht er 1 Feld waagrecht und dann 1 Feld senkrecht auf offenen Karten in eure Richtung. Er ignoriert Dschungelwände. Wenn er euch erreicht, tötet er euch.",win:"Fluss", bgcwin:"blue", warn:"Jane2", bgc:"orange", imgclass:"symbol", task: true,type: "Aktionskarte"},
+ {name: "Prof Hampton", akt: "3",  Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Wenn du ihm beide Kugeln bringst, verlässt er mit euch das Tal.", imgclass:"symbol", task: true,type: "Aktionskarte"},
+ {name: "Heisse Quelle", akt: "3", Aktion: "Ihr könnt den Heissluftballon hier mit heisser Luft füllen. Jack, Jane und Prof. Hampton können das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Aktionskarte"},
+ ];
+
+ var secondActions = [
+ {name: "Ureinwohner", akt: "3",variant:"a", Aktion: "Der Großwildjäger hat versucht den Schatz der Ureinwohner zu stehlen und diesen Frevel mit seinem Leben bezahlt. Falls Jane gefangen wurde, soll Sie als nächstes sterben. Nur wenn du das Idol abgibst oder Gura Gora besiegst, lassen Sie Jane frei. Die Ureinwohner lassen euch nun ungehindert vorbeiziehen.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Ureinwohner", akt: "3",variant:"a", color : "H", Aktion: "Jane hat die Ureinwohner überzeugt, dass ihre friedliche Absichten habt. Falls sie Jane gefangen hielten, kommt Sie nun mit dir mit. Die Ureinwohner lassen euch nun ungehindert vorbeiziehen.", win:"Jane2", bgcwin:"green", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Ureinwohner", akt: "3",variant:"a", color : "H", Aktion: "Die Ureinwohner sehen in Jane die Inkarnation einer Göttin. Falls Jane in Akt 2 gefangen wurde, ist sie nun mit dem Goldschmuck bekleidet. Mit Dynamit oder Pistole kannst du Sie befreien.", win:"Jane2", bgcwin:"green", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Gura Gora", akt: "3",variant:"b", Aktion: "Der Affendämon Gura Gora hat euch entdeckt. Nach jedem Zug zieht er 1 Feld waagrecht und dann 1 Feld senkrecht auf offenen Karten in eure Richtung. Er ignoriert Dschungelwände. Wenn er euch erreicht, tötet er euch.",win:"Fluss", bgcwin:"blue", warn:"Jane2", bgc:"orange", imgclass:"symbol", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Prof Hampton", akt: "3",variant:"c",  Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Wenn du ihm beide Kugeln bringst, verlässt er mit euch das Tal.", imgclass:"symbol", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Prof Hampton", akt: "3",variant:"c",  Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Er ist seinen Verltzungen erlegen, und vor 2 Tagen gestorben. Er hat Jane einen Abschiedsbrief hinterlassen.", imgclass:"symbol", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Prof Hampton", akt: "3",variant:"c",  Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Er ist zu schwach, um Gegenstände tragen zu können.", imgclass:"symbol", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Fluss", akt: "3", variant:"d",Aktion: "Ihr könnt mit dem Boot am Fluss das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Heisse Quelle", akt: "3",variant:"d", Aktion: "Ihr könnt den Heissluftballon hier mit heisser Luft füllen. Jack, Jane und Prof. Hampton können das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Schatzkammer", akt: "3",variant:"d", Aktion: "Ihr habt die goldene Schatzkammer der Ureinwohner gefunden. Mit den beiden Kugeln öffnet ihr ein Portal, dass euch aus dem Dschungel teleportiert. Jack, Jane und Prof. Hampton das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Erweiterung Aktionskarte"}
  ];
 
 
- var start = {name: "Akt III", akt: "3",color : "H",  Aktion: "Ihr betretet das verschollene Tal. Hier muss sich Prof. Hampton befinden. Vielleicht ist er noch am Leben."};
+ var start = {name: "Akt III", akt: "3",color : "H",  Aktion: "Ihr erreicht das verschollene Tal. Hier muss sich Prof. Hampton befinden. Vielleicht ist er noch am Leben.",type: "Startkarte"};

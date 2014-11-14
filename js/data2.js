@@ -19,7 +19,7 @@
  var initActions = [
  {name: "Jäger", akt: "2", Aktion: "Der Großwildjäger Stoephasius klaut dir alle Artefakte und bringt sie zu seinem Lager. Mit der Pistole kannst du sie ihm dort abnehmen.",warn:"Pistole", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Aktionskarte"},
  {name: "Idol", akt: "2", Aktion: "Mit dem Idol kannst du die Ureinwohner verjagen und an Ihnen vorbeilaufen.", imgclass:"symbol", task: true,type: "Aktionskarte"},
- {name: "Überfall", akt: "2", color : "H",Aktion: "Jack kommt ins Nachtlager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Ureinwohner.", warn:"Voodoopuppe", win:"Jane2", bgcwin:"green", task: true,type: "Aktionskarte"},
+ {name: "Überfall", akt: "2", color : "H",Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Ureinwohner. Lege Janes Inventarkarte zur Seite.", warn:"Voodoopuppe", win:"Jane2", bgcwin:"green", task: true,type: "Aktionskarte"},
  {name: "Diamantenmine", akt: "2", color : "H",Aktion: "Mit der Fackel findest du in der dunklen Mine grosse Diamenten. Wenn du Sie herausholst, verlierst du die Fackel.", warn:"Fackel", win:"Diamantenmine", bgcwin:"green", imgclass:"symbol", task: true,type: "Aktionskarte"},
  ];
 

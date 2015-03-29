@@ -5,66 +5,49 @@
   <meta name="viewport"content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <script src="../lib/platform/platform.js"> </script>
   <script src="../js/draggabilly.pkgd.js"></script>
+  <script>
 
+  </script>
   <link rel="import" href="../lib/font-roboto/roboto.html">
   <link rel="import" href="../lib/core-header-panel/core-header-panel.html">
   <link rel="import" href="../lib/core-toolbar/core-toolbar.html">
   <link rel="import" href="../lib/core-icons/core-icons.html">
+  <link rel="import" href="../lib/core-label/core-label.html">
   <link rel="import" href="../lib/core-input/core-input.html">
-  <link rel="import" href="../components/game-board.html">
-  <link rel="import" href="../components/game-help.html">
-  <link rel="import" href="../components/game-dice.html">
-  <link rel="import" href="../components/game-meeple.html">
-  <link rel="import" href="../components/game-show-details.html">
+  <link rel="import" href="../lib/core-item/core-item.html">
+  <link rel="import" href="../lib/core-scaffold/core-scaffold.html">
+  <link rel="import" href="../components/mommel-board.html">
 
   <link rel="stylesheet" href="../css/main.min.css">
 
 </head>
 <body unresolved touch-action="auto">
- <core-header-panel>
-     <core-toolbar>
-     <h2>Mommel - das Wortspiel</h2>
-    </core-toolbar>
-  <div class="container" style="margin: 2px;width: 100%" layout vertical center>
-
-    <div id="dicerow" style="width: 100%">
-      <game-dice charSet="QIACOS"></game-dice>
-      <game-dice charSet="FIAMHR"></game-dice>
-      <game-dice charSet="UTNJEO"></game-dice>
-      <game-dice charSet="NEGKDX"></game-dice>
-      <game-dice charSet="NORFEL"></game-dice>
-      <game-dice charSet="GUPNEL"></game-dice>
-      <game-dice charSet="IÄYUHB"></game-dice>
-      <game-dice charSet="TWIARD"></game-dice>
-      <game-dice charSet="NBSZEV"></game-dice>
-      <game-dice charSet="IKMEDS"></game-dice>
+ <core-scaffold>
+  
+    <core-header-panel navigation flex mode="seamed">
+      <core-toolbar style="background-color: #526E9C; color: #fff;">Buchstabensets</core-toolbar>
+      <core-menu>
+        <core-label style="font-size: 16px;">Buchstabenverteilung auswählen:</core-label>
+        <core-item icon="settings" label="Scrabble" > <a href="?kons=NNNNNNNNNSSSSSSSRRRRRRTTTTTTDDDDHHHHGGGLLLMMMMBBWZCCFFKKPJVXQY&vok=EEEEEEEEEEEEEEEIIIIIIUUUUUUAAAAAOOOÄÖÜ" target="_self"></a></core-item>
+        <core-item icon="settings" label="Unser Vorschlag"> <a href="?kons=NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ&vok=EEEEEEEIIIIIIAAAAAUUUOOÄÖÜ" target="_self"></a></core-item>
+        <core-item icon="settings" label="Flache Verteilung"> <a href="?kons=BBCCDDFFGGHHJJKKLLMMNNPPQQRRSSTTVVWWXXYYZZ&vok=AAEEIIOOUUÄÄÖÖÜÜ" target="_self"></a></core-item>
+        <core-item icon="" label=""></core-item>
+        <core-label style="font-size: 16px;">Über die Browser URL können auch eigene Verteilungen ausprobiert werden!</core-label>
+        <core-item icon="" label=""></core-item>
+        <core-item icon="send" label="Neues Beispiel laden"> <a href="javascript:history.go(0)" target="_self"></a></core-item>
+      </core-menu>
+    </core-header-panel>
+    
+    <div tool>Mommel</div>
+    
+    <div class="content">
+      <div class="container" style="margin: 2px;width: 100%" layout vertical center>
+        <mommel-board/>
+       
+      </div>
     </div>
-    <div id="diceout"><span id="shuffler"></span></div>
-    <div layout vertical center>
-      <span layout horizontal center><h2> Kategorie: </h2> <h2 id="category"></h2></span>
-      <core-input id="wordInput" pattern=".*A-Za-z.*" style="background-color: white;font-size: 32pt; width: 45%" max="10" maxlength="10" label="Erfinde ein Wort zur Kategorie..." autofocus="true"></core-input>
-    </div>
-  </div>
-</core-header-panel>
-<script>var categories = ["Fastfood-Kette", "Sportwagenmarke", "James-Bond Bösewicht", "Märchenfigur", "neu entdeckter Planet", "skandinavisches Möbelstück", "Zahnpasta", "Waschmittel", "Herrenmodenmarke", "Damenmodenmarke", "Schokoriegel", "Stadt in Sibirien", "Präsident von Uganda", "Stadt in den USA", "Kosename für Partner/in", "Tankstellen Marke", "süßer Brotaufstrich", "Heavy Metal Band", "Programmiersprache", "abstraktes Brettspiel", "neumodischer Mädchenname", "neumodischer Jungenname", "Krankheit", "Schmerz Medikament", "Fantasy Heldenfigur", "neue Trendsportart", "Jugendwort für 'super'", "Supermarktkette", "Energiekonzern", "kleines, sparsames Stadtauto", "Hundefutter", "neumodische Beleidigung (Jugendsprache)", "Joghurt-Marke", "neue Flirt-App", "neues Smartphone", "Erfrischungs- getränk", "Schuhmarke", "König von Thailand", "scharfes indisches Gericht", "Fußball-Nationalspieler im Jahr 2025", "Parfüm", "Künstlername für Damen in der Erotikbranche", "seltene Pflanze", "fernöstliche Kampfsportart", "Eingeborenen- stamm in Zentralafrika", "Comicfigur", "türkische Vorspeise", "neuer Frischkäse", "Maßeinheit", "tropische Frucht", "Babywindeln", "Babynahrung", "Putzmittel", "Softdrink", "finnischer  Vorname", "chemisches  Element", "neuer Tanzstil", "Boyband", "Teesorte", "Indische Gottheit", "Farbe", "Deo Marke", "Shampoo ", "Jugendwort  für 'Doof'", "Eissorte", "Spielkonsole", "Brasilianischer  Fussballer", "Zwerg bei  Schneewittchen", "Hunderasse", "Pokemon Figur", "afrikanisches Gemüse", "neue  TV Show", "Star Wars Figur", "neuartiges  Baumaterial", "neue  Partydroge", "Energydrink", "neues  Hipster Getränk", "vegetarischer Burger"];
-  var idx = Math.floor(Math.random() * categories.length);
-  var cat = document.getElementById("category");
-  cat.innerText = categories[idx];
-</script>
-// <script>
-// var shuffleKeys = function() {
-//   var vk = document.getElementById("diceout");
-//   var frag = document.getElementById("dicerow");
-//   var children = frag.children;
-      
-//   var shuffler = document.getElementById("shuffler");
-//   children = Array.prototype.sort.call(children, function(a, b) {
-//             return Math.random() - 0.5;
-//         });
-//   for(var i = 0, l = children.length; i < l; i++) 
-//     vk.insertBefore(children[i], shuffler);
-//   };
-//   shuffleKeys();
-// </script>
+  
+  </core-scaffold>
+ 
 </body>
 </html>

@@ -25,8 +25,10 @@
 
  var secondActions = [
  {name: "Dynamit", akt: "2", Aktion: "Du findest einen versteckten Vorrat an Dynamit und kannst damit einen Felsen sprengen. Lege dazu das Dynamit von einem Nachbarfeld aus ohne Wand dazwischen auf den Felsen.", imgclass:"symbol",task: true,type: "Erweiterung Aktionskarte"},
- {name: "Tiger", akt: "2", color : "H",Aktion: "Ein Tiger überrascht euch und jagt euch 2 Felder diagonal zur Mitte. Ihr könnt die Aktion auf diesem Feld ignorieren.", task: true,type: "Erweiterung Aktionskarte"}
+ {name: "Tiger", akt: "2", color : "H",Aktion: "Ein Tiger überrascht euch und jagt euch 2 Felder diagonal zur Mitte. Ihr könnt die Aktion auf diesem Feld ignorieren.", task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Fluss", akt: "3", variant:"d",Aktion: "Ihr könnt mit dem Boot am Fluss das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Erweiterung Aktionskarte"},
+ {name: "Schatzkammer", akt: "3",variant:"d", Aktion: "Ihr habt die Schatzkammer der Ureinwohner gefunden. Mit den beiden Kugeln öffnet ihr ein Portal, dass euch aus dem Dschungel teleportiert. Jack, Jane und Prof. Hampton das Abenteuer hier erfolgreich beenden.", bgc:"orange", win:"Fluss", bgcwin:"blue",task: true,type: "Erweiterung Aktionskarte"}
 ];
 
- var start = {name: "Akt II", akt: "2",color : "H", 
+ var start = {name: "Akt II", akt: "2",color : "H",  task: true,
  Aktion: "Ihr erreicht das 'Reich der Schlangen', in dem Prof Hampton verschwunden ist. Sucht nach dem Zugang zum verschollenen Tal.",type: "Startkarte"};

@@ -1,0 +1,39 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/core-icon/core-icon.html">
+<link rel="import" href="../lib/paper-ripple/paper-ripple.html">
+<polymer-element name="game-meeple" attributes="imgSrc top left"  >
+<template>
+	<style>
+		:host {
+			position: absolute;
+			top: {{top}}px;
+			left: {{left}}px;
+			color: #fff;
+			overflow: hidden;
+			cursor: move;
+		}
+		core-icon.sized {
+			height: 128px;
+			width: 128px;
+		}
+	</style>
+	<div draggable="true">
+		<core-icon src="../img/{{imgSrc}}.png" class="sized" style="border: 3px solid blue; "></core-icon>
+	</div>
+</template>
+<script>
+	Polymer("game-meeple", {	
+		top: 1060,
+		left: 800,
+		clicker: function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation(); 
+			return false; 
+		},
+		ready: function() {
+			console.log("game-meeple ready ");
+			var draggie = new Draggabilly( this );
+		}
+	});
+</script>
+</polymer-element>

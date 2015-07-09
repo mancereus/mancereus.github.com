@@ -1,0 +1,59 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../board-game-card/board-game-card.html">
+<dom-module id="crime-scene-card">
+	<style>
+		:host {
+		}
+		img {
+			height:160px;
+			width:160px;
+		}
+	</style>
+	<template>
+	    <board-game-card open="{{open}}">
+			<div><img src="{{frontUrl}}"/></div>
+			<div><img src="{{backUrl}}"/></div>
+		</board-game-card>
+	</template>
+</dom-module>
+	<script>
+		Polymer({
+		    is: 'crime-scene-card',
+			properties: {
+    		  front:  {
+		          type: Number
+	          },
+			  frontUrl:  {
+		          type: String,
+				  computed: "_frontUrl(front)"
+				  
+	          },
+			  back: {
+		          type: Number
+	          },
+			  backUrl:  {
+		          type: String,
+				  computed: "_backUrl(back)"
+	          },
+			  open: {
+		          type: Boolean
+	          },
+			  empty: {
+		          type: Boolean,
+				  value: false
+	          }
+	        },
+            ready: function() {
+				if (this.empty) {
+					this.id ="emptyCard";
+				}
+	        },
+			_frontUrl: function() {
+				return this.resolveUrl("img2/front" + this.front + ".png");
+			},
+			_backUrl: function() {
+				return this.resolveUrl("img2/back" + this.back + ".png");
+			}
+		});
+	</script>

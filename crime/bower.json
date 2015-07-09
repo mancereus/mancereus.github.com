@@ -1,0 +1,29 @@
+{
+  "name": "mschmitt",
+  "version": "0.0.0",
+  "authors": [
+    "Matthias Schmitt <matthias.schmitt@scoop-software.de>"
+  ],
+  "description": "test project for jspm",
+  "main": "index.html",
+  "moduleType": [
+    "es6"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.5",
+    "paper-button": "PolymerElements/paper-button#^1.0",
+    "iron-pages": "PolymerElements/iron-pages#^1.0"
+  },
+  "devDependencies": {
+    "web-component-tester": "*"
+  }
+}

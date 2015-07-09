@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <!-- jspm mit typescript -->
+    <script src="jspm_packages/system.js"></script>
+    <script src="config.js"></script>
+    <script>
+      System.import('./script/app');
+      System.import("./script/index.ts!");
+    </script>
+    <!-- Polymer -->
+    <script src="bower_components\webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:900">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="components/board-game-dice/board-game-dice.html">
+    <link rel="import" href="components/board-game-dice/demo.html">
+
+    <!-- custom styling for elements -->
+    <style is="custom-style">      
+      board-game-dice {
+      	--board-game-dice: {
+          background-color: red;
+          width: 60px;
+          height: 60px;
+        };
+      }
+
+    </style>
+  </head>
+  
+  <body>
+    <paper-button>Test Button</paper-button>
+    <board-game-dice>YEAH!</board-game-dice>
+    <board-game-card>
+      <div><img src="img/front1.png"/></div>
+			<div><img src="img/back1.png"/></div>
+    </board-game-card>
+    <div style="width:80vw;height: 80vh;background-color: green;">
+      <div id="test" style="width: 20%; height: 50%; border: 2px solid blue;">testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest</div>
+    </div>
+  </body>
+
+</html>

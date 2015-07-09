@@ -1,0 +1,50 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/core-icon/core-icon.html">
+<link rel="import" href="../lib/paper-ripple/paper-ripple.html">
+<polymer-element name="game-stone" attributes="charSet"  >
+<template>
+	<style>
+		:host {
+			overflow: hidden;
+			/*cursor: move;*/
+			 float: left;
+			z-index: 2000;
+			width: 80px;
+			max-width: 120px;
+			margin: 2px;
+		}
+		h1 {
+			width: 90%;
+			border-radius: 10%;
+			color: black;
+			margin: 2px;
+			background-color: white;
+			border: 3px solid black;
+			font-size: 36pt;
+			text-align: center;
+			vertical-align: middle;			
+		}
+	</style>
+	<div  name="stone" draggable="true" on-click="{{clicker}}">
+		<h1>{{diceValue}}</h1>	
+	</div>
+</template>
+<script>
+	Polymer("game-stone", {	
+		diceValue: "",
+		charSet: [a,b,c,d,e,f],
+		clicker: function(ev) {
+			 var input = document.getElementById("wordInput");
+			 input.value = input.value + this.diceValue;
+			ev.preventDefault();
+			ev.stopPropagation(); 
+			return false; 
+		},
+		ready: function() {
+			console.log("game-stone ready ");
+			var draggie = new Draggabilly( this );
+			this.diceValue = this.charSet.splice(Math.floor(Math.random() * this.charSet.length),1);
+		}
+	});
+</script>
+</polymer-element>

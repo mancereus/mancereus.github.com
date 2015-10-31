@@ -4,6 +4,7 @@
 <head>
 	<title>ZenMeister Beta</title>
 	<script src="webcomponents-lite.js"></script>
+	<script src="data.js"></script>
 	<link rel="import" href="polymer.html">
 	<link rel="stylesheet" href="main.css">
 
@@ -11,25 +12,47 @@
 		body {
 			background-color: cornflowerblue;
 		}
+		
 		.try {
 			font-size: 150%;
 			font-weight: bold;
-			
 		}
+		
 		.inp {
 			width: 120px;
 		}
-		.card {
+		.wie {
+			background-color: lightblue;
 			width: 250px;
-			height: 60px;
+			padding: 0;
+			margin: 5px;
+		}
+		.was {
+			background-color: lightcoral;
+			width: 250px;
+			padding: 0;
+			margin: 5px;
+		}
+		.wo {
+			background-color: lightgreen;
+			width: 250px;
+			padding: 0;
+			margin: 5px;
+		}
+		.wofür {
+			background-color: lightyellow;
+			width: 250px;
+			padding: 0;
+			margin: 5px;
+		}
+		.card {
+			height: 100px;
 			border: 1px solid black;
 			text-align: center;
 			vertical-align: middle;
-			padding: 20px 10px;
+			padding: 5px 10px;
 			font-size: 150%;
 			font-weight: bold;
-			background-color: lightblue;
-			margin: 5px;
 		}
 		
 		.page-break {
@@ -49,6 +72,13 @@
 			border: 1px solid black;
 			background-color: lightgray;
 		}
+		.header {
+			text-align: center;
+			width: 240px;
+			font-size: 60%;
+			margin: 0;
+			padding: 0;
+		}
 	</style>
 </head>
 
@@ -57,7 +87,14 @@
 	<h3>Dinge, die erleuchtet sind:</h3>
 	<template id="tmpl" is="dom-bind">
 		<template is="dom-repeat" items="{{cards}}">
-			<div class="card">{{item}}</div>
+
+			<div class$="{{item.type}}">
+				<div class="card">
+					<span class="header">{{item.type}}</span><span class="header"> ?</span>
+					<br/>
+					<span>{{item.name}}</span>
+				</div>
+			</div>
 		</template>
 	</template>
 	<h3>Info:</h3>
@@ -74,123 +111,45 @@
 				<th>Versuch</th>
 				<th colspan="4">Ergebnis</th>
 			</tr>
-		<template is="dom-repeat" items="{{tips}}">
-			<tr>
-				<td><span class="try">{{index}}</span><span class="try">: </span></td>
-				<td><input class="try inp" value="{{item}}"></input></td>
-				<td><input type="checkbox"></input></td>
-				<td><input type="checkbox"></input></td>
-				<td><input type="checkbox"></input></td>
-				<td><input type="checkbox"></input></td>
-			</tr>
-		</template>
+			<template is="dom-repeat" items="{{tips}}">
+				<tr>
+					<td><span class="try">{{index}}</span><span class="try">: </span></td>
+					<td>
+						<input class="try inp" value="{{item}}"></input>
+					</td>
+					<td>
+						<input type="checkbox"></input>
+					</td>
+					<td>
+						<input type="checkbox"></input>
+					</td>
+					<td>
+						<input type="checkbox"></input>
+					</td>
+					<td>
+						<input type="checkbox"></input>
+					</td>
+				</tr>
+			</template>
 		</table>
-		
+
 	</template>
 	<script>
 		var t = document.querySelector('#tmpl');
-		t.cardsAll = [
-			"so gross wie eine Katze", 
-			"fühlt sich schwer an", 
-			"kann man kneten oder zerknüllen", 
-			"hat mit Kommunikation zu tun",
-			"geht kaputt, wenn man sich darauf setzt", 
-			"ist nicht im Umkreis von 80 Metern zu finden",
-			"kann man so fotografieren, dass es viereckig scheint", 
-			"ist gröstenteils aus Stein, Prozellan oder Glas",
-			"ist unterhaltsam", 
-			"ist auch im Winter draussen",
-			"Teil unserer Zivilisation",
-			"wird oft weggeworfen",
-			"kostet weniger als 20 Euro",
-			"geht nach einem Tag in der Tiefkühltruhe kaputt", 
-			"überdauert Jahrzehnte",
-			"kann man vollständig in eine Weinflassche giessen/ schieben", 
-			"ist oft im Büro",
-			"Hängt an der Wand", 
-			"enthält Kork, Schnur, Gummi oder Wachs",
-			"ist im Wasser nach 60 Sekunden kaputt", 
-			"habe ich in diesem Jahr noch nicht gesehen",
-			"hat Rüssel, Hörner, Schnabel oder Schwanz", 
-			"wird am Fliessband produziert",
-			"besteht aus Papier, Karton oder Stroh",
-			"ist nach 1 Stunde im Wasser aufgelöst oder aufgeweicht",
-			"gibt es im Badezimmer",
-			"gibt es im Wald oder Feld",
-			"fliegt oder schwebt vom Winde verweht",
-			"gibt es bei mir zu Hause",
-			"kenne ich aus einem Märchen oder der Bibel",
-			"haben alle hier schon in der Hand gehabt",
-			"treten meist in größeren Mengen auf",
-			"gab es schon bei den Griechen",
-			"hat Tasten, Pedal oder Knöpfe",
-			"hat Haare",
-			"hat Zähne",
-			"ist mindestens so hoch wie eine Giraffe",
-			"man kann sich damit in den Finger stechen",
-			"wenn es fehlt, würde sich unser Leben stark verändern",
-			"ist im wesentlichen flach",
-			"gibt es in unterschiedlichen Farben",
-			"ist lang und dünn",
-			"ist hauptsächlich rund",
-			"es gibt weniger davon als vor 100 Jahren",
-			"besteht teilweise aus Wolle, Tuch oder Stoff",
-			"riecht man",
-			"ist meistens im Wasser",
-			"geht kaputt, wenn man es aus 1m Höhe fallen lässt",
-			"war früher teurer als heute",
-			"kann für Kleinkinder gefährlich sein",
-			"ist steif, kann brechen",
-			"sollte man gelegentlich waschen, putzen",
-			"hat ein Loch oder Eingang",
-			"besteht hauptsächlich aus Holz",
-			"gibt es in einem Wild West Film",
-			"lässt sich vollständig verbrennen",
-			"hat ein Gehirn, Mechanik oder CPU",
-			"glänzt, strahlt oder leuchtet",
-			"wird meist im Winter verwendet",
-			"macht Geräusche, selbständig oder bei normalen Gebrauch",
-			"kommt in Sprichwort oder Werbeslogan vor",
-			"gibt es am Badestrand",
-			"hat Beine",
-			"gibt in einer Sportanlage",
-			"gibt es im Supermarkt",
-			"hat Griff, Henkel oder Schlaufe",
-			"hat Auge, Linse oder Bildschirm",
-			"ist zähflüssig, schleimig oder klebrig",
-			"hat Haut, Fell Schuppen oder Schale",
-			"ist oft wärmer als die Umgebung",
-			"steht mit 4 Berührungspunkten auf dem Boden",
-			"'Vorne' und 'hinten' sind hier kaum unterscheidbar",
-			"kann ich innerhalb von 5 Minuten hierherbringen",
-			"tragen Menschen an sich",
-			"hat ungefähr die Größe eines Kartenspiels",
-			"kann ohne Elektrizität kaum verwendet werden",
-			"ist so schwer wie ich",
-			"schwimmt im Wasser oben",
-			"gibt es Schlafzimmer",
-			"fühlt sich glatt an",
-			"hat gelbe Anteile",
-			"kann Wasser aufsaugen",
-			"hat innen Weichteile",
-			"hat Löcher",
-			"damit kann man Wasser transportieren",
-			"Schmilzt im Feuer",
-			"wächst",
-			"hat Blätter oder Federn",
-			"von Menschen erfunden",
-			"darauf sind manchmal Buchstaben oder Zahlen",
-			"kann man essen, ohne zu sterben",
-			"ist aussen manchmal grün",
-			"gibt es in Miniatur als Spielzeug",
-			];
 		t.shuffle =  function (o){
 			for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
 			return o;
 		};
-		t.shuffle(t.cardsAll);
-		t.cards = t.cardsAll.slice(0,4);
-		
+		t.shuffle(datawo);
+		t.shuffle(datawas);
+		t.shuffle(datawie);
+		t.shuffle(datawofür);
+		t.cards = [];
+		t.cards.push(datawas.pop());
+		t.cards.push(datawie.pop());
+		t.cards.push(datawo.pop());
+		t.cards.push(datawofür.pop());
+
 		var tp = document.querySelector('#tipTmpl');
 		tp.tips = ["","","","","","","","","",""];
 	</script>

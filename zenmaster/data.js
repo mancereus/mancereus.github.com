@@ -17,9 +17,9 @@ var datawie = [
        {type:"wie", name:"riecht man"},
        {type:"wie", name:"ist steif, kann brechen"},
        {type:"wie", name:"ist oft wärmer als die Umgebung"},
-       {type:"wofür", name:"hat ungefähr die Form eines Quaders (rechteckig)"},
-       {type:"wofür", name:"steht mit 4 Berührungspunkten auf dem Boden"},
-       {type:"wofür", name:"gibt es in unterschiedlichen Farben"},
+       {type:"wie", name:"hat ungefähr die Form eines Quaders (rechteckig)"},
+       {type:"wie", name:"steht mit 4 Berührungspunkten auf dem Boden"},
+       {type:"wie", name:"gibt es in unterschiedlichen Farben"},
 ];
 var datawas = [
        {type:"was", name:"enthält Kork, Schnur, Gummi oder Wachs"},

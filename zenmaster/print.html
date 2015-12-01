@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>ZenMeister Beta</title>
+	<script src="webcomponents-lite.js"></script>
+	<script src="data.js"></script>
+	<link rel="import" href="polymer.html">
+	<link rel="stylesheet" href="main.css">
+
+	<style>
+		.try {
+			font-size: 150%;
+			font-weight: bold;
+		}
+
+		.inp {
+			width: 120px;
+		}
+
+		.Inhalt {
+			border: 6px solid lightblue;
+			border-radius: 4px;
+			padding: 0;
+			margin: 0;
+			width: 94%;
+			height: 102px;
+		}
+
+		.Form {
+			border: 6px solid lightcoral;
+			border-radius: 4px;
+			padding: 0;
+			margin: 0;
+			width: 94%;
+			height: 102px;
+		}
+
+		.Ort {
+			border: 6px solid lightgreen;
+			border-radius: 4px;
+			padding: 0;
+			margin: 0;
+			width: 94%;
+			height: 102px;
+		}
+
+		.Extra {
+			border: 6px solid yellow;
+			border-radius: 4px;
+			padding: 0;
+			margin: 0;
+			width: 94%;
+			height: 102px;
+		}
+
+		.card {
+			width: 213px;
+			height: 112px;
+			float: left;
+			border: 1px solid black;
+			text-align: center;
+			vertical-align: middle;
+			padding: 5px;
+			margin: 2px;
+			font-size: 120%;
+			font-weight: bold;
+		}
+
+		.page-break {
+			page-break-after: always;
+			background-color: red;
+			width: 650px;
+		}
+
+		img {
+			width: 120px;
+			height: 200px;
+		}
+
+		.info {
+			width: 250px;
+			margin: 5px;
+			border: 1px solid black;
+			background-color: lightgray;
+		}
+
+		.header {
+			text-align: center;
+			width: 240px;
+			font-size: 80%;
+			margin: 0;
+			padding: 5px;
+		}
+	</style>
+</head>
+
+<body>
+	<template id="tmpl" is="dom-bind">
+		<template is="dom-repeat" items="{{cards}}">
+
+			<div class="card">
+				<div class$="{{item.type}}">
+					<div style="margin: 5px;">
+						<span class="header">{{item.type}}</span><span class="header"></span>
+						<br/>
+						<span>{{item.name}}</span>
+					</div>
+				</div>
+			</div>
+		</template>
+	</template>
+
+	<script>
+		var t = document.querySelector('#tmpl');
+		t.cards = [];
+		/*t.cards = t.cards.concat(dataform);
+		t.cards = t.cards.concat(datainhalt);
+		t.cards = t.cards.concat(dataort);*/
+		t.cards = t.cards.concat(dataextra);
+	</script>
+</body>
+
+</html>

@@ -4,21 +4,26 @@
 <head>
 	<title>ZenMeister Beta</title>
 	<script src="webcomponents-lite.js"></script>
-	<link rel="import" href="polymer.html">
+	<link rel="import" href="../bower_components/polymer/polymer.html">
+	<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+	<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+	<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
 	<link rel="stylesheet" href="main.css">
 
 	<style>
 		body {
 			background-color: cornflowerblue;
 		}
+
 		.try {
 			font-size: 150%;
 			font-weight: bold;
+		}
 
-		}
 		.inp {
-			width: 120px;
+			width: 160px;
 		}
+
 		.card {
 			width: 250px;
 			height: 60px;
@@ -59,26 +64,68 @@
 		<table style="margin-bottom: 500px;">
 			<tr>
 				<th></th>
-				<th>Versuch</th>
-				<th colspan="4">Ergebnis</th>
+				<th width="180px">Versuch</th>
+				<th width="40px">Form oder Größe</th>
+				<th width="40px">Inhalt oder Bestandteil</th>
+				<th width="40px">Ort oder Zeit</th>
+				<th width="40px">Bewegung oder Transport</th>
 			</tr>
-		<template is="dom-repeat" items="{{tips}}">
-			<tr>
-				<td><span class="try">{{index}}</span><span class="try">: </span></td>
-				<td><input class="try inp" value="{{item}}"></input></td>
-				<td><input type="checkbox"></input></td>
-				<td><input type="checkbox"></input></td>
-				<td><input type="checkbox"></input></td>
-				<td><input type="checkbox"></input></td>
-			</tr>
-		</template>
+			<template is="dom-repeat" items="{{tips}}">
+				<template is="dom-if" if="{{isTipp(item)}}">
+					<tr>
+						<td><span class="try">{{index}}</span><span class="try">: </span></td>
+						<td>
+							<input class="try inp" value="{{item}}"></input>
+						</td>
+						<td>
+							<paper-checkbox></paper-checkbox>
+						</td>
+						<td>
+							<paper-checkbox></paper-checkbox>
+						</td>
+						<td>
+							<paper-checkbox></paper-checkbox>
+						</td>
+						<td>
+							<paper-checkbox></paper-checkbox>
+						</td>
+					</tr>
+				</template>
+				<template is="dom-if" if="{{!isTipp(item)}}">
+					<tr>
+						<td><span class="try">{{index}}</span><span class="try">: </span></td>
+						<td>
+							<input class="try inp" value="{{item}}"></input>
+						</td>
+						<td>
+							<paper-radio-button name$="{{item}}"></paper-radio-button>
+						</td>
+						<td>
+							<paper-radio-button name$="{{item}}"></paper-radio-button>
+						</td>
+						<td>
+							<paper-radio-button name$="{{item}}"></paper-radio-button>
+						</td>
+						<td>
+							<paper-radio-button name$="{{item}}"></paper-radio-button>
+						</td>
+					</tr>
+				</template>
+			</template>
 		</table>
-	<p class="info">Nach 5 Begriffen müssen zu jeder Kategorie ein X gefunden worden sein. Sonst gibt der ZenMeister einen 6. Begriff vor, der die fehlenden X enthält.</p>
+		<p class="info">Nach 5 Begriffen müssen zu jeder Kategorie ein X gefunden worden sein. Sonst gibt der ZenMeister einen 6. Begriff vor,
+			der die fehlenden X enthält.</p>
 
 	</template>
 	<script>
 		var tp = document.querySelector('#tipTmpl');
-		tp.tips = ["","","","","","","","","",""];
+		tp.isTipp =  function (o){
+			if(o == 'tip')
+				return true;
+			return false;
+		};
+
+		tp.tips = ["tip","tip","tip","help1","tip","tip","tip","help2","tip","tip","tip","help3","tip"];
 	</script>
 </body>
 

@@ -22,8 +22,8 @@ body {
     padding: 100px 0;
 }
 
-.image-bg-fixed-height {
-	background: url('../img/schachen-2.jpg') no-repeat center center scroll;
+.image-bg-fixed-height-1 {
+	background: url('../img/img1.jpg') no-repeat center center scroll;
     height: 450px;
 }
 

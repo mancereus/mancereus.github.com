@@ -24,7 +24,15 @@ body {
 
 .image-bg-fixed-height-1 {
 	background: url('../img/img1.jpg') no-repeat center center scroll;
+    height: 600px;
+}
+.image-bg-fixed-height-2 {
+	background: url('../img/img2.jpg') no-repeat center center scroll;
     height: 450px;
+}
+.image-bg-fixed-height-3 {
+	background: url('../img/img3.jpg') no-repeat center center scroll;
+    width: 400px;
 }
 
 .img-center {

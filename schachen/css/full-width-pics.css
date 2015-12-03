@@ -18,7 +18,7 @@ body {
 }
 
 .image-bg-fluid-height {
-	background: url('../img/schachen-2.jpg') repeat center center scroll;
+	background: url('../img/schachen-2.jpg') no-repeat center center scroll;
     padding: 100px 0;
 }
 
@@ -32,7 +32,7 @@ body {
 }
 .image-bg-fixed-height-3 {
 	background: url('../img/img3.jpg') no-repeat center center scroll;
-    width: 400px;
+    height: 450px;
 }
 
 .img-center {

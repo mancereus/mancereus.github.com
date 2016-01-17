@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 	<title>ZenMeister Beta</title>
+	<script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 	<script>(function () {
 function resolve() {
 document.body.removeAttribute('unresolved');
@@ -7268,10 +7269,6 @@ this.fire('dom-change');
 	<link rel="stylesheet" href="../css/main.css">
 
 	<style>
-		body {
-			background-color: cornflowerblue;
-		}
-
 		.try {
 			font-size: 150%;
 			font-weight: bold;
@@ -7282,40 +7279,51 @@ this.fire('dom-change');
 		}
 
 		.Inhalt {
-			background-color: lightblue;
-			width: 250px;
+			border: 6px solid lightblue;
+			border-radius: 4px;
 			padding: 0;
-			margin: 5px;
+			margin: 0;
+			width: 94%;
+			height: 102px;
 		}
 
 		.Form {
-			background-color: lightcoral;
-			width: 250px;
+			border: 6px solid lightcoral;
+			border-radius: 4px;
 			padding: 0;
-			margin: 5px;
+			margin: 0;
+			width: 94%;
+			height: 102px;
 		}
 
 		.Ort {
-			background-color: lightgreen;
-			width: 250px;
+			border: 6px solid lightgreen;
+			border-radius: 4px;
 			padding: 0;
-			margin: 5px;
+			margin: 0;
+			width: 94%;
+			height: 102px;
 		}
 
 		.Bewegung {
-			background-color: lightyellow;
-			width: 250px;
+			border: 6px solid yellow;
+			border-radius: 4px;
 			padding: 0;
-			margin: 5px;
+			margin: 0;
+			width: 94%;
+			height: 102px;
 		}
 
 		.card {
-			height: 100px;
+			width: 213px;
+			height: 112px;
+			float: left;
 			border: 1px solid black;
 			text-align: center;
 			vertical-align: middle;
-			padding: 5px 10px;
-			font-size: 150%;
+			padding: 5px;
+			margin: 2px;
+			font-size: 120%;
 			font-weight: bold;
 		}
 
@@ -7340,51 +7348,38 @@ this.fire('dom-change');
 		.header {
 			text-align: center;
 			width: 240px;
-			font-size: 60%;
+			font-size: 80%;
 			margin: 0;
-			padding: 0;
+			padding: 5px;
 		}
 	</style>
 </head>
 
 <body>
-	<h1>ZenMeister</h1>
-	<h2>Der ZenMeister versucht seine Schüler auf den Weg der Erleuchtung zu bringen...</h2>
-	<h3>1. Finde ein Lösungswort mit den folgenden Eingenschaften:</h3>
 	<template id="tmpl" is="dom-bind">
+		<div style="width:1050px">
 		<template is="dom-repeat" items="{{cards}}">
 
-			<div class$="{{item.type}}">
-				<div class="card">
-					<span class="header">{{item.type}}</span><span class="header"> ?</span>
-					<br>
-					<span>{{item.name}}</span>
+			<div class="card">
+				<div class$="{{item.type}}">
+					<div style="margin: 5px;">
+						<span class="header">{{item.type}}</span><span class="header"></span>
+						<br>
+						<span>{{item.name}}</span>
+					</div>
 				</div>
 			</div>
 		</template>
-		<span class="try">nichts gefunden? </span>
-		<input type="button" onclick="history.go(0)" value="neu laden">
-		<br>
-		<h3>2. Schreibe deine Lösung auf:</h3>
-		<input style="width: 250px;" class="try inp">
-		<h3>3. Die Schüler müssen mit 10 Versuchen einen Begriff finden der allen Eigenschaften entspricht. SIe dürfen sich 3mal einen Tipp zu einer Spalte geben lassen.</h3>
+		</div>
 	</template>
 
 	<script>
 		var t = document.querySelector('#tmpl');
-		t.shuffle =  function (o){
-			for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-			return o;
-		};
-		t.shuffle(dataform);
-		t.shuffle(datainhalt);
-		t.shuffle(dataort);
-		t.shuffle(dataextra);
 		t.cards = [];
-		t.cards.push(dataform.pop());
-		t.cards.push(datainhalt.pop());
-		t.cards.push(dataort.pop());
-		t.cards.push(dataextra.pop());
+		t.cards = t.cards.concat(dataform);
+		t.cards = t.cards.concat(datainhalt);
+		t.cards = t.cards.concat(dataort);
+		t.cards = t.cards.concat(dataextra);
 	</script>
 
 

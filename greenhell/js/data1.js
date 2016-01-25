@@ -6,7 +6,7 @@ var data1 = {
         { name: "Weg", Aktion: "", flavour: "Jane: 'Jack hat ein düsteres Geheimnis, das spüre ich.'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Was suchen wir hier eigentlich?'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Ich brauche einen Whisky.'", ver: "true", hor: "true" },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Puuh, diese Luft bringt mich um.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Puuh, diese Luft bringt mich um.'", ver: "true" },  
         { name: "Weg", Aktion: "", flavour: "Jack: 'Wer hat wohl meinen Bezintank manipuliert?'", hor: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: "true" },

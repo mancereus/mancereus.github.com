@@ -11398,11 +11398,26 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
         .info {
             background-color: #AEC9E8;
         }
+        
         .warn {
             background-color: #FFF09D;
         }
+        
         .problem {
             background-color: #FFCA6F;
+        }
+        
+        .backtext {
+            position: absolute;
+            font-size: 64px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+    <style is="custom-style">
+        .big {
+            --iron-icon-height: 128px;
+            --iron-icon-width: 128px;
         }
     </style>
     <template>
@@ -11410,18 +11425,19 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
             <div>
                 <img class="flex self-stretch" src$="img/back{{carddata.task}}.png" style="width: 99%; height: 300px">
                 <template is="dom-if" if="{{carddata.task}}">
-                    <div style="position: absolute; font-size: 64px;font-weight: bold; opacity: 0.5;text-align: center; background-color: white; left: 30px;top: 40px;">
-                        Akt <span>{{carddata.akt}}</span>
-                        <br>
-                        <span>{{carddata.order}}</span>.
+                    <div class="backtext" style=" left: 30px;top: 40px;">
+                        Akt <span>{{akt}}</span>
                     </div>
+                    <div class="backtext" style=" left: 40px;top: 120px">
+                        <iron-icon class="big" icon="{{carddata.order}}"></iron-icon>
+                    </div>.
                 </template>
             </div>
             <div class="card-header">
                 <voice-player id="player" accent="de-DE" text="{{carddata.Aktion}}"></voice-player>
                 <div class$="layout vertical center {{carddata.info}}">
                     <h2>{{carddata.name}}</h2>
-                    <template is="dom-if" if="{{carddata.akt}}">
+                    <template is="dom-if" if="{{akt}}">
                         <div class="fit" style="left: 5px;top: 12px">
                             <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:30px;height: 30px;" alt="">
                             </template>
@@ -11433,7 +11449,7 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
                     <template is="dom-if" if="{{carddata.flavour}}">
                         <div class="handle" style="width:90%; font-size: 13px;margin: 1px 32px 1px 15px;font-style:italic;">{{carddata.flavour}}</div>
                     </template>
-                    <div class="handle" style="width:90%; font-size: 9px;margin: 1px 32px 1px 15px;"><span>{{carddata.type}}</span> (<span>{{carddata.akt}}</span> <span>{{carddata.level}}</span>)</div>
+                    <div class="handle" style="width:90%; font-size: 9px;margin: 1px 32px 1px 15px;"><span>{{carddata.type}}</span> (<span>{{akt}}</span> <span>{{carddata.level}}</span>)</div>
                     <template is="dom-if" if="{{carddata.ver}}">
                         <div class="fit" style="left: 168px;"><img src="img/vertic.jpg" style="width:30px;height: 296px;" alt=""></div>
                     </template>
@@ -11456,6 +11472,7 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
           type: Object,
           notify: true
         },
+        akt: String,
         item: { notify: true },
         selected: {
           type: String,

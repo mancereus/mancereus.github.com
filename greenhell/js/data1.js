@@ -29,7 +29,7 @@ var data1 = {
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange. ", hor: "true", imgclass: "symbol" },
         { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", hor: "true", imgclass: "symbol", type: "Basiskarte" },
         { name: "Weg", level: "normal", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: "true" },
-        { name: "Weg", level: "normal", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: "true" },
+        { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: "true", type: "Basiskarte" },
         { name: "Hängebrücke", level: "normal", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück.", info: "warn" },
 
         { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluss fahren.", hor: true, imgclass: "symbol" },
@@ -38,30 +38,31 @@ var data1 = {
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: "true", imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", ver: "true", imgclass: "symbol" },
         { name: "Höhle", Aktion: "Nur mit der Fackel kann man durch die Höhle direkt zu anderen Höhlen gehen.", ver: "true", info: "info" },
-        { name: "Inschrift", Aktion: "Wenn du mit dem Tagebuch beim Tempel und bei dieser Inschrift warst, kann Jane den Weg zum 'Reich der Schlangen' erkennen.", hor: "true", info: "Jane2" },
+        { name: "Inschrift", Aktion: "Wenn du mit dem Tagebuch beim Tempel und bei dieser Inschrift warst, kann Jane den Weg zum 'Tal der Kannibalen' erkennen.", hor: "true", info: "Jane2" },
         { name: "See", Aktion: "Nur mit dem Boot kannst du den See betreten oder überqueren.", info: "problem" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: "true" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: "true" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
-        { name: "Tagebuch", Aktion: "Ihr findet das Tagebuch von Professor Hampton. Er sucht das verschollene Reich Mu. Suche zuerst den Tempel und dann die Inschrift.", imgclass: "symbol" },
+        { name: "Tagebuch", Aktion: "Ihr findet das Tagebuch von Professor Hampton. Er sucht das geheime Heiligtum der Kannibalen. Suche zuerst den Tempel und dann die Inschrift, um den den Weg dorhin zu entschlüsseln.", imgclass: "symbol" },
         { name: "Tempel", Aktion: "Jane hat die Tempelruine gefunden. Bring das Tagebuch zuerst hierher und dann zur Inschrift.", hor: "true" },
     ],
     initActions: [
-        { name: "Fluss", order: "home", Aktion: "Wenn ihr den Weg zum 'Reich der Schlangen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 beenden.", task: true },
-        { name: "Mine", order: "home", Aktion: "In dieser Mine wurde vor langer Zeit nach Diaenten geschürft. Wenn alle 4  Höhlen im Spielplan gefunden sind, könnt ihr über diese Mine in den nächsten Akt wechseln. Dabei musst du eine Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
+        { name: "Fluss", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 beenden.", task: true },
+        { name: "Minenfahrt", order: "home", Aktion: "Wenn alle 4 Höhlen im Spielplan gefunden sind und ihr das Tagebuch besitzt, könnt ihr mit einer Lore in dieser Mine in den nächsten Akt fahren. Dabei musst du eine Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
         { name: "Lager", Aktion: "Du findest ein verlassenes Lager. Du kannst bis zu 2 Dinge aus dem Vorrat auf passende leere Karten legen. (z.B.: Liane auf Lianenkarte)", task: true },
-        { name: "Überfall", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
-        { name: "Affenhorde", Aktion: "Die Affenhorde klaut einen offen liegenden Gegenstand auf dem Plan. Wähle einen Gegenstand aus und lege ihn den Vorrat", info: "problem", task: true },
 
         { name: "Tierfalle", Aktion: "Dein Bein verletzt sich in einer Tierfalle des Großwildjägers. Du kannst bis zu einem anderen Eckfeld pro Zug nur 3 Felder weit ziehen.Verwende in Akt 2 eine Aktionskarte mit 'Jäger'", task: true },
         { name: "Karte", Aktion: "Du findest eine Karte des Dschungels. Ab sofort kannst du Karten auch diagonal anlegen.", task: true },
-        { name: "Whiskykiste", order: "Star", Aktion: "Jack findet eine Kiste voll Whisky. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hat, kann sich auch Jack beherrschen. Ansonsten säuft er sich voll und verliert einen Gegenstand aus dem Inventar.", task: true },
         { name: "Treibsand", Aktion: "Jack bleibt im Treibsand stecken. Jane muss eine Liane hierherbringen, um ihn zu retten. Gib die Liane dazu ab. Bis dahin kannst du Jacks Inventarkarte nicht verwenden.", task: true },
         { name: "Sturm", Aktion: "Ein Sturm zieht durch den Dschungel. Alle verwendeten Macheten kommen auf Machetenfelder zurück.", task: true },
+
+        { name: "Überfall", order: "Star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
+        { name: "Affenhorde", order: "Star", Aktion: "Die Affenhorde klaut einen offen liegenden Gegenstand auf dem Plan. Wähle einen Gegenstand aus und lege ihn den Vorrat", info: "problem", task: true },
+        { name: "Whiskykiste", order: "Star", Aktion: "Jack findet eine Kiste voll Whisky. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hat, kann sich auch Jack beherrschen. Ansonsten säuft er sich voll und verliert einen Gegenstand aus dem Inventar.", task: true },
         { name: "Angriff", order: "Star", Aktion: "Jane wird von den Kannibalen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Stoephasius will sich euch anschliessen, aber Jack weisst ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
         { name: "Abendrot", order: "Star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weiss nicht, ob Sie seine Liebe erwidert. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
     ],
     start: { name: "Akt I", Aktion: "Jane hat den Piloten Jack für eine geheime Expedition in den Dschungel engagiert. Jack hat Alkoholprobleme und versucht für den Auftrag nüchtern zu bleiben. Das Flugzeug stürzt kurz vor dem Ziel ab. Jemand hat die Tanks durchlöchert...", task: true, type: "Startkarte" },
-    order: [{key:'home', name: 'Ausgang'},undefined,undefined,undefined]
+    order: [{ key: 'home', name: 'Ausgang' }, undefined, undefined, undefined]
 }

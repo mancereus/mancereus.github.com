@@ -1,0 +1,71 @@
+var data2 = {
+    akt: 2,
+    initcards: [
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Was war das für ein Geräusch?'", hor: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Ich bin auf der Suche nach meinem Vater.' Jack: 'Vorsicht, die ist giftig.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist mein Vater.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Wir sollten umkehren.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Hier geht es nicht weiter.'", ver: "true", hor: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist bei der Suche nach El Dorade verschollen.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Prof. Hampton ist vermutlich schon tot.' Jane: 'Nein, er lebt noch.'", hor: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: "true" },
+        { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu. damit kannsz du zwei Dinge mehr tragen.", ver: "true" },
+        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: "true", imgclass: "symbol" },
+        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", ver: "true", imgclass: "symbol" },
+        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", imgclass: "symbol" },
+        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: "true", imgclass: "symbol" },
+        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", ver: "true", imgclass: "symbol" },
+        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", imgclass: "symbol" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
+        { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: "true", imgclass: "symbol" },
+        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Wenn ihr den Schrunpfkopf bei euch habt, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Wenn ihr den Schrunpfkopf bei euch habt, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
+        { name: "Fels", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen.", info: "problem" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Pause.'", ver: "true", hor: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Pause.'", ver: "true", hor: "true" },
+        { name: "Dynamit", Aktion: "Du findest einen versteckten Vorrat an Dynamit und kannst damit einen Felsen sprengen. Lege dazu das Dynamit von einem Nachbarfeld aus ohne Wand dazwischen auf den Felsen.", imgclass: "symbol", type: "Erweiterung Aktionskarte" },
+        { name: "Fels", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen.", info: "problem" },
+
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", hor: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", hor: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", ver: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", ver: "true" },
+        { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: "true", imgclass: "symbol" },
+        { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", ver: "true", imgclass: "symbol" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
+        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: "true", imgclass: "symbol" },
+        { name: "Pistole", Aktion: "Die Pistole ist alt und hat nur noch eine Kugel.", hor: "true", ver: "true", imgclass: "symbol"},
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: "true" },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
+        { name: "Taleingang", Aktion: "Mit den 4 Artefakten kannst du den Eingang zum verschollenen Tal öffnen. und beendest Akt II. Lege die Artefakte dazu hier ab.", hor: "true" }
+    ],
+    initActions: [
+        { name: "Tiger", Aktion: "Ein Tiger überrascht euch und jagt euch 2 Felder diagonal zur Mitte. Ihr könnt die Aktion auf diesem Feld ignorieren.", task: true },
+        { name: "Alligator", Aktion: "Am Fluss wird Jack von einem Alligator angefallen. Wenn ihr keine Pistole habt, wird er verletzt und ihr könnt pro Zug nur maximal 4 Schritte gehen.", task: true },
+        { name: "Affenhorde",  Aktion: "Die Affenhorde klaut einen offen liegenden Gegenstand auf dem Plan. Wähle einen Gegenstand aus und lege ihn den Vorrat", info: "problem", task: true },
+
+        { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Eckkarte. Mit der Pistole kannst du sie ihm dort abnehmen.", info: "warn", bgc: "orange", win: "Fluss", bgcwin: "blue", task: true, type: "Aktionskarte" },
+
+        { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true, type: "Aktionskarte" },
+
+        { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine grosse Diamanten. Wenn du Sie herausholst, verlierst du die Fackel.", info: "warn", win: "Diamantenmine", bgcwin: "green", imgclass: "symbol", task: true, type: "Aktionskarte" },
+        { name: "Schatzkammer", order:"select-all", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 4 Artefakte hier ablegt, findet Jane die genaue Beschreibung von El Dorado. Über einen versteckten Höhlenausgang könnt ihr das Tal verlassen. The FIN.", task: true },
+
+
+        { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Die Fackel geht in den Vorrat.", task: true },
+        { name: "Freunde", order: "gesture", Aktion: "Jane hat sich mit den Kannibalen angefreundet. Sie erfährt von Prof. Hampton. Er war vor mehreren Monate auch hier und ist weiter zur sagenhaften Stadt El Dorado gezogen.", task: true },
+
+        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluss das Abenteuer beenden.", task: true },
+    ], 
+    start: {name: "Akt II", task: true,
+    Aktion: "Ihr erreicht das 'Reich der Schlangen', in dem Prof Hampton verschwunden ist. Sucht nach dem Zugang zum verschollenen Tal."},
+    order: [{key:'home', name: 'Ausgang'},undefined,undefined,undefined]
+ }

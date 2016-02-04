@@ -1,0 +1,102 @@
+{
+  "kernelmajversion": "3.10",
+  "hostname": "vmvpn2",
+  "kernel": "Linux",
+  "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin",
+  "kernelversion": "3.10.0",
+  "operatingsystem": "CentOS",
+  "virtual": "kvm",
+  "is_virtual": true,
+  "architecture": "x86_64",
+  "hardwaremodel": "x86_64",
+  "os": {
+    "name": "CentOS",
+    "family": "RedHat",
+    "release": {
+      "major": "7",
+      "minor": "2",
+      "full": "7.2.1511"
+    }
+  },
+  "uptime": "24 days",
+  "rubyplatform": "x86_64-linux",
+  "timezone": "CET",
+  "osfamily": "RedHat",
+  "partitions": {
+    "vda1": {
+      "uuid": "fcd81f2a-cc66-4032-afe2-1550691165ef",
+      "size": "1024000",
+      "mount": "/boot",
+      "label": "BOOT",
+      "filesystem": "ext4"
+    },
+    "vda2": {
+      "size": "19945472",
+      "filesystem": "LVM2_member"
+    }
+  },
+  "memorysize": "992.22 MB",
+  "memoryfree": "823.50 MB",
+  "swapsize": "0.00 MB",
+  "swapfree": "0.00 MB",
+  "swapsize_mb": "0.00",
+  "swapfree_mb": "0.00",
+  "memorysize_mb": "992.22",
+  "memoryfree_mb": "823.50",
+  "uptime_hours": 581,
+  "kernelrelease": "3.10.0-327.3.1.el7.x86_64",
+  "uniqueid": "170a0b18",
+  "processors": {
+    "models": [
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)",
+      "QEMU Virtual CPU version (cpu64-rhel6)"
+    ],
+    "count": 8,
+    "physicalcount": 8
+  },
+  "processor0": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor1": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor2": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor3": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor4": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor5": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor6": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processor7": "QEMU Virtual CPU version (cpu64-rhel6)",
+  "processorcount": 8,
+  "facterversion": "2.4.1",
+  "gid": "root",
+  "operatingsystemrelease": "7.2.1511",
+  "uptime_seconds": 2092527,
+  "netmask": "255.255.255.0",
+  "physicalprocessorcount": 8,
+  "system_uptime": {
+    "seconds": 2092527,
+    "hours": 581,
+    "days": 24,
+    "uptime": "24 days"
+  },
+  "rubyversion": "2.0.0",
+  "manufacturer": "Red Hat",
+  "productname": "KVM",
+  "serialnumber": "Not Specified",
+  "uuid": "C50D0D48-0F86-89A7-B7E9-CFAA3E248071",
+  "type": "Other",
+  "rubysitedir": "/usr/local/share/ruby/site_ruby/",
+  "id": "root",
+  "blockdevice_vda_size": 10737418240,
+  "blockdevice_vda_vendor": "0x1af4",
+  "blockdevices": "vda",
+  "uptime_days": 24,
+  "hardwareisa": "x86_64",
+  "operatingsystemmajrelease": "7",
+  "selinux": false,
+  "ipaddress": "192.168.1.2",
+  "filesystems": "ext2,ext3,ext4",
+  "ps": "ps -ef"
+}

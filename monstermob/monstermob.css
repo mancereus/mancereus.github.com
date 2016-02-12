@@ -1,0 +1,67 @@
+	.card {
+			width: 190px;
+			height: 270px;
+			border: 1px solid black;
+			display: inline-block;
+			text-align: center;
+			vertical-align: middle;
+            margin: 1px;
+		}
+		
+		.page-break {
+			page-break-after: always;
+			width: 500px;
+		}
+		
+		img {
+			width: 100px;
+			height: 150px;
+			margin: 10px 0;
+		}
+		
+		hr {
+			margin: 0;
+		}
+		
+		.dark {
+			background-color: #aaaaaa;
+		}
+		
+		.head {
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+			font-size: 18pt;
+			font-weight: bold;
+			margin: 2px 0 2px 0;
+			width: 98%;
+            display: flex;
+            justify-content: space-around
+		}
+		.titel {
+			display: inline-block;
+			width: 60%;
+			text-align: center;
+			}		
+		.count {
+			text-align: left;
+			padding: 2px 5px;
+			border: 1px solid black;
+			border-top: none;
+		}
+		
+		.foot {
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+			font-size: 24pt;
+			margin: 5px 0 5px 0;
+		}
+		
+		.small {
+			margin-top: 10px;
+			width: 40px;
+			height: 50px;
+		}
+		
+		.icon {
+			margin-top: 5px;
+			width: 113px;
+			height: 44px;
+		}

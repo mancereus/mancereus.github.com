@@ -1,6 +1,6 @@
-<!DOCTYPE html><html><head>
+<!DOCTYPE html><html><head><script src="print.js" defer=""></script>
 	<meta charset="utf-8">
-	<title>MonsterMob</title>
+    <title>MonsterMob</title>
 	<style>
 		.card {
 			width: 190px;
@@ -9,6 +9,7 @@
 			display: inline-block;
 			text-align: center;
 			vertical-align: middle;
+            margin: 1px;
 		}
 		
 		.page-break {
@@ -35,7 +36,9 @@
 			font-size: 18pt;
 			font-weight: bold;
 			margin: 2px 0 2px 0;
-			width: 80%;
+			width: 98%;
+            display: flex;
+            justify-content: space-around
 		}
 		.titel {
 			display: inline-block;
@@ -62,105 +65,42 @@
 		}
 		
 		.icon {
-			margin-top: 10px;
+			margin-top: 5px;
 			width: 113px;
 			height: 44px;
 		}
 	</style>
 </head>
 
-<body>
-	<div class="card dark">
-		<div class="head"><span class="count">4x</span><div class="titel">Mob</div></div>
-		<img src="img/mob2.png">
-		<hr><img class="icon" src="img/mobicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">4x</span><div class="titel">Mob</div></div>
-		<img src="img/mob2.png">
-		<hr><img class="icon" src="img/mobicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">4x</span><div class="titel">Mob</div></div>
-		<img src="img/mob2.png">
-		<hr><img class="icon" src="img/mobicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">4x</span><div class="titel">Mob</div></div>
-		<img src="img/mob2.png">
-		<hr><img class="icon" src="img/mobicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">3x</span><div class="titel">Biss</div></div>
-		<img src="img/biss.jpg">
-		<hr><img class="icon" src="img/bissicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">3x</span><div class="titel">Biss</div></div>
-		<img src="img/biss.jpg">
-		<hr><img class="icon" src="img/bissicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">3x</span><div class="titel">Biss</div></div>
-		<img src="img/biss.jpg">
-		<hr><img class="icon" src="img/bissicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">3x</span><div class="titel">Dieb</div></div>
-		<img src="img/dieb.jpg">
-		<hr><img class="icon" src="img/diebicon.png">
-	</div>
-	<div class="card dark">
-		<div class="head"><span class="count">3x</span><div class="titel">Dieb</div></div>
-		<img src="img/dieb.jpg">
-		<hr><img class="icon" src="img/diebicon.png">
-	</div>
-	<div class="page-break">page-break</div>
-	<div class="card dark">
-		<div class="head"><span class="count">3x</span><div class="titel">Dieb</div></div>
-		<img src="img/dieb.jpg">
-		<hr><img class="icon" src="img/diebicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">2x</span><div class="titel">Herz</div></div>
-		<img src="img/herz.jpg">
-		<hr><img class="icon" src="img/herzicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">2x</span><div class="titel">Herz</div></div>
-		<img src="img/herz.jpg">
-		<hr><img class="icon" src="img/herzicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">4x</span><div class="titel">Schatz</div></div>
-		<img src="img/schatz.png">
-		<hr><img class="icon" src="img/schatzicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">4x</span><div class="titel">Schatz</div></div>
-		<img src="img/schatz.png">
-		<hr><img class="icon" src="img/schatzicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">4x</span><div class="titel">Schatz</div></div>
-		<img src="img/schatz.png">
-		<hr><img class="icon" src="img/schatzicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">4x</span><div class="titel">Schatz</div></div>
-		<img src="img/schatz.png">
-		<hr><img class="icon" src="img/schatzicon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">2x</span><div class="titel">Tür</div></div>
-		<img src="img/tuer.jpg">
-		<hr><img class="icon" src="img/tuericon.png">
-	</div>
-	<div class="card">
-		<div class="head"><span class="count">2x</span><div class="titel">Tür</div></div>
-		<img src="img/tuer.jpg">
-		<hr><img class="icon" src="img/tuericon.png">
-	</div>
+<body><div hidden="" by-vulcanize=""><dom-module id="page-break-div" assetpath="../components/page-break-div/">
+    <style>
+        :host {}
 
+        .break {
+            width: 710px;
+            margin: 0;
+            page-break-after: always;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{pageBreak}}">
+            <div class="break">page break</div>
+        </template>
+    </template>
+</dom-module>
+</div>
+        <template id="tmpl" is="dom-bind">
+        <div style="width:1050px">
+            <template is="dom-repeat" items="{{cards}}">
 
-</body></html>
+                <div class$="card {{item.dark}}">
+                    <div class="head"><span class="count">{{item.count}}x</span><div class="titel">{{item.type}}</div><span class="count">{{item.subtype}}</span></div>
+                    <img src="img/{{item.type}}.png">
+                    <hr><img class="icon" src="img/{{item.type}}icon.png">
+                </div>
+                <page-break-div nmbr="{{index}}" max="18"></page-break-div>
+            </template>
+        </div>
+    </template>
+
+    </body></html>

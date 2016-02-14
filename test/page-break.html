@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head>
+	<meta charset="utf-8">
+	<title>page break test</title>
+	<style>
+		.card {
+			width: 190px;
+			height: 270px;
+			border: 1px solid black;
+			display: inline-block;
+			text-align: center;
+			vertical-align: middle;
+		}
+		
+		.page-break {
+			page-break-after: always;
+						width: 500px;
+		}
+		
+		img {
+			width: 100px;
+			height: 170px;
+			margin: 10px 0;
+		}
+		
+		hr {
+			margin: 0;
+		}
+		.dark {
+			background-color: #999999;
+		}
+		.head {
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+			font-size: 15pt;
+			font-weight: bold;
+			margin: 2px 0 2px 0;
+		}
+		.foot {
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+			font-size: 24pt;
+			margin: 5px 0 5px 0;
+		}
+		
+		.small {
+			margin-top: 10px;
+			width: 40px;
+			height: 50px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="card dark">
+		<div class="head">Schritte</div>
+		<img src="img/schritte.jpg">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card dark">
+		<div class="head">Schritte</div>
+		<img src="img/schritte.jpg">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card dark"><div class="head">Schritte</div>
+		<img src="img/schritte.jpg">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card dark"><div class="head">Schritte</div>
+		<img src="img/schritte.jpg">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card dark"><div class="head">Monster</div>
+		<img src="img/monster.jpg">
+		<hr><div class="foot">3x</div>
+	</div>
+	<div class="card dark"><div class="head">Monster</div>
+		<img src="img/monster.jpg">
+		<hr><div class="foot">3x</div>
+	</div>
+	<div class="card dark"><div class="head">Monster</div>
+		<img src="img/monster.jpg">
+		<hr><div class="foot">3x</div>
+	</div>
+	<div class="card dark"><div class="head">Dieb</div>
+		<img src="img/dieb.jpg">
+		<hr><div class="foot">3x</div>
+	</div>
+	<div class="card dark"><div class="head">Dieb</div>
+		<img src="img/dieb.jpg">
+		<hr><div class="foot">3x</div>
+	</div>
+	<div class="page-break">page-break</div>
+	<div class="card dark"><div class="head">Dieb</div>
+		<img src="img/dieb.jpg">
+		<hr><div class="foot">3x</div>
+	</div>
+	<div class="card"><div class="head">Herz</div>
+		<img src="img/herz.jpg">
+		<hr><div class="foot">2x</div>
+	</div>
+	<div class="card"><div class="head">Herz</div>
+		<img src="img/herz.jpg">
+		<hr><div class="foot">2x</div>
+	</div>
+	<div class="card"><div class="head">Schatz</div>
+		<img src="img/schatz.png">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card"><div class="head">Schatz</div>
+		<img src="img/schatz.png">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card"><div class="head">Schatz</div>
+		<img src="img/schatz.png">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card"><div class="head">Schatz</div>
+		<img src="img/schatz.png">
+		<hr><div class="foot">4x</div>
+	</div>
+	<div class="card"><div class="head">Tür</div>
+		<img src="img/tuer.jpg">
+		<hr><div class="foot">2x</div>
+	</div>
+	<div class="card"><div class="head">Tür</div>
+		<img src="img/tuer.jpg">
+		<hr><div class="foot">2x</div>
+	</div>
+
+
+</body></html>

@@ -1,0 +1,17 @@
+<html><head><script src="page-break-div.js" defer=""></script><meta charset="UTF-8"></head><body><dom-module id="page-break-div">
+    <style>
+        :host {}
+
+        .break {
+            width: 710px;
+            margin: 0;
+            page-break-after: always;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{pageBreak}}">
+            <div class="break">page break</div>
+        </template>
+    </template>
+</dom-module>
+</body></html>

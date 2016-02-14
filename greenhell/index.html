@@ -3585,9 +3585,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                             </game-card>
                         </template>
                         <game-hexagon imgsrc="Jack" top="-1140" left="680"></game-hexagon>
-                    <template is="dom-repeat" items="{{vorrat}}" index-as="index">
-                        <game-piece img="img/{{item}}.png" top="{{getTop(-2080, index, 120)}}" left="2250" imgclass="symbol"></game-piece>
-                    </template>
+                        <template is="dom-repeat" items="{{vorrat}}" index-as="index">
+                            <game-piece img="img/{{item}}.png" top="{{getTop(-2080, index, 120)}}" left="2250" imgclass="symbol"></game-piece>
+                        </template>
                     </div>
                 </div>
                 <div>
@@ -3608,20 +3608,20 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                             </td>
                         </tr>
                         <template is="dom-if" if="{{isAkt(config.akt, 1)}}">
-                        <tr>
-                            <td>
-                                <h2>Akt 1</h2></td>
-                            <td>
-                                <select id="sterne" value="{{config.stars::input}}">
-                                    <option value="0">ohne Sterne</option>
-                                    <option value="1">ein Stern</option>
-                                    <option value="2">zwei Sterne</option>
-                                    <option value="3">drei Sterne</option>
-                                </select>
-                            </td>
-                            <td>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>
+                                    <h2>Akt 1</h2></td>
+                                <td>
+                                    <select id="sterne" value="{{config.stars::input}}">
+                                        <option value="0">ohne Sterne</option>
+                                        <option value="1">ein Stern</option>
+                                        <option value="2">zwei Sterne</option>
+                                        <option value="3">drei Sterne</option>
+                                    </select>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
                         </template>
                         <tr>
                             <td>
@@ -3637,6 +3637,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                                     <h2><iron-icon icon="select-all"></iron-icon> Mine</h2></paper-toggle-button>
                             </td>
                             <td>
+                                <form>
+                                    <input style="font-size: 300%;margin-top: 20px; margin-left: 40px;" type="button" onclick="history.go(0)" value="Neu laden">
+                                </form>
                             </td>
                         </tr>
                     </tbody></table>

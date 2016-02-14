@@ -1,0 +1,75 @@
+<!DOCTYPE html><html><head><script src="05events.js" defer=""></script><meta charset="UTF-8">
+    <title>polymer Events</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
+<style>
+        body {
+            font-family: Roboto, 'Noto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Event listener for elements with id</h2>
+    <x-custom></x-custom>
+
+    <dom-module id="x-custom">
+
+        <template>
+            <h1>Title tap</h1>
+            <div>any of my children!</div>
+            <div id="special">I am special!</div>
+
+
+            <div>any of my children!
+                <div id="special2">I am special inside!</div>
+            </div>
+
+        </template>
+
+        </dom-module>
+
+    <hr>
+    <h2>Event listener on-*</h2>
+    <x-track></x-track>
+
+    <dom-module id="x-track">
+
+        <template>
+            <button on-click="handleClick">Kick Me</button>
+        </template>
+
+        </dom-module>
+
+    <hr>
+    <h2>Event DragMe</h2>
+    <drag-me></drag-me>
+
+    <dom-module id="drag-me">
+        <template>
+            <style>
+                #dragme {
+                    width: 50px;
+                    height: 50px;
+                    background: orange;
+                }
+
+                .container {
+                    width: 200px;
+                    height: 200px;
+                    background: gray;
+                }
+            </style>
+            <div id="dragme" on-track="handleTrack">{{message}}</div>
+            <div class="container">Text1</div>
+            <div class="container">text2</div>
+            <div class="container">text3</div>
+        </template>
+
+        </dom-module>
+
+    <hr>
+    <h2>Event retargeting ??</h2>
+
+
+</body></html>

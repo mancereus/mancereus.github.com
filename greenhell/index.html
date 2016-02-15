@@ -2127,6 +2127,82 @@ Custom property | Description | Default
 @demo demo/index.html
 -->
 
+<!--
+`<opaque-animation>` makes an element `opacity:1` for the duration of the animation. Used to prevent
+webkit/safari from drawing a frame before an animation for elements that animate from display:none.
+-->
+
+<!--
+`iron-overlay-backdrop` is a backdrop used by `Polymer.IronOverlayBehavior`. It should be a
+singleton.
+
+### Styling
+
+The following custom properties and mixins are available for styling.
+
+Custom property | Description | Default
+-------------------------------------------|------------------------|---------
+`--iron-overlay-backdrop-background-color` | Backdrop background color                                     | #000
+`--iron-overlay-backdrop-opacity`          | Backdrop opacity                                              | 0.6
+`--iron-overlay-backdrop`                  | Mixin applied to `iron-overlay-backdrop`.                      | {}
+`--iron-overlay-backdrop-opened`           | Mixin applied to `iron-overlay-backdrop` when it is displayed | {}
+-->
+
+<!--
+Material design: [Dialogs](https://www.google.com/design/spec/components/dialogs.html)
+
+`<paper-dialog>` is a dialog with Material Design styling and optional animations when it is
+opened or closed. It provides styles for a header, content area, and an action area for buttons.
+You can use the `<paper-dialog-scrollable>` element (in its own repository) if you need a scrolling
+content area. See `Polymer.PaperDialogBehavior` for specifics.
+
+For example, the following code implements a dialog with a header, scrolling content area and
+buttons.
+
+    <paper-dialog>
+      <h2>Header</h2>
+      <paper-dialog-scrollable>
+        Lorem ipsum...
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
+    </paper-dialog>
+
+### Styling
+
+See the docs for `Polymer.PaperDialogBehavior` for the custom properties available for styling
+this element.
+
+### Animations
+
+Set the `entry-animation` and/or `exit-animation` attributes to add an animation when the dialog
+is opened or closed. See the documentation in
+[PolymerElements/neon-animation](https://github.com/PolymerElements/neon-animation) for more info.
+
+For example:
+
+    <link rel="import" href="components/neon-animation/animations/scale-up-animation.html">
+    <link rel="import" href="components/neon-animation/animations/fade-out-animation.html">
+
+    <paper-dialog entry-animation="scale-up-animation"
+                  exit-animation="fade-out-animation">
+      <h2>Header</h2>
+      <div>Dialog body</div>
+    </paper-dialog>
+
+### Accessibility
+
+See the docs for `Polymer.PaperDialogBehavior` for accessibility features implemented by this
+element.
+
+@group Paper Elements
+@element paper-dialog
+@hero hero.svg
+@demo demo/index.html
+-->
+
 <style>
 h1,h2{font-weight:400;line-height:48px}
 a,h4{line-height:24px}
@@ -3516,6 +3592,98 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </template>
 
   </dom-module>
+<dom-module id="iron-overlay-backdrop" assetpath="../../bower_components/iron-overlay-behavior/">
+
+  <style>
+
+    :host {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--iron-overlay-backdrop-background-color, #000);
+      opacity: 0;
+      transition: opacity 0.2s;
+
+      @apply(--iron-overlay-backdrop);
+    }
+
+    :host([opened]) {
+      opacity: var(--iron-overlay-backdrop-opacity, 0.6);
+
+      @apply(--iron-overlay-backdrop-opened);
+    }
+
+  </style>
+
+  <template>
+    <content></content>
+  </template>
+
+</dom-module>
+
+<dom-module id="paper-dialog-shared-styles" assetpath="../../bower_components/paper-dialog-behavior/">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 24px 40px;
+        -webkit-overflow-scrolling: touch;
+
+        background: var(--paper-dialog-background-color, --primary-background-color);
+        color: var(--paper-dialog-color, --primary-text-color);
+
+        @apply(--paper-font-body1);
+        @apply(--shadow-elevation-16dp);
+        @apply(--paper-dialog);
+      }
+
+      :host > ::content > * {
+        margin-top: 20px;
+        padding: 0 24px;
+      }
+
+      :host > ::content > .no-padding {
+        padding: 0;
+      }
+
+      :host > ::content > *:first-child {
+        margin-top: 24px;
+      }
+
+      :host > ::content > *:last-child {
+        margin-bottom: 24px;
+      }
+
+      :host > ::content h2 {
+        position: relative;
+        margin: 0;
+        @apply(--paper-font-title);
+
+        @apply(--paper-dialog-title);
+      }
+
+      :host > ::content .buttons {
+        position: relative;
+        padding: 8px 8px 8px 24px;
+        margin: 0;
+
+        color: var(--paper-dialog-button-color, --primary-color);
+
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+    </style>
+  </template>
+</dom-module>
+<dom-module id="paper-dialog" assetpath="../../bower_components/paper-dialog/">
+  <template>
+    <style include="paper-dialog-shared-styles"></style>
+    <content></content>
+  </template>
+</dom-module>
+
 <dom-module id="game-show-details" assetpath="/">
     <style>
         :host {
@@ -3573,6 +3741,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 font-size: 300%;
                 margin-top: 20px;
                 margin-left: 50px;
+            }
+            #dialog {
+                width: 600px;
+                z-index: 10000;
             }
         </style>
         <template>
@@ -3685,6 +3857,26 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                     <div id="bigCard" style="background-color:white; border: 2px solid black; height:850px; width: 550px; margin-left: 300px;">
                         <game-show-details id="details"></game-show-details>
                     </div>
+                    
+                    <template is="dom-if" if="{{isAkt(config.akt, 2)}}">
+                    <div style="border: 1px solid black; padding: 10px;margin: 10px;">
+                    <h2 style="font-size: 200%; margin-right: 30px;">Nach Gewinn einer Partie mit 3 Sternen wird ein Geheimnis gelüftet:</h2>
+                    
+                    <template is="dom-repeat" items="{{data.secrets}}">
+                        <button style="font-size: 300%" on-tap="openDialog">Geheimnis {{item.level}}</button>
+                        
+                    </template>
+                    
+                    
+                    </div>
+                        
+                    </template>
+                    <paper-dialog id="dialog">
+                        <h2>Geheimnis Nr. {{level}}</h2>
+                        <h3>Nur lesen, wenn du die Schatzkammer mit 3 Sternen gefunden hast!</h3>
+                        <p>{{secret}}</p>
+                    </paper-dialog>
+                    
                 </div>
                 <div>
                     <h1>Vorrat</h1>

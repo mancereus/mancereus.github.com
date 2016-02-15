@@ -11302,8 +11302,8 @@ var data2 = {
     akt: 2,
     initcards: [
         { name: "Weg", Aktion: "", flavour: "Jane: 'Was war das für ein Geräusch?'", hor: "true" },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Ich bin auf der Suche nach meinem Vater.' Jack: 'Vorsicht, die ist giftig.'", ver: "true" },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist mein Vater.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Vorsicht, die ist giftig.'", ver: "true" },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Wir brauchen mehr Wasser zum Trinken.'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Wir sollten umkehren.'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier geht es nicht weiter.'", ver: "true", hor: "true" },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist bei der Suche nach El Dorade verschollen.'", ver: "true" },
@@ -11357,16 +11357,21 @@ var data2 = {
         { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true, type: "Aktionskarte" },
 
         { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine grosse Diamanten. Wenn du Sie herausholst, verlierst du die Fackel.", info: "warn", win: "Diamantenmine", bgcwin: "green", imgclass: "symbol", task: true, type: "Aktionskarte" },
-        { name: "Schatzkammer", order:"select-all", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 4 Artefakte hier ablegt, findet Jane die genaue Beschreibung von El Dorado. Jane wird ihren Vater Prof. Hampton dort finden. Ende Teil 1.", task: true },
 
 
         { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Die Fackel geht in den Vorrat.", task: true },
         { name: "Freunde", order: "gesture", Aktion: "Jane hat sich mit den Kannibalen angefreundet. Sie erfährt von Prof. Hampton. Er war vor mehreren Monate auch hier und ist weiter zur sagenhaften Stadt El Dorado gezogen.", task: true },
 
-        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluss das Abenteuer beenden. Wenn du mind. 3 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätlzichen Stern beginnen.", task: true },
+        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluss das Abenteuer beenden. Wenn du mind. 3 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
+        { name: "Schatzkammer", order:"home", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 4 Artefakte hier ablegt, findet ihr ein Geheimnis und beendet die Partie siegreich.", task: true },
     ], 
     start: {name: "Akt II", task: true,
-    Aktion: "Ihr erreicht das 'Tal der Kannibalen', in dem Prof Hampton verschwunden ist. Sucht nach dem Zugang zum verschollenen Tal."}
+    Aktion: "Ihr erreicht das 'Tal der Kannibalen', in dem Prof Hampton verschwunden ist. Sucht nach dem Zugang zum verschollenen Tal."},
+    secrets: [
+        {level: 1, text: "Jane: 'Danke Jack, dass wir es bis hier geschafft haben. Ich schulde dir ein paar Hintergründe: Prof. Hampton ist mein Vater. Meine Mutter ist bei der Geburt gestorben. Vater sucht schon seit vielen Jahren nach dem untergegangengen Reich von Atlantis. Von seiner letzten Expedition hier in den Dschungel ist er nicht mehr zurückgekehrt. Ich spüre aber, dass er noch lebt. Lass uns weitersuchen.' Jack sieht plötzlich ein helles Licht auf sich zukommen. In einem Zeitstrudel wird er drei Tage in die Vergangeheit zurückkatapultiert. Er sitzt mit Jane in dem abgestürzten Flugzeug und beginnt das Abenteuer (mit 3 Sternen) von vorne. Jack und Jane können sich nicht an das vorherige Abenteuer erinnern."},
+        {level: 2, text: "Jane: Ich kann die nun vertrauen und dir mein Geheimnis erzählen. Ich besitze eine besondere Gabe. Ich kann die Zeit um bis 3 Tage zuückdrehen. Dabei vergesse ich selbst das Meiste und kann mich nur an kleine Informationen erinnern. Wir haben dieses Abenteuer vermutlich schon viele Male durchlebt. Deswegen glaubst du auch, mich schon so lange zu kennen. Wir werden dieses Abenteuer wiederholen, bis ich weis, wo mein Vater hingegangen ist. Tut mir leid, dass du das alles mitmachen musst."},
+        {level: 3, text: "Jane findet einen versteckten Brief ihres Vaters: 'Liebe Jane, wenn du diese Zeilen liest, bin ich bereits auf dem Weg nach Atlantis. Mit Hilfe dieser Schatzkammer konnte ich den genauen Ort ermittlen. Ich habe deine Mutter Mahara vor 25 Jahren kennengelernt. Nach einer gemeinsamen Nacht war Sie verschwunden. Ein Jahr später kam Sie mit dir im Arm zu mir, und bat mich dich aufzuziehen. Sie ist eine der letzten Überlebenden von Atlantis und du bist die letzte Tochter von Atlantis. Folge mir nun (in Teil 2) und komm in deine eigentliche Heimat.' VOr Freude fallen sich Jack und Jane in die Arme und es gibt einen langen intensiven Liebeskuss. The End (von Teil 1)."},
+    ]
  };
 var initcards = [
     { name: "Weg", Aktion: "", flavour: "Jane: 'Was war das für ein Geräusch?'", hor: "true", type: "Basiskarte" },

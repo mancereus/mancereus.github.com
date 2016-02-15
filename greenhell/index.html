@@ -3864,7 +3864,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
                     <template is="dom-if" if="{{isAkt(config.akt, 2)}}">
                         <div style="border: 1px solid black; padding: 2px;margin: 5px;">
-                            <p style="margin: 1px;">Nach Gewinn einer Partie mit 1,2 oder 3 Sternen wird das Geheimnis 1,2 oder 3 gelüftet:</p>
+                            <p style="margin: 1px;">Nach Gewinn einer Partie mit 1,2 oder 3 Sternen <br>wird das Geheimnis 1,2 oder 3 gelüftet:</p>
 
                             <template is="dom-repeat" items="{{data.secrets}}">
                                 <button style="" on-tap="openDialog">Geheimnis {{item.level}}</button>

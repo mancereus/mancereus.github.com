@@ -11476,9 +11476,9 @@ var data1 = {
         { name: "Sturm", Aktion: "Ein Sturm zieht durch den Dschungel. Alle verwendeten Macheten kommen auf Machetenfelder zurück.", task: true },
 
         { name: "Überfall", order: "star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
-        { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Kiste voll Whisky. Er hat Alkoholprobleme und versucht für den Auftrag nüchtern zu bleiben. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hat, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
-         { name: "Jäger", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weisst ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
-        { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weiss nicht, ob Sie seine Liebe erwidert. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
+        { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Kiste voll Whisky. Er hat Alkohol-probleme und versucht für den Auftrag nüchtern zu bleiben. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
+         { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weisst ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
+        { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weiss nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
     ],
     start: { name: "Akt I", Aktion: "Jane hat den Piloten Jack für eine geheime Expedition in den Dschungel engagiert.  Das Flugzeug stürzt kurz vor dem Ziel ab. Jemand hat die Tanks durchlöchert...", task: true, type: "Startkarte" },
 };
@@ -11493,12 +11493,12 @@ var data2 = {
         { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist bei der Suche nach El Dorade verschollen.'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Prof. Hampton ist vermutlich schon tot.' Jane: 'Nein, er lebt noch.'", hor: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
-        { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: "true" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: "true", imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", ver: "true", imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: "true", imgclass: "symbol" },
+        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluss fahren.", hor: true, imgclass: "symbol" },
+        { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: "true", type: "Basiskarte" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: "true", imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", ver: "true", imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", imgclass: "symbol" },
@@ -11506,9 +11506,9 @@ var data2 = {
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: "true", imgclass: "symbol" },
-        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Hängebrücke",  info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Hängebrücke",  info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Hängebrücke",  info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Wenn ihr den Schrunpfkopf bei euch habt, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Wenn ihr den Schrunpfkopf bei euch habt, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Wenn ihr den Schrunpfkopf bei euch habt, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
@@ -11518,15 +11518,15 @@ var data2 = {
         { name: "Dynamit", Aktion: "Du findest einen versteckten Vorrat an Dynamit und kannst damit einen Felsen sprengen. Lege dazu das Dynamit von einem Nachbarfeld aus ohne Wand dazwischen auf den Felsen.", imgclass: "symbol", type: "Erweiterung Aktionskarte" },
         { name: "Fels", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen.", info: "problem" },
 
-        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", hor: "true" },
-        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", hor: "true" },
-        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", ver: "true" },
-        { name: "Artefakt", Aktion: "Du findest ein Artefakt der verschollenen Zivilisation. Bringe alle 4 Teile zum Taleingang", imgclass: "symbol", ver: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt einer unbekannten Zivilisation. ", imgclass: "symbol", hor: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt einer unbekannten Zivilisation. ", imgclass: "symbol", hor: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt einer unbekannten Zivilisation. ", imgclass: "symbol", ver: "true" },
+        { name: "Artefakt", Aktion: "Du findest ein Artefakt einer unbekannten Zivilisation. ", imgclass: "symbol", ver: "true" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: "true", imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", ver: "true", imgclass: "symbol" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: "true", imgclass: "symbol" },
-        { name: "Pistole", Aktion: "Die Pistole ist alt und hat nur noch eine Kugel.", hor: "true", ver: "true", imgclass: "symbol"},
+        { name: "Pistole", Aktion: "Die Pistole ist alt und hat nur noch zwei Kugeln.", hor: "true", ver: "true", imgclass: "symbol"},
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: "true" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
@@ -11536,25 +11536,26 @@ var data2 = {
         { name: "Alligator", Aktion: "Am Fluss wird Jack von einem Alligator angefallen. Wenn ihr keine Pistole habt, wird er verletzt und ihr könnt pro Zug nur noch maximal 4 Schritte gehen.", task: true },
         { name: "Affenhorde",  Aktion: "Die Affenhorde klaut einen offen liegenden Gegenstand auf dem Plan. Wähle einen Gegenstand aus und lege ihn den Vorrat", info: "problem", task: true },
 
-        { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Eckkarte. Mit der Pistole kannst du sie ihm dort abnehmen.", info: "warn", bgc: "orange", win: "Fluss", bgcwin: "blue", task: true, type: "Aktionskarte" },
+        { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Aktionskarte. Mit der Pistole kannst du sie ihm dort abnehmen.", info: "warn", task: true },
+        { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius wurde von Kannibalen gefangen genommen und wird in ihr Dorf transportiert. Mit der Pistole kannst du ihn retten. Aus Dankbarkeit darfst du in der nächsten Partie einen zusätzlichen Stern verwenden.", info: "warn",  task: true },
 
-        { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true, type: "Aktionskarte" },
+        { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true },
 
-        { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine grosse Diamanten. Wenn du Sie herausholst, verlierst du die Fackel.", info: "warn", win: "Diamantenmine", bgcwin: "green", imgclass: "symbol", task: true, type: "Aktionskarte" },
+        { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine grosse Diamanten. Wenn du Sie herausholst, verlierst du die Fackel.", info: "warn", imgclass: "symbol", task: true },
 
 
         { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Die Fackel geht in den Vorrat.", task: true },
         { name: "Freunde", order: "gesture", Aktion: "Jane hat sich mit den Kannibalen angefreundet. Sie erfährt von Prof. Hampton. Er war vor mehreren Monate auch hier und ist weiter zur sagenhaften Stadt El Dorado gezogen.", task: true },
 
-        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluss das Abenteuer beenden. Wenn du mind. 3 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
-        { name: "Schatzkammer", order:"home", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 4 Artefakte hier ablegt, findet ihr ein Geheimnis und beendet die Partie siegreich.", task: true },
+        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluss das Abenteuer beenden. Wenn du mind. 2 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
+        { name: "Schatzkammer", order:"exit-to-app", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 4 Artefakte hier ablegt, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
     ], 
     start: {name: "Akt II", task: true,
-    Aktion: "Ihr erreicht das 'Tal der Kannibalen', in dem Prof Hampton verschwunden ist. Sucht nach dem Zugang zum verschollenen Tal."},
+    Aktion: "Ihr betretet das 'Tal der Kannibalen'. Jane ist sich sicher, dass Prof. Hampton hier war."},
     secrets: [
-        {level: 1, text: "Jane: 'Danke Jack, dass wir es bis hier geschafft haben. Ich schulde dir ein paar Hintergründe: Prof. Hampton ist mein Vater. Meine Mutter ist bei der Geburt gestorben. Vater sucht schon seit vielen Jahren nach dem untergegangengen Reich von Atlantis. Von seiner letzten Expedition hier in den Dschungel ist er nicht mehr zurückgekehrt. Ich spüre aber, dass er noch lebt. Lass uns weitersuchen.' Jack sieht plötzlich ein helles Licht auf sich zukommen. In einem Zeitstrudel wird er drei Tage in die Vergangeheit zurückkatapultiert. Er sitzt mit Jane in dem abgestürzten Flugzeug und beginnt das Abenteuer (mit 3 Sternen) von vorne. Jack und Jane können sich nicht an das vorherige Abenteuer erinnern."},
-        {level: 2, text: "Jane: Ich kann die nun vertrauen und dir mein Geheimnis erzählen. Ich besitze eine besondere Gabe. Ich kann die Zeit um bis 3 Tage zuückdrehen. Dabei vergesse ich selbst das Meiste und kann mich nur an kleine Informationen erinnern. Wir haben dieses Abenteuer vermutlich schon viele Male durchlebt. Deswegen glaubst du auch, mich schon so lange zu kennen. Wir werden dieses Abenteuer wiederholen, bis ich weis, wo mein Vater hingegangen ist. Tut mir leid, dass du das alles mitmachen musst."},
-        {level: 3, text: "Jane findet einen versteckten Brief ihres Vaters: 'Liebe Jane, wenn du diese Zeilen liest, bin ich bereits auf dem Weg nach Atlantis. Mit Hilfe dieser Schatzkammer konnte ich den genauen Ort ermittlen. Ich habe deine Mutter Mahara vor 25 Jahren kennengelernt. Nach einer gemeinsamen Nacht war Sie verschwunden. Ein Jahr später kam Sie mit dir im Arm zu mir, und bat mich dich aufzuziehen. Sie ist eine der letzten Überlebenden von Atlantis und du bist die letzte Tochter von Atlantis. Folge mir nun (in Teil 2) und komm in deine eigentliche Heimat.' VOr Freude fallen sich Jack und Jane in die Arme und es gibt einen langen intensiven Liebeskuss. The End (von Teil 1)."},
+        {level: 1, text: "Jane: 'Danke Jack, dass wir es bis hier geschafft haben. Ich schulde dir ein paar Hintergründe: Prof. Hampton ist mein Vater. Meine Mutter ist bei der Geburt gestorben. Vater sucht schon seit vielen Jahren nach dem untergegangenen Reich von Atlantis. Von seiner letzten Expedition hier in den Dschungel ist er nicht mehr zurückgekehrt. Ich spüre aber, dass er noch lebt. Lass uns weitersuchen.' Jack sieht plötzlich ein helles Licht auf sich zukommen. In einem Zeitstrudel wird er drei Tage in die Vergangeheit zurückkatapultiert. Er sitzt mit Jane in dem abgestürzten Flugzeug und beginnt das Abenteuer (mit 2 Sternen) von vorne. Jack und Jane können sich nicht an die vorherigen Ereignisse erinnern."},
+        {level: 2, text: "Jane: 'Ich kann dir nun vertrauen und dir mein Geheimnis erzählen. Ich besitze eine besondere Gabe. Ich kann die Zeit um bis 3 Tage zuückdrehen. Dabei vergesse ich selbst das Meiste und kann mich nur an kleine Informationen erinnern. Wir haben dieses Abenteuer vermutlich schon viele Male durchlebt. Deswegen glaubst du auch, mich schon so lange zu kennen. Wir werden dieses Abenteuer wiederholen, bis ich weis, wo mein Vater hingegangen ist. Tut mir leid, dass du das alles mitmachen musst.' Erneut kommt der Zeitstrudel auf Jack und Jane zu und verschluckt beide. Sie finden sich ohne Erinnerung im abgestürzten Flugzeug wieder. Das Abenteuer beginnt erneut (mit 3 Sternen)."},
+        {level: 3, text: "Jane findet einen versteckten Brief ihres Vaters: 'Liebe Jane, wenn du diese Zeilen liest, bin ich bereits auf dem Weg nach Atlantis. Mit Hilfe dieser Schatzkammer konnte ich den genauen Ort ermittlen. Ich habe deine Mutter Mahara vor 25 Jahren kennengelernt. Nach einer gemeinsamen Nacht war Sie verschwunden. Ein Jahr später kam Sie mit dir im Arm zu mir, und bat mich dich aufzuziehen. Sie ist eine der letzten Überlebenden von Atlantis und du bist die letzte Tochter von Atlantis. Folge mir nun (in Teil 2) und komm in deine eigentliche Heimat. Die Kannibalen sind eigentlich friedlich und bewachen den Zugang zur Schatzkammer und den Eingang zum letzten Ort von Atlantis'. VOr Freude fallen sich Jack und Jane in die Arme und es gibt einen langen intensiven Liebeskuss. The END."},
     ]
  };
 /**
@@ -16156,8 +16157,8 @@ Polymer({
         }
       },
       move: function () {
-        this.style.top =1200 - this.offsetTop + 'px';
-        this.style.left = 1520 - this.offsetLeft + 'px';
+        this.style.top =120 - this.offsetTop + 'px';
+        this.style.left = 790 - this.offsetLeft + 'px';
       },
       show: function () {
         var card = this.$.card;
@@ -17122,6 +17123,10 @@ function get(name) {
                     type: Array,
                     value: ['Fackel','Liane','Liane','Machete','Machete','Gegengift','Gegengift','Boot','Schrumpfkopf','Rucksack','Tagebuch']
                 },
+                inventar: {
+                    type: Array,
+                    value: ['Jack','Jane','Rucksack']
+                },
                cards: { notify: true },
                 // initialize the element's model
                 width: {
@@ -17165,6 +17170,9 @@ function get(name) {
                     if(this.config.check == undefined)
                         this.config.check = {};
                    this.config.akt2 = ['home'];
+                   if(this.config.stars >= 1) {
+                       this.config.akt2 = ['exit-to-app'];
+                   }
                    if(this.config.check.jane) {
                        this.config.akt2.push('gesture');
                    }

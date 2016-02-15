@@ -1925,8 +1925,8 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
       :host {z-index: 2000;}
 		div {
 			position: absolute;
-			width: 112px;
-			height: 112px;
+			width: 56px;
+			height: 56px;
 			border-radius: 50%;
 			color: #fff;
 			overflow: hidden;
@@ -1934,24 +1934,24 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 			transition-delay: 0.2s;
 			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 			cursor: move;
-			border: 3px solid green;
+			border: 2px solid green;
 			background-color: white;
 			z-index: 2000;
 		}
 		:host.bigsymbol {
-			height: 112px;
+			height: 56px;
 		}
 		div.bigsymbol img {
 			background-color: yellow;
-			height: 112px;
+			height: 56px;
 		}
 		div.symbol img {
-			height: 112px;
+			height: 56px;
 		}
 	</style>
   <template>
 	<div name="piece" draggable="true" on-click="clicker" class$="{{computeClass(imgclass)}}">
-		<img src="{{img}}" style="width: 120px;">
+		<img src="{{img}}" style="width: 60px;">
 	</div>
 </template>
   </dom-module><dom-module id="game-card" assetpath="/">
@@ -1963,30 +1963,27 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
             border: 1px solid black;
             padding: 2px;
             margin: 1px;
-            width: 200px;
-            height: 300px;
+            width: 100px;
+            height: 150px;
             font-size: 1em;
-            font-weight: 300;
             page-break-inside: avoid;
             -webkit-region-break-inside: avoid;
         }
         
         .card-header {
-            margin: 3px;
+            margin: 1px;
         }
         
         .card-header h2 {
             margin: 0;
-            font-size: 1.8rem;
-            font-weight: 300;
         }
         
         .card-header .picture {
-            width: 70px;
+            width: 35px;
             border: 1px dotted black;
-            margin: 10px;
+            margin: 2px;
             width: 60%;
-            height: 100px;
+            height: 50px;
         }
         
         .card-header .picture.symbol {
@@ -2006,29 +2003,32 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
         .problem {
             background-color: #FFCA6F;
         }
-        
+        .text {
+            font-size: 6pt;
+            line-height: 0.9em;
+        }
         .backtext {
             position: absolute;
-            font-size: 64px;
+            font-size: 32px;
             font-weight: bold;
             text-align: center;
         }
     </style>
     <style is="custom-style">
         .big {
-            --iron-icon-height: 128px;
-            --iron-icon-width: 128px;
+            --iron-icon-height: 64px;
+            --iron-icon-width: 64px;
         }
     </style>
     <template>
         <iron-pages id="card" on-click="toggle" on-mouseenter="sendCard">
             <div>
-                <img class="flex self-stretch" src$="img/back{{carddata.task}}.png" style="width: 99%; height: 300px">
+                <img class="flex self-stretch" src$="img/back{{carddata.task}}.png" style="width: 99%; height: 150px">
                 <template is="dom-if" if="{{carddata.task}}">
-                    <div class="backtext" style=" left: 30px;top: 40px;">
+                    <div class="backtext" style=" left: 15px;top: 20px;">
                         Akt <span>{{akt}}</span>
                     </div>
-                    <div class="backtext" style=" left: 40px;top: 120px">
+                    <div class="backtext" style=" left: 20px;top: 60px">
                         <iron-icon class="big" icon="{{carddata.order}}"></iron-icon>
                     </div>.
                 </template>
@@ -2036,28 +2036,28 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
             <div class="card-header">
                 <voice-player id="player" accent="de-DE" text="{{carddata.Aktion}}"></voice-player>
                 <div class$="layout vertical center {{carddata.info}}">
-                    <h2>{{carddata.name}}</h2>
+                    <span>{{carddata.name}}</span>
                     <template is="dom-if" if="{{akt}}">
-                        <div class="fit" style="left: 5px;top: 12px">
-                            <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:30px;height: 30px;" alt="">
+                        <div class="fit" style="left: 2.5px;top: 2px">
+                            <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:15px;height: 15px;" alt="">
                             </template>
                         </div>
                     </template>
                     <img src$="img/{{carddata.name}}.png" style="" class$="picture {{carddata.imgclass}}">
 
-                    <div class="handle" style="width:90%; font-size: 13px;margin: 1px 32px 1px 15px;">{{carddata.Aktion}}</div>
+                    <div class="handle text" style="width:90%; margin: 1px 16px 1px 7px;">{{carddata.Aktion}}</div>
                     <template is="dom-if" if="{{carddata.flavour}}">
-                        <div class="handle" style="width:90%; font-size: 13px;margin: 1px 32px 1px 15px;font-style:italic;">{{carddata.flavour}}</div>
+                        <div class="handle text" style="width:90%; margin: 1px 16px 1px 7px;font-style:italic;">{{carddata.flavour}}</div>
                     </template>
-                    <div class="handle" style="width:90%; font-size: 9px;margin: 1px 32px 1px 15px;"><span>{{carddata.type}}</span> (<span>{{akt}}</span> <span>{{carddata.level}}</span>)</div>
+                    <div class="handle" style="width:90%; font-size: 9px;margin: 1px 16px 1px 7px;"><span>{{carddata.type}}</span> (<span>{{akt}}</span> <span>{{carddata.level}}</span>)</div>
                     <template is="dom-if" if="{{carddata.ver}}">
-                        <div class="fit" style="left: 168px;"><img src="img/vertic.jpg" style="width:30px;height: 296px;" alt=""></div>
+                        <div class="fit" style="left: 89px;"><img src="img/vertic.jpg" style="width:15px;height: 148px;" alt=""></div>
                     </template>
                     <template is="dom-if" if="{{carddata.hor}}">
-                        <div class="fit" style="top: 266px;"><img src="img/horiz.jpg" style="height:30px; width: 196px;" alt=""></div>
+                        <div class="fit" style="top: 139px;"><img src="img/horiz.jpg" style="height:15px; width: 98px;" alt=""></div>
                     </template>
                     <template is="dom-if" if="{{item}}">
-                        <game-piece top="-200" left="-20" img="{{computeImg(carddata)}}" imgclass="{{carddata.imgclass}}"></game-piece>
+                        <game-piece top="-100" left="-25" img="{{computeImg(carddata)}}" imgclass="{{carddata.imgclass}}"></game-piece>
                     </template>
                 </div>
             </div>

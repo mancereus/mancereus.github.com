@@ -2013,12 +2013,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </dom-module>
 <dom-module id="page-break-div" assetpath="../components/page-break-div/">
     <style>
-        :host {}
+        :host {
+            background-color: cadetblue;
+        }
 
         .break {
             width: 710px;
-            margin: 0;
-            page-break-after: always;
+            page-break-before: always;
         }
     </style>
     <template>

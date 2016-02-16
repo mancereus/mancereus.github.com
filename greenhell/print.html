@@ -1954,65 +1954,51 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 		<img src="{{img}}" style="width: 60px;">
 	</div>
 </template>
-  </dom-module><dom-module id="game-card" assetpath="/">
+  </dom-module><dom-module id="game-print-card" assetpath="/">
     <style>
         :host {
-            display: block;
+            margin: 1px;
+            padding: 0;
+        }
+       .card-header {
+            margin: 1px;
+            display: inline-block;
             position: relative;
-            background-color: white;
+              background-color: white;
             border: 1px solid black;
             padding: 2px;
-            margin: 1px;
-            width: 100px;
-            height: 150px;
+            width: 150px;
+            height: 225px;
             font-size: 1em;
-            page-break-inside: avoid;
-            -webkit-region-break-inside: avoid;
+
         }
-        
-        .card-header {
-            margin: 1px;
-        }
-        
-        .card-header h2 {
-            margin: 0;
-        }
-        
+
         .card-header .picture {
             width: 35px;
             border: 1px dotted black;
             margin: 2px;
             width: 60%;
-            height: 50px;
+            height: 70px;
         }
-        
-        .card-header .picture.symbol {
-            border-radius: 50%;
-            border: 2px solid green;
-            opacity: 0.5;
-        }
-        
+
+
         .info {
             background-color: #AEC9E8;
         }
-        
+
         .warn {
             background-color: #FFF09D;
         }
-        
+
         .problem {
             background-color: #FFCA6F;
         }
+
         .text {
-            font-size: 6pt;
-            line-height: 0.9em;
+            font-size: 8pt;
+            line-height: 0.95em;
         }
-        .backtext {
-            position: absolute;
-            font-size: 32px;
-            font-weight: bold;
-            text-align: center;
-        }
+
     </style>
     <style is="custom-style">
         .big {
@@ -2021,29 +2007,14 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
         }
     </style>
     <template>
-        <iron-pages id="card" on-click="toggle" on-mouseenter="sendCard">
-            <div>
-                <img class="flex self-stretch" src$="img/back{{carddata.task}}.png" style="width: 99%; height: 150px">
-                <template is="dom-if" if="{{carddata.task}}">
-                    <div class="backtext" style=" left: 15px;top: 20px;">
-                        Akt <span>{{akt}}</span>
-                    </div>
-                    <div class="backtext" style=" left: 20px;top: 60px">
-                        <iron-icon class="big" icon="{{carddata.order}}"></iron-icon>
-                    </div>.
-                </template>
-            </div>
             <div class="card-header">
-                <voice-player id="player" accent="de-DE" text="{{carddata.Aktion}}"></voice-player>
-                <div class$="layout vertical center {{carddata.info}}">
+                <div class$="layout vertical center {{carddata.info}}" style="min-height: 220px;">
                     <span>{{carddata.name}}</span>
-                    <template is="dom-if" if="{{akt}}">
-                        <div class="fit" style="left: 2.5px;top: 2px">
-                            <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:15px;height: 15px;" alt="">
-                            </template>
-                        </div>
-                    </template>
-                    <img src$="img/{{carddata.name}}.png" style="" class$="picture {{carddata.imgclass}}">
+                    <div class="fit" style="left: 2.5px;top: 2px">
+                        <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:15px;height: 15px;" alt="">
+                        </template>
+                    </div>
+                    <img src$="img/{{carddata.name}}.png" class$="picture {{carddata.imgclass}}">
 
                     <div class="handle text" style="width:90%; margin: 1px 16px 1px 7px;">{{carddata.Aktion}}</div>
                     <template is="dom-if" if="{{carddata.flavour}}">
@@ -2051,42 +2022,56 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
                     </template>
                     <div class="handle" style="width:90%; font-size: 9px;margin: 1px 16px 1px 7px;"><span>{{carddata.type}}</span> (<span>{{akt}}</span> <span>{{carddata.level}}</span>)</div>
                     <template is="dom-if" if="{{carddata.ver}}">
-                        <div class="fit" style="left: 89px;"><img src="img/vertic.jpg" style="width:15px;height: 148px;" alt=""></div>
+                        <img class="fit " src="img/vertic.jpg" style="top: 0;left: 139px;width:15px;height: 100%;" alt="">
                     </template>
                     <template is="dom-if" if="{{carddata.hor}}">
-                        <div class="fit" style="top: 139px;"><img src="img/horiz.jpg" style="height:15px; width: 98px;" alt=""></div>
-                    </template>
-                    <template is="dom-if" if="{{item}}">
-                        <game-piece top="-100" left="-25" img="{{computeImg(carddata)}}" imgclass="{{carddata.imgclass}}"></game-piece>
+                       <img src="img/horiz.jpg" class="fit" style="top: 214px;height:15px; width: 100%;" alt="">
                     </template>
                 </div>
-            </div>
-        </iron-pages>
-        <paper-material elevation="1"></paper-material>
+    </div></template>
+    </dom-module><dom-module id="page-break-div" assetpath="../components/page-break-div/">
+    <style>
+        :host {
+            background-color: cadetblue;
+        }
+
+        .break {
+            width: 710px;
+            page-break-before: always;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{pageBreak}}">
+            <div class="break">page break</div>
+        </template>
     </template>
-    </dom-module><dom-module id="print-board" assetpath="/">
+</dom-module>
+<dom-module id="print-board" assetpath="/">
     <style>
         :host {
             display: block;
         }
 
-        game-card {
-            margin: 3px;
+        game-print-card {
+            margin: 1px 1px;
+        }
+        #gameTable {
+            width: 660px;
         }
     </style>
     <template>
 
-        <div id="gameTable" class="layout horizontal wrap center" style="padding-top: 220px">
+        <div id="gameTable">
             <template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
-                <template is="dom-if" if="{{ card.imgclass}}">
-                    <game-piece style="margin: 2px;" img="{{computeImg(card)}}" imgclass="{{card.imgclass}}"></game-piece>
-                </template>
-                <!--      <game-card selected="1"  cardData="{{card}}" >
-    </game-card>
-      <template if="{{ (cardIndex+1) % 9 == 0 }}">
-      <div class="pagebreak" style="height: 88px;width: 600px;">page-break</div>
-      </template>-->
+                <game-print-card selected="1" carddata="{{card}}"></game-print-card>
+                <page-break-div nmbr="{{cardIndex}}" max="16"></page-break-div>
             </template>
+            <br>
+            <!--<template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
+                <template is="dom-if" if="{{ card.imgclass}}">
+                    <game-piece print style="margin: 2px;" img="{{computeImg(card)}}" imgclass="{{card.imgclass}}"></game-piece>
+                </template>
+            </template>-->
         </div>
     </template>
     </dom-module></div>

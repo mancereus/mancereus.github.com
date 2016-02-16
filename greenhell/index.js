@@ -11424,7 +11424,7 @@ var data1 = {
         { name: "Weg", Aktion: "", flavour: "Jane: 'Jack hat ein düsteres Geheimnis, das spüre ich.'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Was suchen wir hier eigentlich?'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Ich brauche einen Whisky.'", ver: "true", hor: "true" },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Puuh, diese Luft bringt mich um.'", ver: "true" },  
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Puuh, diese Luft bringt mich um.'", ver: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Wer hat wohl meinen Bezintank manipuliert?'", hor: "true" },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: "true" },
@@ -11439,18 +11439,18 @@ var data1 = {
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", info: "info" },
+        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluss fahren.", hor: true, imgclass: "symbol" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: "true", imgclass: "symbol" },
         { name: "Hängebrücke", info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: "true" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange. ", hor: "true", imgclass: "symbol" },
-        { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", hor: "true", imgclass: "symbol", type: "Basiskarte" },
-        { name: "Weg", level: "normal", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: "true" },
-        { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: "true", type: "Basiskarte" },
-        { name: "Hängebrücke", level: "normal", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück.", info: "warn" },
+        { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", hor: "true", imgclass: "symbol" },
+        { name: "Weg",  Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: "true" },
+        { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: "true" },
+        { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück.", info: "warn" },
 
-        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluss fahren.", hor: true, imgclass: "symbol" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: "true", imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: "true", imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: "true", imgclass: "symbol" },
@@ -11476,7 +11476,7 @@ var data1 = {
         { name: "Sturm", Aktion: "Ein Sturm zieht durch den Dschungel. Alle verwendeten Macheten kommen auf Machetenfelder zurück.", task: true },
 
         { name: "Überfall", order: "star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
-        { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Kiste voll Whisky. Er hat Alkohol-probleme und versucht für den Auftrag nüchtern zu bleiben. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
+        { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Whisky-kiste. Er hat Alkohol-probleme und versucht für den Auftrag nüchtern zu bleiben. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
          { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weisst ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
         { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weiss nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
     ],
@@ -16086,6 +16086,7 @@ Polymer({
 Polymer({
       is: 'game-piece',
       properties: {
+          print: Boolean,
           top: Number,
           left: Number,
         img: { notify: true },
@@ -16097,11 +16098,15 @@ Polymer({
         return false;
       },
       attached: function () {
+          if(this.print) {
+              this.style.position = 'relative';
+          } else {
           if(this.top) {
               this.style.top = this.top + "px";
           }
           if(this.left) {
               this.style.left = this.left + "px";
+          }
           }
       },
       ready: function () {

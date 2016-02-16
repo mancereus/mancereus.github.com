@@ -7480,7 +7480,6 @@ var datainhalt = [
     { type: "Inhalt", type2: "Gewicht", name: "ist 10kg oder leichter" },
     { type: "Inhalt", type2: "Gewicht", name: "ist zwischen 10kg und 100kg" },
     { type: "Inhalt", type2: "Gewicht", name: "ist 100kg oder schwerer" },
-    { type: "Inhalt", type2: "Gewicht", name: "mit glatter Oberfläche" },
     { type: "Inhalt", type2: "Gewicht", name: "hat Zähne oder spitze Teile" },
     { type: "Inhalt", type2: "Gewicht", name: "mit Rad oder vollständig drehbarem Teil" },
     { type: "Inhalt", type2: "Gewicht", name: "mit Gelenk oder beweglichem Teil" },
@@ -7499,11 +7498,11 @@ var dataort = [
 var dataextra = [
     { type: "Bewegung", type2: "Oberfläche", name: "bewegt sich selbständig" },
     { type: "Bewegung", type2: "Oberfläche", name: "bewegt sich selbständig, aber eher langsam" },
-    { type: "Bewegung", type2: "Oberfläche", name: "kann von Menschen gefahren oder geführt werden." },
     { type: "Bewegung", type2: "Oberfläche", name: "schwimmt im Wasser oben" },
     { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist grösstenteils pelzig oder haarig" },
     { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist warm oder heiss" },
     { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend glatt" },
+    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend rauh" },
     { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend hart" },
     { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend elastisch" },
 ];

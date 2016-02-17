@@ -2431,7 +2431,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 		}
 	</style>
   <template>
-	<div name="piece" draggable="true" on-click="clicker" class$="{{computeClass(imgclass)}}">
+	<div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
 		<img src="{{img}}" style="width: 60px;">
 	</div>
 </template>
@@ -2450,15 +2450,15 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             page-break-inside: avoid;
             -webkit-region-break-inside: avoid;
         }
-        
+
         .card-header {
             margin: 1px;
         }
-        
+
         .card-header h2 {
             margin: 0;
         }
-        
+
         .card-header .picture {
             width: 35px;
             border: 1px dotted black;
@@ -2466,21 +2466,21 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             width: 60%;
             height: 50px;
         }
-        
+
         .card-header .picture.symbol {
             border-radius: 50%;
             border: 2px solid green;
             opacity: 0.5;
         }
-        
+
         .info {
             background-color: #AEC9E8;
         }
-        
+
         .warn {
             background-color: #FFF09D;
         }
-        
+
         .problem {
             background-color: #FFCA6F;
         }
@@ -2502,7 +2502,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         }
     </style>
     <template>
-        <iron-pages id="card" on-click="toggle" on-mouseenter="sendCard">
+        <iron-pages id="card" on-tap="toggle" on-mouseenter="sendCard">
             <div>
                 <img class="flex self-stretch" src$="img/back{{carddata.task}}.png" style="width: 99%; height: 150px">
                 <template is="dom-if" if="{{carddata.task}}">

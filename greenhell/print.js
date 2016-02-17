@@ -11406,7 +11406,7 @@ var initcards=[];
         // initialize the element's model
         width: {
           type: String,
-          value: '1480px',
+          value: '180mm',
           notify: true
         }
       },

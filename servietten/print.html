@@ -1,225 +1,6 @@
-<!DOCTYPE html><html><head><script src="print.js" defer=""></script><meta charset="UTF-8">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      background-color: white;
-      font-family: 'RobotoDraft', sans-serif;
-    }
-  </style>
-
-
-  <title>Tiger</title>
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
-<!--
-`iron-pages` is used to select one of its children to show. One use is to cycle through a list of
-children "pages".
-
-Example:
-
-    <iron-pages selected="0">
-      <div>One</div>
-      <div>Two</div>
-      <div>Three</div>
-    </iron-pages>
-
-    <script>
-      document.addEventListener('click', function(e) {
-        var pages = document.querySelector('iron-pages');
-        pages.selectNext();
-      });
-    </script>
-
-@group Iron Elements
-@class iron-pages
-@hero hero.svg
-@demo demo/index.html
-@extends iron-selector
--->
-
-<!--
-Material design: [Surface reaction](https://www.google.com/design/spec/animation/responsive-interaction.html#responsive-interaction-surface-reaction)
-
-`paper-ripple` provides a visual effect that other paper elements can
-use to simulate a rippling effect emanating from the point of contact.  The
-effect can be visualized as a concentric circle with motion.
-
-Example:
-
-    <div style="position:relative">
-      <paper-ripple></paper-ripple>
-    </div>
-
-Note, it's important that the parent container of the ripple be relative position, otherwise
-the ripple will emanate outside of the desired container.
-
-`paper-ripple` listens to "mousedown" and "mouseup" events so it would display ripple
-effect when touches on it.  You can also defeat the default behavior and
-manually route the down and up actions to the ripple element.  Note that it is
-important if you call `downAction()` you will have to make sure to call
-`upAction()` so that `paper-ripple` would end the animation loop.
-
-Example:
-
-    <paper-ripple id="ripple" style="pointer-events: none;"></paper-ripple>
-    ...
-    downAction: function(e) {
-      this.$.ripple.downAction({x: e.x, y: e.y});
-    },
-    upAction: function(e) {
-      this.$.ripple.upAction();
-    }
-
-Styling ripple effect:
-
-  Use CSS color property to style the ripple:
-
-    paper-ripple {
-      color: #4285f4;
-    }
-
-  Note that CSS color property is inherited so it is not required to set it on
-  the `paper-ripple` element directly.
-
-By default, the ripple is centered on the point of contact.  Apply the `recenters`
-attribute to have the ripple grow toward the center of its container.
-
-    <paper-ripple recenters></paper-ripple>
-
-You can also  center the ripple inside its container from the start.
-
-    <paper-ripple center></paper-ripple>
-
-Apply `circle` class to make the rippling effect within a circle.
-
-    <paper-ripple class="circle"></paper-ripple>
-
-@group Paper Elements
-@element paper-ripple
-@hero hero.svg
-@demo demo/index.html
--->
-
-<style is="custom-style">
-
-  :root {
-
-    --shadow-transition: {
-      transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    };
-
-    --shadow-none: {
-      box-shadow: none;
-    };
-
-    /* from http://codepen.io/shyndman/pen/c5394ddf2e8b2a5c9185904b57421cdb */
-
-    --shadow-elevation-2dp: {
-      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-                  0 1px 5px 0 rgba(0, 0, 0, 0.12),
-                  0 3px 1px -2px rgba(0, 0, 0, 0.2);
-    };
-
-    --shadow-elevation-3dp: {
-      box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14),
-                  0 1px 8px 0 rgba(0, 0, 0, 0.12),
-                  0 3px 3px -2px rgba(0, 0, 0, 0.4);
-    };
-
-    --shadow-elevation-4dp: {
-      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
-                  0 1px 10px 0 rgba(0, 0, 0, 0.12),
-                  0 2px 4px -1px rgba(0, 0, 0, 0.4);
-    };
-
-    --shadow-elevation-6dp: {
-      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),
-                  0 1px 18px 0 rgba(0, 0, 0, 0.12),
-                  0 3px 5px -1px rgba(0, 0, 0, 0.4);
-    };
-
-    --shadow-elevation-8dp: {
-      box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
-                  0 3px 14px 2px rgba(0, 0, 0, 0.12),
-                  0 5px 5px -3px rgba(0, 0, 0, 0.4);
-    };
-
-    --shadow-elevation-12dp: {
-      box-shadow: 0 12px 16px 1px rgba(0, 0, 0, 0.14),
-                  0 4px 22px 3px rgba(0, 0, 0, 0.12),
-                  0 6px 7px -4px rgba(0, 0, 0, 0.4);
-    };
-
-    --shadow-elevation-16dp: {
-      box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),
-                  0  6px 30px 5px rgba(0, 0, 0, 0.12),
-                  0  8px 10px -5px rgba(0, 0, 0, 0.4);
-    };
-
-  }
-
-</style>
-<!--
-Material design: [Cards](https://www.google.com/design/spec/components/cards.html)
-
-`paper-material` is a container that renders two shadows on top of each other to
-create the effect of a lifted piece of paper.
-
-Example:
-
-    <paper-material elevation="1">
-      ... content ...
-    </paper-material>
-
-@group Paper Elements
-@demo demo/index.html
--->
-
-<!--
-`iron-meta` is a generic element you can use for sharing information across the DOM tree.
-It uses [monostate pattern](http://c2.com/cgi/wiki?MonostatePattern) such that any
-instance of iron-meta has access to the shared
-information. You can use `iron-meta` to share whatever you want (or create an extension
-[like x-meta] for enhancements).
-
-The `iron-meta` instances containing your actual data can be loaded in an import,
-or constructed in any way you see fit. The only requirement is that you create them
-before you try to access them.
-
-Examples:
-
-If I create an instance like this:
-
-    <iron-meta key="info" value="foo/bar"></iron-meta>
-
-Note that value="foo/bar" is the metadata I've defined. I could define more
-attributes or use child nodes to define additional metadata.
-
-Now I can access that element (and it's metadata) from any iron-meta instance
-via the byKey method, e.g.
-
-    meta.byKey('info').getAttribute('value');
-
-Pure imperative form would be like:
-
-    document.createElement('iron-meta').byKey('info').getAttribute('value');
-
-Or, in a Polymer element, you can include a meta in your template:
-
-    <iron-meta id="meta"></iron-meta>
-    ...
-    this.$.meta.byKey('info').getAttribute('value');
-
-@group Iron Elements
-@demo demo/index.html
-@hero hero.svg
-@element iron-meta
--->
-
-<!--
+<!DOCTYPE html><html><head><script src="print.js" defer=""></script>
+    <meta charset="utf-8">
+    <!--
 The `<iron-flex-layout>` component provides simple ways to use [CSS flexible box layout](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Flexible_boxes), also known as flexbox. This component provides two different ways to use flexbox:
 
 1. [Layout classes](https://github.com/PolymerElements/iron-flex-layout/tree/master/classes). The layout class stylesheet provides a simple set of class-based flexbox rules. Layout classes let you specify layout properties directly in markup.
@@ -535,71 +316,6 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
   }
 
 </style>
-<!--
-
-The `iron-icon` element displays an icon. By default an icon renders as a 24px square.
-
-Example using src:
-
-    <iron-icon src="star.png"></iron-icon>
-
-Example setting size to 32px x 32px:
-
-    <iron-icon class="big" src="big_star.png"></iron-icon>
-
-    <style is="custom-style">
-      .big {
-        --iron-icon-height: 32px;
-        --iron-icon-width: 32px;
-      }
-    </style>
-
-The iron elements include several sets of icons.
-To use the default set of icons, import `iron-icons.html` and use the `icon` attribute to specify an icon:
-
-    <link rel="import" href="/components/iron-icons/iron-icons.html">
-
-    <iron-icon icon="menu"></iron-icon>
-
-To use a different built-in set of icons, import the specific `iron-icons/<iconset>-icons.html`, and
-specify the icon as `<iconset>:<icon>`. For example, to use a communication icon, you would
-use:
-
-    <link rel="import" href="/components/iron-icons/communication-icons.html">
-
-    <iron-icon icon="communication:email"></iron-icon>
-
-You can also create custom icon sets of bitmap or SVG icons.
-
-Example of using an icon named `cherry` from a custom iconset with the ID `fruit`:
-
-    <iron-icon icon="fruit:cherry"></iron-icon>
-
-See [iron-iconset](iron-iconset) and [iron-iconset-svg](iron-iconset-svg) for more information about
-how to create a custom iconset.
-
-See the [iron-icons demo](iron-icons?view=demo:demo/index.html) to see the icons available
-in the various iconsets.
-
-
-### Styling
-
-The following custom properties are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--iron-icon-width` | Width of the icon | `24px`
-`--iron-icon-height` | Height of the icon | `24px`
-`--iron-icon-fill-color` | Fill color of the svg icon | `currentcolor`
-`--iron-icon-stroke-color` | Stroke color of the svg icon | none
-
-@group Iron Elements
-@element iron-icon
-@demo demo/index.html
-@hero hero.svg
-@homepage polymer.github.io
--->
-
 <style>
 
   /*******************************
@@ -1597,6 +1313,67 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 
   :root {
 
+    --shadow-transition: {
+      transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    };
+
+    --shadow-none: {
+      box-shadow: none;
+    };
+
+    /* from http://codepen.io/shyndman/pen/c5394ddf2e8b2a5c9185904b57421cdb */
+
+    --shadow-elevation-2dp: {
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 5px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    };
+
+    --shadow-elevation-3dp: {
+      box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 8px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 3px -2px rgba(0, 0, 0, 0.4);
+    };
+
+    --shadow-elevation-4dp: {
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 10px 0 rgba(0, 0, 0, 0.12),
+                  0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    };
+
+    --shadow-elevation-6dp: {
+      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 18px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 5px -1px rgba(0, 0, 0, 0.4);
+    };
+
+    --shadow-elevation-8dp: {
+      box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                  0 3px 14px 2px rgba(0, 0, 0, 0.12),
+                  0 5px 5px -3px rgba(0, 0, 0, 0.4);
+    };
+
+    --shadow-elevation-12dp: {
+      box-shadow: 0 12px 16px 1px rgba(0, 0, 0, 0.14),
+                  0 4px 22px 3px rgba(0, 0, 0, 0.12),
+                  0 6px 7px -4px rgba(0, 0, 0, 0.4);
+    };
+
+    --shadow-elevation-16dp: {
+      box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),
+                  0  6px 30px 5px rgba(0, 0, 0, 0.12),
+                  0  8px 10px -5px rgba(0, 0, 0, 0.4);
+    };
+
+  }
+
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
+<style is="custom-style">
+
+  :root {
+
     /* Shared Styles */
     --paper-font-common-base: {
       font-family: 'Roboto', 'Noto', sans-serif;
@@ -1749,288 +1526,77 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
   }
 
 </style>
+<style>
+body {margin: 0; padding: 1px}
+body,h5,h6,p{font-size:13px;line-height:20px}
+a,body,paper-toolbar{color:#424242}
+body{font-family:Roboto,Noto,'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+code,pre{font-family:Inconsolata,monospace}
+a,h1,h2,h3,h4,h5,h6{text-rendering:optimizeLegibility}
+a{text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.018em}
+catalog-app{overflow:hidden}
+.menu-icon{display:block;width:24px;padding-top:3px;cursor:pointer;box-sizing:border-box;-webkit-user-select:none}
+.menu-bar{display:block;width:18px;height:2px;margin:0 auto 3px;background:#333;-webkit-transform-origin:center;transition:all 300ms cubic-bezier(.55,0,.1,1)}
+.menu-icon[active] .menu-bar{opacity:0}
+.menu-icon[active] .menu-bar:first-child{-webkit-transform:rotate(45deg)translate(2px,2px);margin-top:4px;opacity:1}
+.menu-icon[active] .menu-bar:last-child{-webkit-transform:rotate(-45deg)translate(5px,-5px);opacity:1}
+paper-toolbar{transition:height 450ms cubic-bezier(.55,0,.1,1)}
+paper-toolbar.medium-tall{height:107px}
+paper-toolbar nav{margin:12px 0 0}
+paper-toolbar nav a{display:inline-block;font-weight:500;line-height:50px;text-transform:none;color:#666;margin:0 12px;padding:0 4px}
+paper-toolbar nav a:hover{color:#536DFE}
+paper-toolbar nav a:first-child{margin-left:0}
+paper-toolbar nav .active{color:#000;border-bottom:2px solid #7986CB}
+iron-icon{color:rgba(0,0,0,.54)}
+p a{text-transform:none;color:#5572fa}
+li p{margin:0}
+aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e5e5e5}
+
+</style>
+    <title>Attack</title>
+    <style>
+        .game {
+            width: 165mm;
+            height: 165mm;
+            border: 2px solid gray;
+            border-radius: 5px;
+            padding: 2mm;
+        }
+
+        .card {
+            width: 25mm;
+            height: 25mm;
+            border: 4px solid darkslategray;
+            border-radius: 10%;
+            display: inline-block;
+            margin: 2mm;
+            font-size: 18mm;
+            color: black;
+            text-align: center;
+        }
+        .item {
+            height: 100%;
+            margin-top: 10mm;
+        }
+        .red {
+            background-color: #EF5350;
+        }
+        .orange {
+            background-color: #FFA726;
+        }
+        .yellow {
+            background-color: #FFEE58;
+        }
+        .green {
+            background-color: #9CCC65;
+        }
+        .blue {
+            background-color: #29B6F6;
+        }
+    </style>
 </head>
 
-<body><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
-
-  <style>
-
-    :host {
-      display: block;
-    }
-
-    :host > ::content > :not(.iron-selected) {
-      display: none !important;
-    }
-
-  </style>
-
-  <template>
-
-    <content></content>
-
-  </template>
-
-</dom-module>
-
-<dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
-
-  <!--
-  Fired when the animation finishes. This is useful if you want to wait until the ripple
-  animation finishes to perform some action.
-
-  @event transitionend
-  @param {Object} detail
-  @param {Object} detail.node The animated node
-  -->
-
-  <template>
-    <style>
-      :host {
-        display: block;
-        position: absolute;
-        border-radius: inherit;
-        overflow: hidden;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-
-        /* See PolymerElements/paper-behaviors/issues/34. On non-Chrome browsers,
-         * creating a node (with a position:absolute) in the middle of an event
-         * handler "interrupts" that event handler (which happens when the
-         * ripple is created on demand) */
-        pointer-events: none;
-      }
-
-      :host([animating]) {
-        /* This resolves a rendering issue in Chrome (as of 40) where the
-           ripple is not properly clipped by its parent (which may have
-           rounded corners). See: http://jsbin.com/temexa/4
-
-           Note: We only apply this style conditionally. Otherwise, the browser
-           will create a new compositing layer for every ripple element on the
-           page, and that would be bad. */
-        -webkit-transform: translate(0, 0);
-        transform: translate3d(0, 0, 0);
-      }
-
-      #background,
-      #waves,
-      .wave-container,
-      .wave {
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      #background,
-      .wave {
-        opacity: 0;
-      }
-
-      #waves,
-      .wave {
-        overflow: hidden;
-      }
-
-      .wave-container,
-      .wave {
-        border-radius: 50%;
-      }
-
-      :host(.circle) #background,
-      :host(.circle) #waves {
-        border-radius: 50%;
-      }
-
-      :host(.circle) .wave-container {
-        overflow: hidden;
-      }
-    </style>
-
-    <div id="background"></div>
-    <div id="waves"></div>
-  </template>
-</dom-module>
-<dom-module id="paper-material-shared-styles" assetpath="../../bower_components/paper-material/">
-  <template>
-    <style>
-      :host {
-        display: block;
-        position: relative;
-      }
-
-      :host([elevation="1"]) {
-        @apply(--shadow-elevation-2dp);
-      }
-
-      :host([elevation="2"]) {
-        @apply(--shadow-elevation-4dp);
-      }
-
-      :host([elevation="3"]) {
-        @apply(--shadow-elevation-6dp);
-      }
-
-      :host([elevation="4"]) {
-        @apply(--shadow-elevation-8dp);
-      }
-
-      :host([elevation="5"]) {
-        @apply(--shadow-elevation-16dp);
-      }
-    </style>
-  </template>
-</dom-module>
-<dom-module id="paper-material" assetpath="../../bower_components/paper-material/">
-  <template>
-    <style include="paper-material-shared-styles"></style>
-    <style>
-      :host([animated]) {
-        @apply(--shadow-transition);
-      }
-    </style>
-
-    <content></content>
-  </template>
-</dom-module>
-<dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
-
-  <style>
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center-center);
-      position: relative;
-
-      vertical-align: middle;
-
-      fill: var(--iron-icon-fill-color, currentcolor);
-      stroke: var(--iron-icon-stroke-color, none);
-
-      width: var(--iron-icon-width, 24px);
-      height: var(--iron-icon-height, 24px);
-    }
-  </style>
-
-  <template>
-  </template>
-
-  </dom-module>
-<dom-module id="game-piece" assetpath="/">
-  <style>
-      :host {z-index: 2000;}
-		div {
-			position: absolute;
-			width: 56px;
-			height: 56px;
-			border-radius: 50%;
-			color: #fff;
-			overflow: hidden;
-			transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-			transition-delay: 0.2s;
-			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-			cursor: move;
-			border: 2px solid green;
-			background-color: white;
-			z-index: 2000;
-		}
-		:host.bigsymbol {
-			height: 56px;
-		}
-		div.bigsymbol img {
-			background-color: yellow;
-			height: 56px;
-		}
-		div.symbol img {
-			height: 56px;
-		}
-	</style>
-  <template>
-	<div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
-		<img src="{{img}}" style="width: 60px;">
-	</div>
-</template>
-  </dom-module><dom-module id="game-print-card" assetpath="/">
-    <style>
-        :host {
-            margin: 0;
-            padding: 0;
-        }
-       .card-header {
-            margin: 0.3mm 0;
-            display: inline-block;
-            position: relative;
-              background-color: white;
-            border: 1px solid lightslategray;
-            border-radius: 1%;
-            padding: 0;
-            width: 42mm;
-            height: 63mm;
-            font-size: 1em;
-
-        }
-
-        .card-header .picture {
-            width: 30mm;
-            border: 1px dotted black;
-            margin: 2px;
-            width: 60%;
-            height: 18mm;
-        }
-
-
-        .info {
-            background-color: #AEC9E8;
-        }
-
-        .warn {
-            background-color: #FFF09D;
-        }
-
-        .problem {
-            background-color: #FFCA6F;
-        }
-
-        .text {
-            font-size: 8pt;
-            line-height: 0.95em;
-        }
-
-    </style>
-    <style is="custom-style">
-        .big {
-            --iron-icon-height: 64px;
-            --iron-icon-width: 64px;
-        }
-    </style>
-    <template>
-            <div class="card-header">
-                <div class$="layout vertical center {{carddata.info}}" style="min-height: 63mm;">
-                    <span>{{carddata.name}}</span>
-                    <div class="fit" style="left: 1mm;top: 1mm">
-                        <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:15px;height: 15px;" alt="">
-                        </template>
-                    </div>
-                    <img src$="img/{{carddata.name}}.png" class$="picture {{carddata.imgclass}}">
-
-                    <div class="handle text" style="width:90%; margin: 1px 18px 1px 7px;">{{carddata.Aktion}}</div>
-                    <template is="dom-if" if="{{carddata.flavour}}">
-                        <div class="handle text" style="width:90%; margin: 1px 16px 1px 7px;font-style:italic;">{{carddata.flavour}}</div>
-                    </template>
-                    <div class="handle" style="width:90%; font-size: 9px;margin: 1px 16px 1px 7px;"><span>{{carddata.type}}</span> (<span>{{akt}}</span> <span>{{carddata.level}}</span>)</div>
-                    <template is="dom-if" if="{{carddata.ver}}">
-                        <img class="fit " src="img/vertic.jpg" style="top: 0;left: 38mm;width:4mm;height: 100%;" alt="">
-                    </template>
-                    <template is="dom-if" if="{{carddata.hor}}">
-                       <img src="img/horiz.jpg" class="fit" style="top: 59mm;height:4mm; width: 100%;" alt="">
-                    </template>
-                </div>
-    </div></template>
-    </dom-module><dom-module id="page-break-div" assetpath="../components/page-break-div/">
+<body><div hidden="" by-vulcanize=""><dom-module id="page-break-div" assetpath="../components/page-break-div/">
     <style>
         :host {
             background-color: cadetblue;
@@ -2047,38 +1613,16 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
         </template>
     </template>
 </dom-module>
-<dom-module id="print-board" assetpath="/">
-    <style>
-        :host {
-            display: block;
-        }
+</div>
+    <template id="tmpl" is="dom-bind">
+        <div class="game">
+            <template is="dom-repeat" items="{{cards}}">
 
-        game-print-card {
-            margin: 0 -1px;
-        }
-        #gameTable {
-            width: 180mm;
-        }
-    </style>
-    <template>
-
-        <div id="gameTable">
-            <template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
-                <game-print-card selected="1" carddata="{{card}}"></game-print-card>
-                <page-break-div nmbr="{{cardIndex}}" max="16"></page-break-div>
+                <div class$="card {{item.color}}">
+                    <div class="item">{{item.name}}</div>
+                </div>
             </template>
-            <br>
-            <!--<template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
-                <template is="dom-if" if="{{ card.imgclass}}">
-                    <game-piece print style="margin: 2px;" img="{{computeImg(card)}}" imgclass="{{card.imgclass}}"></game-piece>
-                </template>
-            </template>-->
         </div>
     </template>
-    </dom-module></div>
-  <print-board width="700px">
-    </print-board>
 
-
-
-</body></html>
+    </body></html>

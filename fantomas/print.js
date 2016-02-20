@@ -10482,6 +10482,44 @@ this.fire('dom-change');
     }
 
   };
+var data = [
+    { name: "Fantomas", typ: "special", value: "F", text: "Du bist Fantomas, der Herr des Verbrechens. Lege diese Karte ab." },
+    { name: "Juve", typ: "special", value: "J", text: "Du bist Inspektor Juve und willst Fantomas zur Strecke bringen. Lege diese Karte ab. Falls in deiner Kartenhand auch Fantomas ist, bist du nur Fantomas." },
+    { name: "Beute      ", typ: "green", value: "1", text: "Die rote Wespe", buerger: "-2", juve: "-1", fantomas: "2", spieler: "nur bei 4,5,6 Spielern" },
+    { name: "Beute", typ: "green", value: "2", text: "Die abgetrennte Hand", buerger: "-2", juve: "-1", fantomas: "2" },
+    { name: "Beute ", typ: "green", value: "3", text: "Das tödliche Bouquet", buerger: "-2", juve: "-1", fantomas: "2" },
+    { name: "Beute  ", typ: "green", value: "4", text: "Der Tote, der tötet", buerger: "-2", juve: "-1", fantomas: "2" },
+    { name: "Beute   ", typ: "green", value: "5", text: "Die Geheimagentin", buerger: "-2", juve: "-1", fantomas: "2" },
+    { name: "Beute    ", typ: "green", value: "6", text: "Der leere Sarg", buerger: "-2", juve: "-1", fantomas: "2", spieler: "nur bei 4,5,6 Spielern" },
+    { name: "Beute     ", typ: "green", value: "7", text: "Die Agentur des Verbrechens", buerger: "-2", juve: "-1", fantomas: "2", spieler: "nur bei 4,6 Spielern" },
+    { name: "Ganoven", typ: "yellow", value: "1", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "yellow", value: "2", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "yellow", value: "3", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "red", value: "1", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "red", value: "2", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "red", value: "3", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "blue", value: "1", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "blue", value: "2", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Ganoven", typ: "blue", value: "3", text: "", buerger: "1", juve: "-1", fantomas: "1" },
+    { name: "Polizei", typ: "yellow", value: "4", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "yellow", value: "5", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "yellow", value: "6.", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "red", value: "4", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "red", value: "5", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "red", value: "6.", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "blue", value: "4", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "blue", value: "5", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Polizei", typ: "blue", value: "6.", text: "", buerger: "1", juve: "1", fantomas: "-1" },
+    { name: "Bürger", typ: "yellow", value: "7", text: "", buerger: "1", juve: "-1", fantomas: "-1" },
+    { name: "Bürger", typ: "yellow", value: "8", text: "", buerger: "1", juve: "-1", fantomas: "-1" },
+    { name: "Bürger", typ: "yellow", value: "9", text: "", buerger: "1", juve: "-1", fantomas: "-1" },
+    { name: "Bürger", typ: "red", value: "7", text: "", buerger: "1", juve: "0", fantomas: "-1" },
+    { name: "Bürger", typ: "red", value: "8", text: "", buerger: "1", juve: "0", fantomas: "-1" },
+    { name: "Bürger", typ: "red", value: "9.", text: "", buerger: "1", juve: "0", fantomas: "-1" },
+    { name: "Bürger", typ: "blue", value: "7", text: "", buerger: "1", juve: "0", fantomas: "-1" },
+    { name: "Bürger", typ: "blue", value: "8", text: "", buerger: "1", juve: "0", fantomas: "-1" },
+    { name: "Bürger", typ: "blue", value: "9.", text: "", buerger: "1", juve: "0", fantomas: "-1" }
+];
 Polymer({
       is: 'iron-image',
 
@@ -10912,67 +10950,12 @@ Polymer({
 		          type: Object
 	          }
 			},
-            ready: function() {
+            attached: function() {
 				console.log(this.data);
 				 this.$.pic.setAttribute("src", "img/" + this.data.name + ".jpg");
 				 //this.$.card.addAttribute("class", this.data.type);
 	        }
 		});
-Polymer({
-		    is: 'fantomas-print',
-			properties: {
-				data: {type: Array,
-        value: function() {
-          return [
-              {name:"Fantomas", typ: "special", value: "F", text: "Du bist Fantomas, der Herr des Verbrechens. Lege diese Karte ab."},
-              {name:"Juve", typ: "special", value: "J", text: "Du bist Inspektor Juve und willst Fantomas zur Strecke bringen. Lege diese Karte ab. Falls in deiner Kartenhand auch Fantomas ist, bist du nur Fantomas."},
-              {name:"Beute      ", typ: "green", value: "1", text: "Die rote Wespe", buerger: "-2", juve: "-1", fantomas: "2", spieler: "nur bei 4,5,6 Spielern"},
-              {name:"Beute", typ: "green", value: "2", text: "Die abgetrennte Hand", buerger: "-2", juve: "-1", fantomas: "2"},
-              {name:"Beute ", typ: "green", value: "3", text: "Das tödliche Bouquet", buerger: "-2", juve: "-1", fantomas: "2"},
-              {name:"Beute  ", typ: "green", value: "4", text: "Der Tote, der tötet", buerger: "-2", juve: "-1", fantomas: "2"},
-              {name:"Beute   ", typ: "green", value: "5", text: "Die Geheimagentin", buerger: "-2", juve: "-1", fantomas: "2"},
-              {name:"Beute    ", typ: "green", value: "6", text: "Der leere Sarg", buerger: "-2", juve: "-1", fantomas: "2", spieler: "nur bei 4,5,6 Spielern"},
-              {name:"Beute     ", typ: "green", value: "7", text: "Die Agentur des Verbrechens", buerger: "-2", juve: "-1", fantomas: "2", spieler: "nur bei 4,6 Spielern"},
-              {name:"Ganoven", typ: "yellow", value: "1", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "yellow", value: "2", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "yellow", value: "3", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "red", value: "1", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "red", value: "2", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "red", value: "3", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "blue", value: "1", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "blue", value: "2", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Ganoven", typ: "blue", value: "3", text: "", buerger: "1", juve: "-1", fantomas: "1"},
-              {name:"Polizei", typ: "yellow", value: "4", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "yellow", value: "5", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "yellow", value: "6.", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "red", value: "4", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "red", value: "5", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "red", value: "6.", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "blue", value: "4", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "blue", value: "5", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Polizei", typ: "blue", value: "6.", text: "", buerger: "1", juve: "1", fantomas: "-1"},
-              {name:"Bürger", typ: "yellow", value: "7", text: "", buerger: "1", juve: "-1", fantomas: "-1"},
-              {name:"Bürger", typ: "yellow", value: "8", text: "", buerger: "1", juve: "-1", fantomas: "-1"},
-              {name:"Bürger", typ: "yellow", value: "9", text: "", buerger: "1", juve: "-1", fantomas: "-1"},
-              {name:"Bürger", typ: "red", value: "7", text: "", buerger: "1", juve: "0", fantomas: "-1"},
-              {name:"Bürger", typ: "red", value: "8", text: "", buerger: "1", juve: "0", fantomas: "-1"},
-              {name:"Bürger", typ: "red", value: "9.", text: "", buerger: "1", juve: "0", fantomas: "-1"},
-              {name:"Bürger", typ: "blue", value: "7", text: "", buerger: "1", juve: "0", fantomas: "-1"},
-              {name:"Bürger", typ: "blue", value: "8", text: "", buerger: "1", juve: "0", fantomas: "-1"},
-              {name:"Bürger", typ: "blue", value: "9.", text: "", buerger: "1", juve: "0", fantomas: "-1"}
-        ];
-      }
-      }
-		},
-    ready: function() {
-	        console.log("ready");
-	        console.log(this.data);
-    },
-    created: function() {
-	        console.log("created");
-    }
-
-    });
 Polymer({
 		    is: 'page-break-div',
             properties: {
@@ -10994,3 +10977,21 @@ Polymer({
 	            return (this.nmbr+1) % this.max == 0;
 	        }
 		});
+Polymer({
+		    is: 'fantomas-print',
+			properties: {
+				data: {type: Array,
+        value: function() {
+          return data;
+      }
+      }
+		},
+    ready: function() {
+	        console.log("ready");
+	        console.log(this.data);
+    },
+    created: function() {
+	        console.log("created");
+    }
+
+    });

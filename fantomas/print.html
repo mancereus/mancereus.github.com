@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><script src="print.js" defer=""></script>
-  <meta charset="utf-8">
-  <!--
+    <meta charset="utf-8">
+    <!--
 The `<iron-flex-layout>` component provides simple ways to use [CSS flexible box layout](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Flexible_boxes), also known as flexbox. This component provides two different ways to use flexbox:
 
 1. [Layout classes](https://github.com/PolymerElements/iron-flex-layout/tree/master/classes). The layout class stylesheet provides a simple set of class-based flexbox rules. Layout classes let you specify layout properties directly in markup.
@@ -1672,7 +1672,7 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 
 </style>
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:900">
-  <style>
+    <style>
 body {margin: 0; padding: 1px}
 body,h5,h6,p{font-size:13px;line-height:20px}
 a,body,paper-toolbar{color:#424242}
@@ -1699,7 +1699,7 @@ li p{margin:0}
 aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e5e5e5}
 
 </style>
-</head>
+    </head>
 
 <body><div hidden="" by-vulcanize=""><dom-module id="iron-image" assetpath="../../bower_components/iron-image/">
   <template>
@@ -1993,24 +1993,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 		</div>
 	</template>
 </dom-module>
-<dom-module id="fantomas-print" assetpath="/">
-  <style>
-    :host {}
-
-    .item {
-      width: 30px;
-      height: 30px;
-    }
-  </style>
-
-  <template>
-    <template is="dom-repeat" items="{{data}}" as="item" index-as="nmbr">
-      <fantomas-card data="{{item}}"></fantomas-card>
-      <page-break-div nmbr="{{nmbr}}" max="9"></page-break-div>
-    </template>
-  </template>
-
-</dom-module>
 <dom-module id="page-break-div" assetpath="../components/page-break-div/">
     <style>
         :host {
@@ -2029,8 +2011,25 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     </template>
 </dom-module>
 </div>
-  <fantomas-print></fantomas-print>
+    <fantomas-print></fantomas-print>
 
 
+    <dom-module id="fantomas-print">
+        <style>
+            :host {}
 
-</body></html>
+            .item {
+                width: 30px;
+                height: 30px;
+            }
+        </style>
+
+        <template>
+            <template is="dom-repeat" items="{{data}}" as="item" index-as="nmbr">
+                <fantomas-card data="{{item}}"></fantomas-card>
+                <page-break-div nmbr="{{nmbr}}" max="9"></page-break-div>
+            </template>
+        </template>
+
+    </dom-module>
+    </body></html>

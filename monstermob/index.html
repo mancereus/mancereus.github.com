@@ -3786,6 +3786,12 @@ Custom property | Description | Default
                 --paper-slider-active-color: var(--google-yellow-500);
             }
 
+            paper-button.blue {
+                background-color: var(--paper-blue-500) !important;
+                color: white !important;
+                padding: 4px;
+            }
+
             paper-button.green {
                 background-color: var(--paper-green-500) !important;
                 color: white !important;
@@ -3859,6 +3865,13 @@ Custom property | Description | Default
                     <paper-button class="green" on-tap="startTip">
                         <iron-icon icon="menu"></iron-icon>
                         Tippen
+                    </paper-button>
+
+                </template>
+                <template is="dom-if" if="{{container.active}}">
+                    <paper-button class="blue" on-tap="finishTurn">
+                        <iron-icon icon="home"></iron-icon>
+                        Zug beendet
                     </paper-button>
 
                 </template>

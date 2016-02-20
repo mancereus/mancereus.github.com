@@ -16260,7 +16260,8 @@ Polymer({
                 value: false
             },
             container: {
-                type: Object
+                type: Object,
+                notify: true
             },
             testCard: {
                 type: Object
@@ -16298,6 +16299,10 @@ Polymer({
             console.log("dropCard " + e);
             this.tipp = true;
             this.tippCard = this.getCards().sample();
+
+        },
+        finishTurn: function (e) {
+            this.fire("finish", this.container);
 
         },
         equals: function (card1, card2) {
@@ -16343,6 +16348,11 @@ Polymer({
                     }
                 }
             },
+            observers: [
+                 'playersChanged(players.splices)'
+            ],
+             listeners: {
+                'finish': 'endTurn'},
             ready: function() {
                 this.data = this.shuffle(cards);
                 var count = 0;
@@ -16355,6 +16365,9 @@ Polymer({
             },
             getMonsterIdx: function() {
                 return this.players.map(function(e) { return e.type; }).indexOf('monster');
+            },
+            playersChanged: function(changeRecord) {
+                console.log(changeRecord);
             },
             getMonster: function() {
                 return this.players[this.getMonsterIdx()];
@@ -16381,6 +16394,19 @@ Polymer({
                     if (filtered.length == 1) {
                     }
                 }
+            },
+			endTurn: function (e){
+                var idx = this.players.findIndex(function(n) {
+                return n.active == true; 
+                });
+                this.players[idx].active = false;
+                var nextIdx = (idx+1) % this.players.length;
+                if (this.players[nextIdx].type == 'monster') {
+                    nextIdx = (nextIdx+1) % this.players.length;
+                }
+                this.players[nextIdx].active = true;
+                console.log(this.players[nextIdx]);
+                this.notifyPath('players.*', this.players[nextIdx])
             },
 			isDirection: function (item, dir){
                 return item.direction == dir;

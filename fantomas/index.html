@@ -1717,7 +1717,7 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 	</style>
 	<template>
 		<div style="width: 780px;">
-			<template is="dom-repeat" items="{{cards}}">
+			<template is="dom-repeat" items="{{data}}">
 				<fantomas-card on-click="swap" front="{{item.front}}" back="{{item.back}}" open="{{item.open}}" empty="{{item.empty}}"></fantomas-card>
 			</template>
 		</div>

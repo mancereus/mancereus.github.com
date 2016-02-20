@@ -1951,7 +1951,7 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 	</style>
   <template>
 	<div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
-		<img src="{{img}}" style="width: 60px;">
+		<img src="img/{{img}}.png" style="width: 60px;">
 	</div>
 </template>
   </dom-module><dom-module id="game-print-card" assetpath="/">
@@ -2070,7 +2070,7 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
             <br>
             <!--<template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
                 <template is="dom-if" if="{{ card.imgclass}}">
-                    <game-piece print style="margin: 2px;" img="{{computeImg(card)}}" imgclass="{{card.imgclass}}"></game-piece>
+                    <game-piece print style="margin: 2px;" img="{{card.name}}" imgclass="{{card.imgclass}}"></game-piece>
                 </template>
             </template>-->
         </div>

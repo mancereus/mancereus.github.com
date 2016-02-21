@@ -2402,40 +2402,52 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
   </dom-module>
 <dom-module id="game-piece" assetpath="/">
-  <style>
-      :host {z-index: 2000;}
-		div {
-			position: absolute;
-			width: 56px;
-			height: 56px;
-			border-radius: 50%;
-			color: #fff;
-			overflow: hidden;
-			transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-			transition-delay: 0.2s;
-			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-			cursor: move;
-			border: 2px solid green;
-			background-color: white;
-			z-index: 2000;
-		}
-		:host.bigsymbol {
-			height: 56px;
-		}
-		div.bigsymbol img {
-			background-color: yellow;
-			height: 56px;
-		}
-		div.symbol img {
-			height: 56px;
-		}
-	</style>
-  <template>
-	<div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
-		<img src="img/{{img}}.png" style="width: 60px;">
-	</div>
-</template>
-  </dom-module><dom-module id="game-card" assetpath="/">
+    <style>
+        :host {
+            z-index: 99;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        div {
+            position: absolute;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            color: #fff;
+            overflow: hidden;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+            cursor: move;
+            border: 2px solid green;
+            background-color: white;
+            z-index: 99;
+        }
+        
+        :host.bigsymbol {
+            height: 56px;
+        }
+        
+        div.bigsymbol img {
+            background-color: yellow;
+            height: 56px;
+        }
+        
+        div.symbol img {
+            height: 56px;
+        }
+    </style>
+    <template>
+        <div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
+            <img src="img/{{img}}.png" style="width: 60px;">
+        </div>
+    </template>
+    </dom-module><dom-module id="game-card" assetpath="/">
     <style>
         :host {
             display: block;
@@ -2449,6 +2461,12 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             font-size: 1em;
             page-break-inside: avoid;
             -webkit-region-break-inside: avoid;
+             -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .card-header {
@@ -3692,6 +3710,12 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             font-size: 1em;
             font-weight: 150;
             line-height: 1.2em;
+             -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         h2 {
@@ -3729,6 +3753,12 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     <dom-module id="game-board" assetpath="/">
         <style>
             :host {
+             -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
                 display: block;
             }
 
@@ -3756,10 +3786,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 border-color: var(--paper-green-500);
                 background-color: var(--paper-light-green-50);
                 color: var(--paper-green-500);
+                z-index: 2002;
             }
         </style>
         <template>
-            <iron-localstorage auto="" id="local" name="config" value="{{config}}"></iron-localstorage>
+            <iron-localstorage auto="" id="local" name="config" value="{{config}}" on-iron-localstorage-load-empty="createConfig"></iron-localstorage>
             <div class="container layout horizontal ">
                 <div>
                     <div id="field" style="width: 780px;" class="layout horizontal wrap" on-showdetails="showCard">
@@ -3825,7 +3856,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                                 <h2>Akt 1</h2></td>
                             <td>
                                 <select id="sterne" value="{{config.stars::input}}">
-                                    <option value="0">ohne Sterne</option>
                                     <option value="1">ein Stern</option>
                                     <option value="2">zwei Sterne</option>
                                     <option value="3">drei Sterne</option>
@@ -3881,10 +3911,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                         </div>
 
                     </template>
-                    <paper-dialog id="dialog">
+                    <paper-dialog id="dialog" modal="">
                         <h2>Geheimnis Nr. {{level}} <game-help text="{{secret}}"></game-help></h2>
                         <h3>Nur lesen, wenn du die Schatzkammer mit {{level}} Stern(en) geöffnet hast!</h3>
                         <p>{{secret}}</p>
+                         <div class="buttons">
+                            <paper-button dialog-confirm="" autofocus="">OK</paper-button>
+                        </div>
                     </paper-dialog>
 
                 </div>

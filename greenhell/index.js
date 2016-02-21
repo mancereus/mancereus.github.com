@@ -11445,14 +11445,14 @@ var data1 = {
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluss fahren.", hor: true, imgclass: "symbol" },
+        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluß fahren.", hor: true, imgclass: "symbol" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
         { name: "Pistole", Aktion: "Die Pistole ist alt und hat nur noch eine Kugel.", hor: true, imgclass: "symbol"},
         { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: true, imgclass: "symbol" },
-        { name: "Inschrift", Aktion: "Die Inschrift ist versteckt hinter Dschungelpflanzen. Lege eine Machete und das Tagebuch hier ab, dann ihr ihr den Weg zum 'Tal der Kannibalen' erkennen.", hor: true },
+        { name: "Inschrift", Aktion: "Die Inschrift ist versteckt hinter Dschungelpflanzen. Lege eine Machete und das Tagebuch hier ab, dann könnt ihr den Weg zum 'Tal der Kannibalen' erkennen.", hor: true },
         { name: "See", Aktion: "Nur mit dem Boot kannst du den See betreten oder überqueren.", info: "problem" },
-        { name: "Tagebuch", Aktion: "Ihr findet das Tagebuch von Professor Hampton. Er sucht das geheime 'Tal der Kannibalen'. Suche den Tempel oder die versteckte Inschrift, um den den Weg dorhin zu entschlüsseln.", imgclass: "symbol" },
+        { name: "Tagebuch", Aktion: "Ihr findet das Tagebuch von Professor Hampton. Er sucht das geheime 'Tal der Kannibalen'. Finde den Tempel oder die versteckte Inschrift, um den Weg dorhin zu entschlüsseln.", imgclass: "symbol" },
 
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange. ", hor: true, imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: true, imgclass: "symbol" },
@@ -11467,9 +11467,9 @@ var data1 = {
     ],
     initActions: [
         { name: "Fluss", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 beenden.", task: true },
-        { name: "Minenfahrt", order: "home", Aktion: "Wenn alle 4 Höhlen im Spielplan gefunden sind und ihr das Tagebuch besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du eine Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
-        { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", hor: true, imgclass: "symbol", task: true },
-        { name: "Tempel", Aktion: "Ihr habt die alte Tempelruine gefunden. Lege das Tagebuch hier ab, dann könnt ihr den Weg zum 'Tal der Kannibalen' entdecken. Spiele Akt 2 mit 'Tempel'.", task: true },
+        { name: "Minenfahrt", order: "home", Aktion: "Wenn alle 4 Höhlen im Spielplan gefunden sind und ihr das Tagebuch und eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
+        { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", imgclass: "symbol", task: true },
+        { name: "Tempel", Aktion: "Ihr habt die alte Tempelruine gefunden. Lege das Tagebuch hier ab, dann kennt ihr den Weg zum 'Tal der Kannibalen'.", task: true },
         { name: "Lager", Aktion: "Du findest ein verlassenes Lager. Du kannst bis zu 2 Dinge aus dem Vorrat auf passende leere Karten legen. (z.B.: Liane auf Lianenkarte)", task: true },
 
         { name: "Tierfalle", Aktion: "Jacks Bein verletzt sich in einer Tierfalle des Großwildjägers. Du kannst bis zu einem anderen Eckfeld pro Zug nur 3 Felder weit ziehen. Verwende in Akt 2 eine Aktionskarte mit 'Jäger'", task: true },
@@ -11478,8 +11478,8 @@ var data1 = {
 
         { name: "Überfall", order: "star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
         { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Whisky-kiste. Er hat Alkohol-probleme und versucht für den Auftrag nüchtern zu bleiben. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
-         { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weisst ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
-        { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weiss nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
+         { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weist ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
+        { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
     ],
     start: { name: "Akt I", Aktion: "Jane hat den Piloten Jack für eine geheime Expedition in den Dschungel engagiert.  Das Flugzeug stürzt kurz vor dem Ziel ab. Jemand hat die Tanks durchlöchert...", task: true, type: "Startkarte" },
 };
@@ -11487,23 +11487,23 @@ var data2 = {
     akt: 2,
     initcards: [
         { name: "Weg", Aktion: "", flavour: "Jane: 'Was war das für ein Geräusch?'", hor: true },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Prof. Hampton ist vermutlich schon tot.' Jane: 'Nein, er lebt noch.'", hor: true },
+        { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Vorsicht, die ist giftig.'", ver: true },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Wir brauchen mehr Wasser zum Trinken.'", ver: true },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Wir sollten umkehren.'", ver: true },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist bei der letzten Expedition verschollen.'", ver: true },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier geht es nicht weiter.'", ver: true, hor: true },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Prof. Hampton ist bei der Suche nach El Dorade verschollen.'", ver: true },
-        { name: "Weg", Aktion: "", flavour: "Jack: 'Prof. Hampton ist vermutlich schon tot.' Jane: 'Nein, er lebt noch.'", hor: true },
-        { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Pause.'", ver: true, hor: true },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Pause.'", ver: true, hor: true },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true,  imgclass: "symbol" },
-        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true,  imgclass: "symbol" },
-        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluss fahren.", hor: true, imgclass: "symbol" },
+        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true,  imgclass: "symbol" },
+        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluß fahren.", hor: true, imgclass: "symbol" },
         { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
-        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
+        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
@@ -11512,11 +11512,11 @@ var data2 = {
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", hor: true, info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", hor: true, info: "info" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
-        { name: "Hängebrücke",  info: "warn", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "warn" },
-        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "warn" },
-        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "warn" },
-        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "warn" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Fels", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen.", info: "problem" },
         { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", hor: true, imgclass: "symbol"},
         { name: "Dynamit", Aktion: "Du findest einen versteckten Vorrat an Dynamit und kannst damit einen Felsen sprengen. Lege dazu das Dynamit von einem Nachbarfeld aus ohne Wand dazwischen auf den Felsen.", imgclass: "symbol", type: "Erweiterung Aktionskarte" },
@@ -11528,29 +11528,29 @@ var data2 = {
         { name: "Pistole", Aktion: "Die Pistole ist alt und hat nur noch eine Kugel.", hor: true, imgclass: "symbol"},
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: true, imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", ver: true, imgclass: "symbol" },
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem"},
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem"},
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
     ],
     initActions: [
         { name: "Tiger", Aktion: "Ein Tiger überrascht euch und jagt euch 2 Felder diagonal zur Mitte. Ihr könnt die Aktion auf diesem Feld ignorieren.", task: true },
-        { name: "Alligator", Aktion: "Am Fluss wird Jack von einem Alligator angefallen. Wenn ihr keine Pistole habt, wird er verletzt und ihr könnt pro Zug nur noch maximal 4 Schritte gehen.", task: true },
+        { name: "Alligator", Aktion: "Am Fluß wird Jack von einem Alligator angefallen. Wenn ihr keine Pistole habt, wird er verletzt und ihr könnt pro Zug nur noch maximal 4 Schritte gehen.", task: true },
         { name: "Affenhorde",  Aktion: "Die Affenhorde klaut einen offen liegenden Gegenstand auf dem Plan. Wähle einen Gegenstand aus und lege ihn den Vorrat", info: "problem", task: true },
 
-        { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Aktionskarte. Mit der Pistole kannst du sie ihm dort abnehmen.", info: "warn", task: true },
+        { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Aktionskarte. Mit der Pistole kannst du sie ihm dort abnehmen.",  task: true },
         { name: "Jäger", order: "accessibility", Aktion: "Der Großwildjäger Stoephasius wurde von Kannibalen gefangen genommen und wird in ihr Dorf transportiert. Mit der Pistole kannst du ihn retten. Aus Dankbarkeit darfst du in der nächsten Partie einen zusätzlichen Stern verwenden.", info: "warn",  task: true },
 
         { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true },
 
         { name: "Treibsand", order: "build", Aktion: "Jack bleibt im Treibsand stecken. Jane muss eine Liane hierherbringen, um ihn zu retten. Gib die Liane dazu ab. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist Jane nicht dabei, stirbt Jack und das Abenteuer ist zu Ende.", task: true },
 
-        { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine grosse Diamanten. Wenn du Sie herausholst, verlierst du die Fackel.", info: "warn", imgclass: "symbol", task: true },
+        { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine große Diamanten. Wenn du Sie herausholst, verlierst du die Fackel.", info: "warn", imgclass: "symbol", task: true },
 
 
         { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Die Fackel geht in den Vorrat.", task: true },
 
-        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluss das Abenteuer beenden. Wenn du mind. 2 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
-        { name: "Schatzkammer", order:"exit-to-app", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 3 Artefakte hier ablegt, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
+        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluß das Abenteuer beenden. Wenn du mind. 2 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
+        { name: "Schatzkammer", order:"exit-to-app", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 3 Artefakte hier ablegt und Jack und Jane dabei sind, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
     ],
     start: {name: "Akt II", task: true,
     Aktion: "Ihr erreicht das 'Tal der Kannibalen'. Jane ist sich sicher, dass Prof. Hampton hier hergekommen ist."},
@@ -17278,16 +17278,17 @@ function get(name) {
             observers: [
                 "configChanged(config.*)"
             ],
+            createConfig: function () {
+                 this.config = {
+                     check: {},
+                     akt: 1,
+                     open: false,
+                     stars: 1
+                 }
+                this.notifyPath('config.akt',this.config.path);
+            },
             attached: function () {
-                if (this.config == undefined) {
-                    this.config = {};
-                    this.config.check = {};
-                    this.config.akt = 1;
-                    this.config.akt2 = {};
-                    this.notifyPath('config.akt',this.config.path);
-                    this.config.open = false;
-                    this.config.stars = 0;
-                }
+              
                 if (this.config.akt == 1) {
                     this.data = data1;
                 }

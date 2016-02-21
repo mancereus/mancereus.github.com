@@ -1921,40 +1921,52 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 
   </dom-module>
 <dom-module id="game-piece" assetpath="/">
-  <style>
-      :host {z-index: 2000;}
-		div {
-			position: absolute;
-			width: 56px;
-			height: 56px;
-			border-radius: 50%;
-			color: #fff;
-			overflow: hidden;
-			transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-			transition-delay: 0.2s;
-			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-			cursor: move;
-			border: 2px solid green;
-			background-color: white;
-			z-index: 2000;
-		}
-		:host.bigsymbol {
-			height: 56px;
-		}
-		div.bigsymbol img {
-			background-color: yellow;
-			height: 56px;
-		}
-		div.symbol img {
-			height: 56px;
-		}
-	</style>
-  <template>
-	<div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
-		<img src="img/{{img}}.png" style="width: 60px;">
-	</div>
-</template>
-  </dom-module><dom-module id="game-print-card" assetpath="/">
+    <style>
+        :host {
+            z-index: 99;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        div {
+            position: absolute;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            color: #fff;
+            overflow: hidden;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+            cursor: move;
+            border: 2px solid green;
+            background-color: white;
+            z-index: 99;
+        }
+        
+        :host.bigsymbol {
+            height: 56px;
+        }
+        
+        div.bigsymbol img {
+            background-color: yellow;
+            height: 56px;
+        }
+        
+        div.symbol img {
+            height: 56px;
+        }
+    </style>
+    <template>
+        <div name="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
+            <img src="img/{{img}}.png" style="width: 60px;">
+        </div>
+    </template>
+    </dom-module><dom-module id="game-print-card" assetpath="/">
     <style>
         :host {
             margin: 0;

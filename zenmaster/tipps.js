@@ -13140,6 +13140,10 @@ Polymer({
 Polymer({
             is: 'zenmaster-tipps',
             properties: {
+                master: {
+                    type:Boolean,
+                    value: false
+                },
                 data: {type:Object, notify: true},
             },
             isTipp: function (o){

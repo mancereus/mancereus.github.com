@@ -1089,29 +1089,29 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             <tbody><tr>
                 <th></th>
                 <th width="180px">Versuch</th>
-                <th width="40px">Form oder Größe</th>
-                <th width="40px">Inhalt oder Teil</th>
+                <th width="40px">Form oder Oberfläche</th>
+                <th width="40px">Größe oder Gewicht</th>
+                <th width="40px">Inhalt oder Bewegung</th>
                 <th width="40px">Ort oder Zeit</th>
-                <th width="40px">Bewegung oder Oberfläche</th>
             </tr>
             <template is="dom-repeat" items="{{data.tips}}">
                 <template is="dom-if" if="{{isTipp(item)}}">
                     <tr>
                         <td><span class="try">{{index}}</span><span class="try">: </span></td>
                         <td>
-                            <input class="try inp" value="{{item.value::input}}">
+                            <input class="try inp" value="{{item.value::input}}" disabled="{{master}}">
                         </td>
                         <td>
-                            <paper-checkbox checked="{{item.form}}"></paper-checkbox>
+                            <paper-checkbox checked="{{item.form}}" disabled="{{!master}}"></paper-checkbox>
                         </td>
                         <td>
-                            <paper-checkbox checked="{{item.inhalt}}"></paper-checkbox>
+                            <paper-checkbox checked="{{item.inhalt}}" disabled="{{!master}}"></paper-checkbox>
                         </td>
                         <td>
-                            <paper-checkbox checked="{{item.ort}}"></paper-checkbox>
+                            <paper-checkbox checked="{{item.ort}}" disabled="{{!master}}"></paper-checkbox>
                         </td>
                         <td>
-                            <paper-checkbox checked="{{item.bewegung}}"></paper-checkbox>
+                            <paper-checkbox checked="{{item.gewicht}}" disabled="{{!master}}"></paper-checkbox>
                         </td>
                     </tr>
                 </template>
@@ -1119,33 +1119,30 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                     <tr>
                         <td><span class="try">{{index}}</span><span class="try">: </span></td>
                         <td>
-                            <input class="try inp">
+                            <input class="try inp" value="{{item.value::input}}" disabled="{{!master}}">
                         </td>
                         <td>
-                            <paper-radio-button name$="{{item}}" checked="{{item.form}}"></paper-radio-button>
+                            <paper-radio-button name$="{{item}}" checked="{{item.form}}" disabled="{{master}}"></paper-radio-button>
                         </td>
                         <td>
-                            <paper-radio-button name$="{{item}}"></paper-radio-button>
+                            <paper-radio-button name$="{{item}}" checked="{{item.inhalt}}" disabled="{{master}}"></paper-radio-button>
                         </td>
                         <td>
-                            <paper-radio-button name$="{{item}}"></paper-radio-button>
+                            <paper-radio-button name$="{{item}}" checked="{{item.ort}}" disabled="{{master}}"></paper-radio-button>
                         </td>
                         <td>
-                            <paper-radio-button name$="{{item}}"></paper-radio-button>
+                            <paper-radio-button name$="{{item}}" checked="{{item.gewicht}}" disabled="{{master}}"></paper-radio-button>
                         </td>
                     </tr>
                 </template>
             </template>
         </tbody></table>
-        <p class="info">Nach 5 Begriffen müssen zu jeder Kategorie ein X gefunden worden sein. Sonst gibt der ZenMeister einen 6. Begriff
-            vor, der die fehlenden X enthält.</p>
 
     </template>
 
     </dom-module>
 </div>
-	<h1>Schüler</h1>
-	<h3>ZenMeister, ist das erleuchtet?</h3>
+	<h1>ZenMeister Tipp Seite</h1>
     <zenmaster-tipps></zenmaster-tipps>
 	<template id="tipTmpl" is="dom-bind">
 		

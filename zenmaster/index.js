@@ -8003,24 +8003,26 @@ Polymer({
     }
   });
 var dataform = [
-    { type: "Form", type2: "Größe", name: "grösser als eine Katze" },
-    { type: "Form", type2: "Größe", name: "passt in ein Gartenhäuschen" },
-    { type: "Form", type2: "Größe", name: "höher als ein 2-stöckiges Reihenhaus" },
-    { type: "Form", type2: "Größe", name: "passt in einen Schuhkarton" },
-    { type: "Form", type2: "Größe", name: "ist lang und dünn oder stabförmig" },
-    { type: "Form", type2: "Größe", name: "ist im wesentlichen flach" },
-    { type: "Form", type2: "Größe", name: "ist kugel- oder eiförmig" },
-    { type: "Form", type2: "Größe", name: "ist Kistenförmig oder rechteckig" },
+    { type: "Form", type2: "Oberfläche", name: "ist lang und dünn oder stabförmig" },
+    { type: "Form", type2: "Oberfläche", name: "ist im wesentlichen flach" },
+    { type: "Form", type2: "Oberfläche", name: "ist kugel- oder eiförmig" },
+    { type: "Form", type2: "Oberfläche", name: "ist Kistenförmig oder rechteckig" },
+    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist grösstenteils pelzig oder haarig" },
+    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist warm oder heiss" },
+    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend glatt" },
+    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend rauh" },
+    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend hart" },
+    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend elastisch" },
 ];
 
 var datainhalt = [
-    { type: "Inhalt", type2: "Gewicht", name: "ist 10kg oder leichter" },
-    { type: "Inhalt", type2: "Gewicht", name: "ist zwischen 10kg und 100kg" },
-    { type: "Inhalt", type2: "Gewicht", name: "ist 100kg oder schwerer" },
-    { type: "Inhalt", type2: "Gewicht", name: "hat Zähne oder spitze Teile" },
-    { type: "Inhalt", type2: "Gewicht", name: "mit Rad oder vollständig drehbarem Teil" },
-    { type: "Inhalt", type2: "Gewicht", name: "mit Gelenk oder beweglichem Teil" },
-    { type: "Inhalt", type2: "Gewicht", name: "darauf sind Buchstaben, Zeichen oder Zahlen" },
+    { type: "Inhalt", type2: "Bewegung", name: "hat Zähne oder spitze Teile" },
+    { type: "Inhalt", type2: "Bewegung", name: "mit Rad oder vollständig drehbarem Teil" },
+    { type: "Inhalt", type2: "Bewegung", name: "mit Gelenk oder beweglichem Teil" },
+    { type: "Inhalt", type2: "Bewegung", name: "darauf sind Buchstaben, Zeichen oder Zahlen" },
+    { type: "Inhalt", type2: "Bewegung", name: "bewegt sich selbständig" },
+    { type: "Inhalt", type2: "Bewegung", name: "bewegt sich selbständig, aber eher langsam" },
+    { type: "Inhalt", type2: "Bewegung", name: "schwimmt im Wasser oben" },
 ];
 var dataort = [
     { type: "Ort", type2: "Zeit", name: "kann ich innerhalb von 5 Minuten hierherbringen" },
@@ -8033,15 +8035,13 @@ var dataort = [
     { type: "Ort", type2: "Zeit", name: "es gibt jetzt mehr als vor 100 Jahren" },
 ];
 var dataextra = [
-    { type: "Bewegung", type2: "Oberfläche", name: "bewegt sich selbständig" },
-    { type: "Bewegung", type2: "Oberfläche", name: "bewegt sich selbständig, aber eher langsam" },
-    { type: "Bewegung", type2: "Oberfläche", name: "schwimmt im Wasser oben" },
-    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist grösstenteils pelzig oder haarig" },
-    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist warm oder heiss" },
-    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend glatt" },
-    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend rauh" },
-    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend hart" },
-    { type: "Bewegung", type2: "Oberfläche", name: "Oberfläche ist vorwiegend elastisch" },
+    { type2: "Größe", type: "Gewicht", name: "grösser als eine Katze" },
+    { type2: "Größe", type: "Gewicht", name: "passt in ein Gartenhäuschen" },
+    { type2: "Größe", type: "Gewicht", name: "höher als ein 2-stöckiges Reihenhaus" },
+    { type2: "Größe", type: "Gewicht", name: "passt in einen Schuhkarton" },
+    { type2: "Größe", type: "Gewicht", name: "ist 10kg oder leichter" },
+    { type2: "Größe", type: "Gewicht", name: "ist zwischen 10kg und 100kg" },
+    { type2: "Größe", type: "Gewicht", name: "ist 100kg oder schwerer" },
 ];
 (function() {
     'use strict';
@@ -9975,15 +9975,15 @@ Polymer({
                 this.set("data.solution", "");
                 this.newCards();
                 this.push('data.tips',
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false,},
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'help1',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'help2',value:"", form:false,inhalt:false,ort:false,bewegung:false},
-                {name: 'tip',value:"", form:false,inhalt:false,ort:false,bewegung:false});
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'help1',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'help2',value:"", form:false,inhalt:false,ort:false,gewicht:false},
+                {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false});
             },
             attached: function() {
                                 
@@ -10796,6 +10796,10 @@ Polymer({
 Polymer({
             is: 'zenmaster-tipps',
             properties: {
+                master: {
+                    type:Boolean,
+                    value: false
+                },
                 data: {type:Object, notify: true},
             },
             isTipp: function (o){

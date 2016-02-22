@@ -1,27 +1,30 @@
-<!DOCTYPE html><html><head><script src="index.js" defer=""></script><meta charset="UTF-8">
-	<title>ZenMeister</title>
-	<!--
-An element wrapper for the Firebase API.
-
-A `<firebase-document>` is a reference to a remote document somewhere on
-Firebase. The element fetchs a document at a provided `location`, and exposes
-it as an Object that is suitable for deep two-way databinding.
-
-Example:
-
-    <firebase-document
-      location="https://dinosaur-facts.firebaseio.com/dinosaurs"
-      data="{{dinosaurs}}"></firebase-document>
-
-In the above example, if the `dinosaurs` object is data-bound elsewhere via
-Polymer's data-binding system, changes to the document will be automatically
-reflected in the remote document and any other clients referencing that
-document.
-
-@demo demo/index.html
+<!DOCTYPE html><html><head><script src="index.js" defer=""></script><meta charset="UTF-8"><!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
-<style>
+	<title>ZenMeister</title>
+	<style>
 body {margin: 0; padding: 1px}
 body,h5,h6,p{font-size:13px;line-height:20px}
 a,body,paper-toolbar{color:#424242}
@@ -49,7 +52,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
 </style>
 
-<!-- Taken from https://www.google.com/design/spec/style/color.html#color-ui-color-application -->
+
 
 <style is="custom-style">
 
@@ -106,221 +109,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   }
 
 </style>
-<!--
-`iron-meta` is a generic element you can use for sharing information across the DOM tree.
-It uses [monostate pattern](http://c2.com/cgi/wiki?MonostatePattern) such that any
-instance of iron-meta has access to the shared
-information. You can use `iron-meta` to share whatever you want (or create an extension
-[like x-meta] for enhancements).
 
-The `iron-meta` instances containing your actual data can be loaded in an import,
-or constructed in any way you see fit. The only requirement is that you create them
-before you try to access them.
-
-Examples:
-
-If I create an instance like this:
-
-    <iron-meta key="info" value="foo/bar"></iron-meta>
-
-Note that value="foo/bar" is the metadata I've defined. I could define more
-attributes or use child nodes to define additional metadata.
-
-Now I can access that element (and it's metadata) from any iron-meta instance
-via the byKey method, e.g.
-
-    meta.byKey('info').getAttribute('value');
-
-Pure imperative form would be like:
-
-    document.createElement('iron-meta').byKey('info').getAttribute('value');
-
-Or, in a Polymer element, you can include a meta in your template:
-
-    <iron-meta id="meta"></iron-meta>
-    ...
-    this.$.meta.byKey('info').getAttribute('value');
-
-@group Iron Elements
-@demo demo/index.html
-@hero hero.svg
-@element iron-meta
--->
-
-<!--
-Material design: [Surface reaction](https://www.google.com/design/spec/animation/responsive-interaction.html#responsive-interaction-surface-reaction)
-
-`paper-ripple` provides a visual effect that other paper elements can
-use to simulate a rippling effect emanating from the point of contact.  The
-effect can be visualized as a concentric circle with motion.
-
-Example:
-
-    <div style="position:relative">
-      <paper-ripple></paper-ripple>
-    </div>
-
-Note, it's important that the parent container of the ripple be relative position, otherwise
-the ripple will emanate outside of the desired container.
-
-`paper-ripple` listens to "mousedown" and "mouseup" events so it would display ripple
-effect when touches on it.  You can also defeat the default behavior and
-manually route the down and up actions to the ripple element.  Note that it is
-important if you call `downAction()` you will have to make sure to call
-`upAction()` so that `paper-ripple` would end the animation loop.
-
-Example:
-
-    <paper-ripple id="ripple" style="pointer-events: none;"></paper-ripple>
-    ...
-    downAction: function(e) {
-      this.$.ripple.downAction({x: e.x, y: e.y});
-    },
-    upAction: function(e) {
-      this.$.ripple.upAction();
-    }
-
-Styling ripple effect:
-
-  Use CSS color property to style the ripple:
-
-    paper-ripple {
-      color: #4285f4;
-    }
-
-  Note that CSS color property is inherited so it is not required to set it on
-  the `paper-ripple` element directly.
-
-By default, the ripple is centered on the point of contact.  Apply the `recenters`
-attribute to have the ripple grow toward the center of its container.
-
-    <paper-ripple recenters></paper-ripple>
-
-You can also  center the ripple inside its container from the start.
-
-    <paper-ripple center></paper-ripple>
-
-Apply `circle` class to make the rippling effect within a circle.
-
-    <paper-ripple class="circle"></paper-ripple>
-
-@group Paper Elements
-@element paper-ripple
-@hero hero.svg
-@demo demo/index.html
--->
-
-<!--
-Material design: [Checkbox](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-checkbox)
-
-`paper-checkbox` is a button that can be either checked or unchecked.  User
-can tap the checkbox to check or uncheck it.  Usually you use checkboxes
-to allow user to select multiple options from a set.  If you have a single
-ON/OFF option, avoid using a single checkbox and use `paper-toggle-button`
-instead.
-
-Example:
-
-    <paper-checkbox>label</paper-checkbox>
-
-    <paper-checkbox checked> label</paper-checkbox>
-
-### Styling
-
-The following custom properties and mixins are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-checkbox-unchecked-background-color` | Checkbox background color when the input is not checked | `transparent`
-`--paper-checkbox-unchecked-color` | Checkbox border color when the input is not checked | `--primary-text-color`
-`--paper-checkbox-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--primary-text-color`
-`--paper-checkbox-checked-color` | Checkbox color when the input is checked | `--primary-color`
-`--paper-checkbox-checked-ink-color` | Selected/focus ripple color when the input is checked | `--primary-color`
-`--paper-checkbox-checkmark-color` | Checkmark color | `white`
-`--paper-checkbox-label-color` | Label color | `--primary-text-color`
-`--paper-checkbox-label-spacing` | Spacing between the label and the checkbox | `8px`
-`--paper-checkbox-error-color` | Checkbox color when invalid | `--error-color`
-`--paper-checkbox-size` | Size of the checkbox | `18px`
-
-This element applies the mixin `--paper-font-common-base` but does not import `paper-styles/typography.html`.
-In order to apply the `Roboto` font to this element, make sure you've imported `paper-styles/typography.html`.
-
-@demo demo/index.html
--->
-
-<!--
-Material design: [Radio button](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-radio-button)
-
-`paper-radio-button` is a button that can be either checked or unchecked.
-User can tap the radio button to check or uncheck it.
-
-Use a `<paper-radio-group>` to group a set of radio buttons.  When radio buttons
-are inside a radio group, exactly one radio button in the group can be checked
-at any time.
-
-Example:
-
-    <paper-radio-button></paper-radio-button>
-    <paper-radio-button>Item label</paper-radio-button>
-
-### Styling
-
-The following custom properties and mixins are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-radio-button-unchecked-background-color` | Radio button background color when the input is not checked | `transparent`
-`--paper-radio-button-unchecked-color` | Radio button color when the input is not checked | `--primary-text-color`
-`--paper-radio-button-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--primary-text-color`
-`--paper-radio-button-checked-color` | Radio button color when the input is checked | `--primary-color`
-`--paper-radio-button-checked-ink-color` | Selected/focus ripple color when the input is checked | `--primary-color`
-`--paper-radio-button-label-color` | Label color | `--primary-text-color`
-`--paper-radio-button-label-spacing` | Spacing between the label and the button | `10px`
-
-This element applies the mixin `--paper-font-common-base` but does not import `paper-styles/typography.html`.
-In order to apply the `Roboto` font to this element, make sure you've imported `paper-styles/typography.html`.
-
-@group Paper Elements
-@element paper-radio-button
-@hero hero.svg
-@demo demo/index.html
--->
-
-<!--
-Material design: [Radio button](https://www.google.com/design/spec/components/selection-controls.html#selection-controls-radio-button)
-
-`paper-radio-group` allows user to select at most one radio button from a set.
-Checking one radio button that belongs to a radio group unchecks any
-previously checked radio button within the same group. Use
-`selected` to get or set the selected radio button.
-
-The <paper-radio-buttons> inside the group must have the `name` attribute
-set.
-
-Example:
-
-    <paper-radio-group selected="small">
-      <paper-radio-button name="small">Small</paper-radio-button>
-      <paper-radio-button name="medium">Medium</paper-radio-button>
-      <paper-radio-button name="large">Large</paper-radio-button>
-    </paper-radio-group>
-
-Radio-button-groups can be made optional, and allow zero buttons to be selected:
-
-    <paper-radio-group selected="small" allow-empty-selection>
-      <paper-radio-button name="small">Small</paper-radio-button>
-      <paper-radio-button name="medium">Medium</paper-radio-button>
-      <paper-radio-button name="large">Large</paper-radio-button>
-    </paper-radio-group>
-
-See <a href="paper-radio-button">paper-radio-button</a> for more
-information about `paper-radio-button`.
-
-@group Paper Elements
-@element paper-radio-group
-@hero hero.svg
-@demo demo/index.html
--->
 
 <style>
 body {margin: 0; padding: 1px}
@@ -458,17 +247,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         <button on-click="finishTurn">Fertig</button>
     </template>
 
-    </dom-module>
-<dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
+    </dom-module><dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
 
-  <!--
-  Fired when the animation finishes. This is useful if you want to wait until the ripple
-  animation finishes to perform some action.
-
-  @event transitionend
-  @param {Object} detail
-  @param {Object} detail.node The animated node
-  -->
+  
 
   <template>
     <style>
@@ -974,6 +755,4 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 	<h1>ZenMeister</h1>
 	<zenmaster-game></zenmaster-game>
 	<zenmaster-tipps master=""></zenmaster-tipps>
-
-
-</body></html>
+    </body></html>

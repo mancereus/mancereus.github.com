@@ -161,38 +161,26 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
             .Inhalt {
                 background-color: lightblue;
-                width: 250px;
-                padding: 0;
-                margin: 5px;
             }
 
             .Form {
                 background-color: lightcoral;
-                width: 250px;
-                padding: 0;
-                margin: 5px;
             }
 
             .Ort {
                 background-color: lightgreen;
-                width: 250px;
-                padding: 0;
-                margin: 5px;
             }
 
             .Größe {
                 background-color: yellow;
-                width: 250px;
-                padding: 0;
-                margin: 5px;
             }
 
             .cards {
             }
 
             .card {
-                height: 100px;
                 border: 1px solid black;
+                width: 400px;
                 text-align: center;
                 vertical-align: middle;
                 padding: 5px 10px;
@@ -231,12 +219,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         <div class="cards">
             <template is="dom-repeat" items="{{data.cards}}">
 
-                <div class$="{{item.type}}">
-                    <div class="card">
+                <div class$="{{item.type}} card">
                         <span class="header">{{item.type}} / {{item.type2}}</span>
                         <br>
                         <span>{{item.name}}</span>
-                    </div>
                 </div>
             </template>
 

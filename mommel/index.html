@@ -1,21 +1,25 @@
-<!DOCTYPE html><html><head><script src="index.js" defer=""></script><meta charset="UTF-8">
+<!DOCTYPE html><html><head><script src="index.js" defer=""></script><meta charset="UTF-8"><!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
   <title>Mommel</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
-<!--
-The `<iron-flex-layout>` component provides simple ways to use [CSS flexible box layout](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Flexible_boxes), also known as flexbox. This component provides two different ways to use flexbox:
 
-1. [Layout classes](https://github.com/PolymerElements/iron-flex-layout/tree/master/classes). The layout class stylesheet provides a simple set of class-based flexbox rules. Layout classes let you specify layout properties directly in markup.
-
-2. [Custom CSS mixins](https://github.com/PolymerElements/iron-flex-layout/blob/master/iron-flex-layout.html). The mixin stylesheet includes custom CSS mixins that can be applied inside a CSS rule using the `@apply` function.
-
-A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `<iron-flex-layout>` is available.
-
-@group Iron Elements
-@pseudoElement iron-flex-layout
-@demo demo/index.html
--->
 
 <style>
   /* IE 10 support for HTML5 hidden attr */
@@ -319,130 +323,9 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
   }
 
 </style>
-<!--
-`paper-header-panel` contains a header section and a content panel section.
-
-__Important:__ The `paper-header-panel` will not display if its parent does not have a height.
-
-Using layout classes, you can make the `paper-header-panel` fill the screen
-
-    <body class="fullbleed layout vertical">
-      <paper-header-panel class="flex">
-        <paper-toolbar>
-          <div>Hello World!</div>
-        </paper-toolbar>
-      </paper-header-panel>
-    </body>
-
-Special support is provided for scrolling modes when one uses a paper-toolbar or equivalent for the
-header section.
-
-Example:
-
-    <paper-header-panel>
-      <paper-toolbar>Header</paper-toolbar>
-      <div>Content goes here...</div>
-    </paper-header-panel>
-
-If you want to use other than `paper-toolbar` for the header, add `paper-header` class to that
-element.
-
-Example:
-
-    <paper-header-panel>
-      <div class="paper-header">Header</div>
-      <div>Content goes here...</div>
-    </paper-header-panel>
-
-To have the content fit to the main area, use the `fit` class.
-
-    <paper-header-panel>
-      <div class="paper-header">standard</div>
-      <div class="fit">content fits 100% below the header</div>
-    </paper-header-panel>
-
-### Modes
-
-Controls header and scrolling behavior. Options are `standard`, `seamed`, `waterfall`, `waterfall-tall`, `scroll` and
-`cover`. Default is `standard`.
-
-Mode | Description
-----------------|-------------
-`standard` | The header is a step above the panel. The header will consume the panel at the point of entry, preventing it from passing through to the opposite side.
-`seamed` | The header is presented as seamed with the panel.
-`waterfall` | Similar to standard mode, but header is initially presented as seamed with panel, but then separates to form the step.
-`waterfall-tall` | The header is initially taller (`tall` class is added to the header). As the user scrolls, the header separates (forming an edge) while condensing (`tall` class is removed from the header).
-`scroll` | The header keeps its seam with the panel, and is pushed off screen.
-`cover` | The panel covers the whole `paper-header-panel` including the header. This allows user to style the panel in such a way that the panel is partially covering the header.
-
-Example:
-
-    <paper-header-panel mode="waterfall">
-      <div class="paper-header">standard</div>
-      <div class="content fit">content fits 100% below the header</div>
-    </paper-header-panel>
 
 
-### Styling
 
-To change the shadow that shows up underneath the header:
-
-    paper-header-panel {
-      --paper-header-panel-shadow: {
-          height: 6px;
-          bottom: -6px;
-          box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
-      };
-    }
-
-To change the panel container in different modes:
-
-    paper-header-panel {
-      --paper-header-panel-standard-container: {
-        border: 1px solid gray;
-      };
-
-      --paper-header-panel-seamed-container: {
-        border: 1px solid gray;
-      };
-
-      --paper-header-panel-waterfall-container: {
-        border: 1px solid gray;
-      };
-
-      --paper-header-panel-waterfall-tall-container: {
-        border: 1px solid gray;
-      };
-
-      --paper-header-panel-scroll-container: {
-        border: 1px solid gray;
-      };
-
-      --paper-header-panel-cover-container: {
-        border: 1px solid gray;
-      };
-    }
-
-The following custom properties and mixins are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-header-panel` | Mixin applied to the element | `{}`
-`--paper-header-panel-body` | Mixin applied to the element's body (i.e. everything below the toolbar) | `{}`
-`--paper-header-panel-scroll-container` | Mixin applied to the container when in scroll mode | `{}`
-`--paper-header-panel-cover-container` | Mixin applied to the container when in cover mode | `{}`
-`--paper-header-panel-standard-container` | Mixin applied to the container when in standard mode | `{}`
-`--paper-header-panel-seamed-container` | Mixin applied to the container when in seamed mode | `{}`
-`--paper-header-panel-waterfall-container` | Mixin applied to the container when in waterfall mode | `{}`
-`--paper-header-panel-waterfall-tall-container` | Mixin applied to the container when in tall waterfall mode | `{}`
-
-@group Paper Elements
-@element paper-header-panel
-@demo demo/index.html
-@hero hero.svg
--->
-
-<!-- Taken from https://www.google.com/design/spec/style/color.html#color-ui-color-application -->
 
 <style is="custom-style">
 
@@ -655,206 +538,9 @@ Custom property | Description | Default
   }
 
 </style>
-<!--
-Material design: [Toolbars](https://www.google.com/design/spec/components/toolbars.html)
-
-`paper-toolbar` is a horizontal bar containing items that can be used for
-label, navigation, search and actions.  The items placed inside the
-`paper-toolbar` are projected into a `class="horizontal center layout"` container inside of
-`paper-toolbar`'s Shadow DOM.  You can use flex attributes to control the items'
-sizing.
-
-Example:
-
-```html
-<paper-toolbar>
-  <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
-  <div class="title">Title</div>
-  <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
-</paper-toolbar>
-```
-
-`paper-toolbar` has a standard height, but can made be taller by setting `tall`
-class on the `paper-toolbar`. This will make the toolbar 3x the normal height.
-
-```html
-<paper-toolbar class="tall">
-  <paper-icon-button icon="menu"></paper-icon-button>
-</paper-toolbar>
-```
-
-Apply `medium-tall` class to make the toolbar medium tall.  This will make the
-toolbar 2x the normal height.
-
-```html
-<paper-toolbar class="medium-tall">
-  <paper-icon-button icon="menu"></paper-icon-button>
-</paper-toolbar>
-```
-
-When `tall`, items can pin to either the top (default), middle or bottom.  Use
-`middle` class for middle content and `bottom` class for bottom content.
-
-```html
-<paper-toolbar class="tall">
-  <paper-icon-button icon="menu"></paper-icon-button>
-  <div class="middle title">Middle Title</div>
-  <div class="bottom title">Bottom Title</div>
-</paper-toolbar>
-```
-
-For `medium-tall` toolbar, the middle and bottom contents overlap and are
-pinned to the bottom.  But `middleJustify` and `bottomJustify` attributes are
-still honored separately.
-
-To make an element completely fit at the bottom of the toolbar, use `fit` along
-with `bottom`.
-
-```html
-<paper-toolbar class="tall">
-  <div id="progressBar" class="bottom fit"></div>
-</paper-toolbar>
-```
-
-When inside a `paper-header-panel` element, the class `.animate` is toggled to animate
-the height change in the toolbar.
-
-### Styling
-
-The following custom properties and mixins are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-toolbar-title`      | Mixin applied to the title of the toolbar | `{}`
-`--paper-toolbar-background` | Toolbar background color     | `--primary-color`
-`--paper-toolbar-color`      | Toolbar foreground color     | `--dark-theme-text-color`
-`--paper-toolbar-height`     | Custom height for toolbar    | `64px`
-`--paper-toolbar-sm-height`  | Custom height for small screen toolbar | `56px`
-`--paper-toolbar`            | Mixin applied to the toolbar | `{}`
-`--paper-toolbar-content`    | Mixin applied to the content section of the toolbar | `{}`
-`--paper-toolbar-medium`     | Mixin applied to medium height toolbar | `{}`
-`--paper-toolbar-tall`       | Mixin applied to tall height toolbar | `{}`
-`--paper-toolbar-transition` | Transition applied to the `.animate` class | `height 0.18s ease-in`
-
-### Accessibility
-
-`<paper-toolbar>` has `role="toolbar"` by default. Any elements with the class `title` will
-be used as the label of the toolbar via `aria-labelledby`.
-
-@demo demo/index.html
--->
-
-<!--
-`iron-meta` is a generic element you can use for sharing information across the DOM tree.
-It uses [monostate pattern](http://c2.com/cgi/wiki?MonostatePattern) such that any
-instance of iron-meta has access to the shared
-information. You can use `iron-meta` to share whatever you want (or create an extension
-[like x-meta] for enhancements).
-
-The `iron-meta` instances containing your actual data can be loaded in an import,
-or constructed in any way you see fit. The only requirement is that you create them
-before you try to access them.
-
-Examples:
-
-If I create an instance like this:
-
-    <iron-meta key="info" value="foo/bar"></iron-meta>
-
-Note that value="foo/bar" is the metadata I've defined. I could define more
-attributes or use child nodes to define additional metadata.
-
-Now I can access that element (and it's metadata) from any iron-meta instance
-via the byKey method, e.g.
-
-    meta.byKey('info').getAttribute('value');
-
-Pure imperative form would be like:
-
-    document.createElement('iron-meta').byKey('info').getAttribute('value');
-
-Or, in a Polymer element, you can include a meta in your template:
-
-    <iron-meta id="meta"></iron-meta>
-    ...
-    this.$.meta.byKey('info').getAttribute('value');
-
-@group Iron Elements
-@demo demo/index.html
-@hero hero.svg
-@element iron-meta
--->
-
-<!--
-
-The `iron-icon` element displays an icon. By default an icon renders as a 24px square.
-
-Example using src:
-
-    <iron-icon src="star.png"></iron-icon>
-
-Example setting size to 32px x 32px:
-
-    <iron-icon class="big" src="big_star.png"></iron-icon>
-
-    <style is="custom-style">
-      .big {
-        --iron-icon-height: 32px;
-        --iron-icon-width: 32px;
-      }
-    </style>
-
-The iron elements include several sets of icons.
-To use the default set of icons, import `iron-icons.html` and use the `icon` attribute to specify an icon:
-
-    <link rel="import" href="/components/iron-icons/iron-icons.html">
-
-    <iron-icon icon="menu"></iron-icon>
-
-To use a different built-in set of icons, import the specific `iron-icons/<iconset>-icons.html`, and
-specify the icon as `<iconset>:<icon>`. For example, to use a communication icon, you would
-use:
-
-    <link rel="import" href="/components/iron-icons/communication-icons.html">
-
-    <iron-icon icon="communication:email"></iron-icon>
-
-You can also create custom icon sets of bitmap or SVG icons.
-
-Example of using an icon named `cherry` from a custom iconset with the ID `fruit`:
-
-    <iron-icon icon="fruit:cherry"></iron-icon>
-
-See [iron-iconset](iron-iconset) and [iron-iconset-svg](iron-iconset-svg) for more information about
-how to create a custom iconset.
-
-See the [iron-icons demo](iron-icons?view=demo:demo/index.html) to see the icons available
-in the various iconsets.
 
 
-### Styling
 
-The following custom properties are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--iron-icon-width` | Width of the icon | `24px`
-`--iron-icon-height` | Height of the icon | `24px`
-`--iron-icon-fill-color` | Fill color of the svg icon | `currentcolor`
-`--iron-icon-stroke-color` | Stroke color of the svg icon | none
-
-@group Iron Elements
-@element iron-icon
-@demo demo/index.html
-@hero hero.svg
-@homepage polymer.github.io
--->
-
-<!--
-`PaperItemBehavior` is a convenience behavior shared by <paper-item> and
-<paper-icon-item> that manages the shared control states and attributes of
-the items.
--->
 
 <style is="custom-style">
 
@@ -1177,171 +863,7 @@ the items.
   }
 
 </style>
-<!--
-Material design: [Lists](https://www.google.com/design/spec/components/lists.html)
 
-`<paper-item>` is an interactive list item. By default, it is a horizontal flexbox.
-
-    <paper-item>Item</paper-item>
-
-Use this element with `<paper-item-body>` to make Material Design styled two-line and three-line
-items.
-
-    <paper-item>
-      <paper-item-body two-line>
-        <div>Show your status</div>
-        <div secondary>Your status is visible to everyone</div>
-      </paper-item-body>
-      <iron-icon icon="warning"></iron-icon>
-    </paper-item>
-
-### Styling
-
-The following custom properties and mixins are available for styling:
-
-Custom property               | Description                                  | Default
-------------------------------|----------------------------------------------|----------
-`--paper-item-min-height`     | Minimum height of the item                   | `48px`
-`--paper-item`                | Mixin applied to the item                    | `{}`
-`--paper-item-selected-weight`| The font weight of a selected item           | `bold`
-`--paper-item-selected`       | Mixin applied to selected paper-items        | `{}`
-`--paper-item-disabled-color` | The color for disabled paper-items           | `--disabled-text-color`
-`--paper-item-disabled`       | Mixin applied to disabled paper-items        | `{}`
-`--paper-item-focused`        | Mixin applied to focused paper-items         | `{}`
-`--paper-item-focused-before` | Mixin applied to :before focused paper-items | `{}`
-
-### Accessibility
-
-This element has `role="listitem"` by default. Depending on usage, it may be more appropriate to set
-`role="menuitem"`, `role="menuitemcheckbox"` or `role="menuitemradio"`.
-
-    <paper-item role="menuitemcheckbox">
-      <paper-item-body>
-        Show your status
-      </paper-item-body>
-      <paper-checkbox></paper-checkbox>
-    </paper-item>
-
-@group Paper Elements
-@element paper-item
-@demo demo/index.html
--->
-
-<!--
-Material design: [Menus](https://www.google.com/design/spec/components/menus.html)
-
-`<paper-menu>` implements an accessible menu control with Material Design styling. The focused item
-is highlighted, and the selected item has bolded text.
-
-    <paper-menu>
-      <paper-item>Item 1</paper-item>
-      <paper-item>Item 2</paper-item>
-    </paper-menu>
-
-An initial selection can be specified with the `selected` attribute.
-
-    <paper-menu selected="0">
-      <paper-item>Item 1</paper-item>
-      <paper-item>Item 2</paper-item>
-    </paper-menu>
-
-Make a multi-select menu with the `multi` attribute. Items in a multi-select menu can be deselected,
-and multiple items can be selected.
-
-    <paper-menu multi>
-      <paper-item>Item 1</paper-item>
-      <paper-item>Item 2</paper-item>
-    </paper-menu>
-
-### Styling
-
-The following custom properties and mixins are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-menu-background-color`   | Menu background color                                            | `--primary-background-color`
-`--paper-menu-color`              | Menu foreground color                                            | `--primary-text-color`
-`--paper-menu-disabled-color`     | Foreground color for a disabled item                             | `--disabled-text-color`
-`--paper-menu`                    | Mixin applied to the menu                                        | `{}`
-`--paper-menu-selected-item`      | Mixin applied to the selected item                               | `{}`
-`--paper-menu-focused-item`       | Mixin applied to the focused item                                | `{}`
-`--paper-menu-focused-item-after` | Mixin applied to the ::after pseudo-element for the focused item | `{}`
-
-### Accessibility
-
-`<paper-menu>` has `role="menu"` by default. A multi-select menu will also have
-`aria-multiselectable` set. It implements key bindings to navigate through the menu with the up and
-down arrow keys, esc to exit the menu, and enter to activate a menu item. Typing the first letter
-of a menu item will also focus it.
-
-@group Paper Elements
-@element paper-menu
-@hero hero.svg
-@demo demo/index.html
--->
-
-<!--
-Material design: [Surface reaction](https://www.google.com/design/spec/animation/responsive-interaction.html#responsive-interaction-surface-reaction)
-
-`paper-ripple` provides a visual effect that other paper elements can
-use to simulate a rippling effect emanating from the point of contact.  The
-effect can be visualized as a concentric circle with motion.
-
-Example:
-
-    <div style="position:relative">
-      <paper-ripple></paper-ripple>
-    </div>
-
-Note, it's important that the parent container of the ripple be relative position, otherwise
-the ripple will emanate outside of the desired container.
-
-`paper-ripple` listens to "mousedown" and "mouseup" events so it would display ripple
-effect when touches on it.  You can also defeat the default behavior and
-manually route the down and up actions to the ripple element.  Note that it is
-important if you call `downAction()` you will have to make sure to call
-`upAction()` so that `paper-ripple` would end the animation loop.
-
-Example:
-
-    <paper-ripple id="ripple" style="pointer-events: none;"></paper-ripple>
-    ...
-    downAction: function(e) {
-      this.$.ripple.downAction({x: e.x, y: e.y});
-    },
-    upAction: function(e) {
-      this.$.ripple.upAction();
-    }
-
-Styling ripple effect:
-
-  Use CSS color property to style the ripple:
-
-    paper-ripple {
-      color: #4285f4;
-    }
-
-  Note that CSS color property is inherited so it is not required to set it on
-  the `paper-ripple` element directly.
-
-By default, the ripple is centered on the point of contact.  Apply the `recenters`
-attribute to have the ripple grow toward the center of its container.
-
-    <paper-ripple recenters></paper-ripple>
-
-You can also  center the ripple inside its container from the start.
-
-    <paper-ripple center></paper-ripple>
-
-Apply `circle` class to make the rippling effect within a circle.
-
-    <paper-ripple class="circle"></paper-ripple>
-
-@group Paper Elements
-@element paper-ripple
-@hero hero.svg
-@demo demo/index.html
--->
 
 <style>
 body {margin: 0; padding: 1px}
@@ -2102,14 +1624,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
 
-  <!--
-  Fired when the animation finishes. This is useful if you want to wait until the ripple
-  animation finishes to perform some action.
-
-  @event transitionend
-  @param {Object} detail
-  @param {Object} detail.node The animated node
-  -->
+  
 
   <template>
     <style>

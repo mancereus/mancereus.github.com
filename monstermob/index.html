@@ -207,7 +207,7 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
     };
 
     --layout-around-justified: {
-      -ms-flex-pack: around;
+      -ms-flex-pack: distribute;
       -webkit-justify-content: space-around;
       justify-content: space-around;
     };
@@ -1827,8 +1827,8 @@ The following custom properties and mixins are available for styling:
 Custom property | Description | Default
 ----------------|-------------|----------
 `--paper-input-container-color` | Label and underline color when the input is not focused | `--secondary-text-color`
-`--paper-input-container-focus-color` | Label and underline color when the input is focused | `--default-primary-color`
-`--paper-input-container-invalid-color` | Label and underline color when the input is is invalid | `--google-red-500`
+`--paper-input-container-focus-color` | Label and underline color when the input is focused | `--primary-color`
+`--paper-input-container-invalid-color` | Label and underline color when the input is is invalid | `--error-color`
 `--paper-input-container-input-color` | Input foreground color | `--primary-text-color`
 `--paper-input-container` | Mixin applied to the container | `{}`
 `--paper-input-container-disabled` | Mixin applied to the container when it's disabled | `{}`
@@ -1861,7 +1861,7 @@ The following custom properties and mixins are available for styling:
 
 Custom property | Description | Default
 ----------------|-------------|----------
-`--paper-input-container-invalid-color` | The foreground color of the error | `--google-red-500`
+`--paper-input-container-invalid-color` | The foreground color of the error | `--error-color`
 `--paper-input-error`                   | Mixin applied to the error        | `{}`
 -->
 
@@ -2612,8 +2612,9 @@ Custom property | Description | Default
       .focused-line {
         @apply(--layout-fit);
 
-        background: var(--paper-input-container-focus-color, --default-primary-color);
+        background: var(--paper-input-container-focus-color, --primary-color);
         height: 2px;
+
         -webkit-transform-origin: center center;
         transform-origin: center center;
         -webkit-transform: scale3d(0,1,1);
@@ -2632,7 +2633,7 @@ Custom property | Description | Default
       }
 
       .underline.is-invalid .focused-line {
-        background: var(--paper-input-container-invalid-color, --google-red-500);
+        background: var(--paper-input-container-invalid-color, --error-color);
         -webkit-transform: none;
         transform: none;
         -webkit-transition: -webkit-transform 0.25s;
@@ -2644,8 +2645,8 @@ Custom property | Description | Default
       .unfocused-line {
         @apply(--layout-fit);
 
-        height: 1px;
         background: var(--paper-input-container-color, --secondary-text-color);
+        height: 1px;
 
         @apply(--paper-input-container-underline);
       }
@@ -2661,6 +2662,7 @@ Custom property | Description | Default
       .label-and-input-container {
         @apply(--layout-flex-auto);
         @apply(--layout-relative);
+
         width: 100%;
         max-width: 100%;
       }
@@ -2681,26 +2683,26 @@ Custom property | Description | Default
         width: 100%;
         font: inherit;
         color: var(--paper-input-container-color, --secondary-text-color);
+        -webkit-transition: -webkit-transform 0.25s, width 0.25s;
+        transition: transform 0.25s, width 0.25s;
+        -webkit-transform-origin: left top;
+        transform-origin: left top;
 
         @apply(--paper-font-common-nowrap);
         @apply(--paper-font-subhead);
         @apply(--paper-input-container-label);
+        @apply(--paper-transition-easing);
       }
 
       .input-content.label-is-floating ::content label,
       .input-content.label-is-floating ::content .paper-input-label {
         -webkit-transform: translateY(-75%) scale(0.75);
         transform: translateY(-75%) scale(0.75);
-        -webkit-transition: -webkit-transform 0.25s, width 0.25s;
-        transition: transform 0.25s, width 0.25s;
-        -webkit-transform-origin: left top;
-        transform-origin: left top;
 
         /* Since we scale to 75/100 of the size, we actually have 100/75 of the
         original space now available */
         width: 133%;
 
-        @apply(--paper-transition-easing);
         @apply(--paper-input-container-label-floating);
       }
 
@@ -2716,14 +2718,14 @@ Custom property | Description | Default
 
       .input-content.label-is-highlighted ::content label,
       .input-content.label-is-highlighted ::content .paper-input-label {
-        color: var(--paper-input-container-focus-color, --default-primary-color);
+        color: var(--paper-input-container-focus-color, --primary-color);
 
         @apply(--paper-input-container-label-focus);
       }
 
       .input-content.is-invalid ::content label,
       .input-content.is-invalid ::content .paper-input-label {
-        color: var(--paper-input-container-invalid-color, --google-red-500);
+        color: var(--paper-input-container-invalid-color, --error-color);
       }
 
       .input-content.label-is-hidden ::content label,
@@ -2753,12 +2755,14 @@ Custom property | Description | Default
 
       ::content [prefix] {
         @apply(--paper-font-subhead);
+
         @apply(--paper-input-prefix);
         @apply(--layout-flex-none);
       }
 
       ::content [suffix] {
         @apply(--paper-font-subhead);
+
         @apply(--paper-input-suffix);
         @apply(--layout-flex-none);
       }
@@ -2777,11 +2781,11 @@ Custom property | Description | Default
       }
 
       .add-on-content.is-invalid ::content * {
-        color: var(--paper-input-container-invalid-color, --google-red-500);
+        color: var(--paper-input-container-invalid-color, --error-color);
       }
 
       .add-on-content.is-highlighted ::content * {
-        color: var(--paper-input-container-focus-color, --default-primary-color);
+        color: var(--paper-input-container-focus-color, --primary-color);
       }
     </style>
 
@@ -2817,7 +2821,7 @@ Custom property | Description | Default
         display: inline-block;
         visibility: hidden;
 
-        color: var(--paper-input-container-invalid-color, --google-red-500);
+        color: var(--paper-input-container-invalid-color, --error-color);
 
         @apply(--paper-font-caption);
         @apply(--paper-input-error);

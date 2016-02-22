@@ -7,7 +7,7 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.20
+// @version 0.7.21
 (function() {
   window.WebComponents = window.WebComponents || {
     flags: {}
@@ -912,14 +912,29 @@ if (typeof WeakMap === "undefined") {
   }
 })(self);
 
-if (typeof HTMLTemplateElement === "undefined") {
-  (function() {
-    var TEMPLATE_TAG = "template";
+(function() {
+  var needsTemplate = typeof HTMLTemplateElement === "undefined";
+  var needsCloning = function() {
+    if (!needsTemplate) {
+      var frag = document.createDocumentFragment();
+      var t = document.createElement("template");
+      frag.appendChild(t);
+      t.content.appendChild(document.createElement("div"));
+      var clone = frag.cloneNode(true);
+      return clone.firstChild.content.childNodes.length === 0;
+    }
+  }();
+  var TEMPLATE_TAG = "template";
+  var TemplateImpl = function() {};
+  if (needsTemplate) {
     var contentDoc = document.implementation.createHTMLDocument("template");
     var canDecorate = true;
-    HTMLTemplateElement = function() {};
-    HTMLTemplateElement.prototype = Object.create(HTMLElement.prototype);
-    HTMLTemplateElement.decorate = function(template) {
+    var templateStyle = document.createElement("style");
+    templateStyle.textContent = TEMPLATE_TAG + "{display:none;}";
+    var head = document.head;
+    head.insertBefore(templateStyle, head.firstElementChild);
+    TemplateImpl.prototype = Object.create(HTMLElement.prototype);
+    TemplateImpl.decorate = function(template) {
       if (template.content) {
         return;
       }
@@ -940,7 +955,7 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             set: function(text) {
               contentDoc.body.innerHTML = text;
-              HTMLTemplateElement.bootstrap(contentDoc);
+              TemplateImpl.bootstrap(contentDoc);
               while (this.content.firstChild) {
                 this.content.removeChild(this.content.firstChild);
               }
@@ -950,27 +965,30 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             configurable: true
           });
+          template.cloneNode = function(deep) {
+            return TemplateImpl.cloneNode(this, deep);
+          };
         } catch (err) {
           canDecorate = false;
         }
       }
-      HTMLTemplateElement.bootstrap(template.content);
+      TemplateImpl.bootstrap(template.content);
     };
-    HTMLTemplateElement.bootstrap = function(doc) {
+    TemplateImpl.bootstrap = function(doc) {
       var templates = doc.querySelectorAll(TEMPLATE_TAG);
       for (var i = 0, l = templates.length, t; i < l && (t = templates[i]); i++) {
-        HTMLTemplateElement.decorate(t);
+        TemplateImpl.decorate(t);
       }
     };
     document.addEventListener("DOMContentLoaded", function() {
-      HTMLTemplateElement.bootstrap(document);
+      TemplateImpl.bootstrap(document);
     });
     var createElement = document.createElement;
     document.createElement = function() {
       "use strict";
       var el = createElement.apply(document, arguments);
       if (el.localName == "template") {
-        HTMLTemplateElement.decorate(el);
+        TemplateImpl.decorate(el);
       }
       return el;
     };
@@ -993,8 +1011,61 @@ if (typeof HTMLTemplateElement === "undefined") {
     function escapeData(s) {
       return s.replace(escapeDataRegExp, escapeReplace);
     }
-  })();
-}
+  }
+  if (needsTemplate || needsCloning) {
+    var nativeCloneNode = Node.prototype.cloneNode;
+    TemplateImpl.cloneNode = function(template, deep) {
+      var clone = nativeCloneNode.call(template);
+      if (this.decorate) {
+        this.decorate(clone);
+      }
+      if (deep) {
+        clone.content.appendChild(nativeCloneNode.call(template.content, true));
+        this.fixClonedDom(clone.content, template.content);
+      }
+      return clone;
+    };
+    TemplateImpl.fixClonedDom = function(clone, source) {
+      var s$ = source.querySelectorAll(TEMPLATE_TAG);
+      var t$ = clone.querySelectorAll(TEMPLATE_TAG);
+      for (var i = 0, l = t$.length, t, s; i < l; i++) {
+        s = s$[i];
+        t = t$[i];
+        if (this.decorate) {
+          this.decorate(s);
+        }
+        t.parentNode.replaceChild(s.cloneNode(true), t);
+      }
+    };
+    var originalImportNode = document.importNode;
+    Node.prototype.cloneNode = function(deep) {
+      var dom = nativeCloneNode.call(this, deep);
+      if (deep) {
+        TemplateImpl.fixClonedDom(dom, this);
+      }
+      return dom;
+    };
+    document.importNode = function(element, deep) {
+      if (element.localName === TEMPLATE_TAG) {
+        return TemplateImpl.cloneNode(element, deep);
+      } else {
+        var dom = originalImportNode.call(document, element, deep);
+        if (deep) {
+          TemplateImpl.fixClonedDom(dom, element);
+        }
+        return dom;
+      }
+    };
+    if (needsCloning) {
+      HTMLTemplateElement.prototype.cloneNode = function(deep) {
+        return TemplateImpl.cloneNode(this, deep);
+      };
+    }
+  }
+  if (needsTemplate) {
+    HTMLTemplateElement = TemplateImpl;
+  }
+})();
 
 (function(scope) {
   "use strict";
@@ -1595,7 +1666,7 @@ window.HTMLImports.addModule(function(scope) {
       if (doc && this._mayParse.indexOf(doc) < 0) {
         this._mayParse.push(doc);
         var nodes = doc.querySelectorAll(this.parseSelectorsForNode(doc));
-        for (var i = 0, l = nodes.length, p = 0, n; i < l && (n = nodes[i]); i++) {
+        for (var i = 0, l = nodes.length, n; i < l && (n = nodes[i]); i++) {
           if (!this.isParsed(n)) {
             if (this.hasResource(n)) {
               return nodeIsImport(n) ? this.nextToParseInDoc(n.__doc, n) : n;
@@ -9896,438 +9967,6 @@ this.fire('dom-change');
 }
 });
 (function() {
-    'use strict';
-
-    /**
-     * Chrome uses an older version of DOM Level 3 Keyboard Events
-     *
-     * Most keys are labeled as text, but some are Unicode codepoints.
-     * Values taken from: http://www.w3.org/TR/2007/WD-DOM-Level-3-Events-20071221/keyset.html#KeySet-Set
-     */
-    var KEY_IDENTIFIER = {
-      'U+0008': 'backspace',
-      'U+0009': 'tab',
-      'U+001B': 'esc',
-      'U+0020': 'space',
-      'U+007F': 'del'
-    };
-
-    /**
-     * Special table for KeyboardEvent.keyCode.
-     * KeyboardEvent.keyIdentifier is better, and KeyBoardEvent.key is even better
-     * than that.
-     *
-     * Values from: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.keyCode#Value_of_keyCode
-     */
-    var KEY_CODE = {
-      8: 'backspace',
-      9: 'tab',
-      13: 'enter',
-      27: 'esc',
-      33: 'pageup',
-      34: 'pagedown',
-      35: 'end',
-      36: 'home',
-      32: 'space',
-      37: 'left',
-      38: 'up',
-      39: 'right',
-      40: 'down',
-      46: 'del',
-      106: '*'
-    };
-
-    /**
-     * MODIFIER_KEYS maps the short name for modifier keys used in a key
-     * combo string to the property name that references those same keys
-     * in a KeyboardEvent instance.
-     */
-    var MODIFIER_KEYS = {
-      'shift': 'shiftKey',
-      'ctrl': 'ctrlKey',
-      'alt': 'altKey',
-      'meta': 'metaKey'
-    };
-
-    /**
-     * KeyboardEvent.key is mostly represented by printable character made by
-     * the keyboard, with unprintable keys labeled nicely.
-     *
-     * However, on OS X, Alt+char can make a Unicode character that follows an
-     * Apple-specific mapping. In this case, we fall back to .keyCode.
-     */
-    var KEY_CHAR = /[a-z0-9*]/;
-
-    /**
-     * Matches a keyIdentifier string.
-     */
-    var IDENT_CHAR = /U\+/;
-
-    /**
-     * Matches arrow keys in Gecko 27.0+
-     */
-    var ARROW_KEY = /^arrow/;
-
-    /**
-     * Matches space keys everywhere (notably including IE10's exceptional name
-     * `spacebar`).
-     */
-    var SPACE_KEY = /^space(bar)?/;
-
-    /**
-     * Transforms the key.
-     * @param {string} key The KeyBoardEvent.key
-     * @param {Boolean} [noSpecialChars] Limits the transformation to
-     * alpha-numeric characters.
-     */
-    function transformKey(key, noSpecialChars) {
-      var validKey = '';
-      if (key) {
-        var lKey = key.toLowerCase();
-        if (lKey === ' ' || SPACE_KEY.test(lKey)) {
-          validKey = 'space';
-        } else if (lKey.length == 1) {
-          if (!noSpecialChars || KEY_CHAR.test(lKey)) {
-            validKey = lKey;
-          }
-        } else if (ARROW_KEY.test(lKey)) {
-          validKey = lKey.replace('arrow', '');
-        } else if (lKey == 'multiply') {
-          // numpad '*' can map to Multiply on IE/Windows
-          validKey = '*';
-        } else {
-          validKey = lKey;
-        }
-      }
-      return validKey;
-    }
-
-    function transformKeyIdentifier(keyIdent) {
-      var validKey = '';
-      if (keyIdent) {
-        if (keyIdent in KEY_IDENTIFIER) {
-          validKey = KEY_IDENTIFIER[keyIdent];
-        } else if (IDENT_CHAR.test(keyIdent)) {
-          keyIdent = parseInt(keyIdent.replace('U+', '0x'), 16);
-          validKey = String.fromCharCode(keyIdent).toLowerCase();
-        } else {
-          validKey = keyIdent.toLowerCase();
-        }
-      }
-      return validKey;
-    }
-
-    function transformKeyCode(keyCode) {
-      var validKey = '';
-      if (Number(keyCode)) {
-        if (keyCode >= 65 && keyCode <= 90) {
-          // ascii a-z
-          // lowercase is 32 offset from uppercase
-          validKey = String.fromCharCode(32 + keyCode);
-        } else if (keyCode >= 112 && keyCode <= 123) {
-          // function keys f1-f12
-          validKey = 'f' + (keyCode - 112);
-        } else if (keyCode >= 48 && keyCode <= 57) {
-          // top 0-9 keys
-          validKey = String(48 - keyCode);
-        } else if (keyCode >= 96 && keyCode <= 105) {
-          // num pad 0-9
-          validKey = String(96 - keyCode);
-        } else {
-          validKey = KEY_CODE[keyCode];
-        }
-      }
-      return validKey;
-    }
-
-    /**
-      * Calculates the normalized key for a KeyboardEvent.
-      * @param {KeyboardEvent} keyEvent
-      * @param {Boolean} [noSpecialChars] Set to true to limit keyEvent.key
-      * transformation to alpha-numeric chars. This is useful with key
-      * combinations like shift + 2, which on FF for MacOS produces
-      * keyEvent.key = @
-      * To get 2 returned, set noSpecialChars = true
-      * To get @ returned, set noSpecialChars = false
-     */
-    function normalizedKeyForEvent(keyEvent, noSpecialChars) {
-      // Fall back from .key, to .keyIdentifier, to .keyCode, and then to
-      // .detail.key to support artificial keyboard events.
-      return transformKey(keyEvent.key, noSpecialChars) ||
-        transformKeyIdentifier(keyEvent.keyIdentifier) ||
-        transformKeyCode(keyEvent.keyCode) ||
-        transformKey(keyEvent.detail.key, noSpecialChars) || '';
-    }
-
-    function keyComboMatchesEvent(keyCombo, event) {
-      // For combos with modifiers we support only alpha-numeric keys
-      var keyEvent = normalizedKeyForEvent(event, keyCombo.hasModifiers);
-      return keyEvent === keyCombo.key &&
-        (!keyCombo.hasModifiers || (
-          !!event.shiftKey === !!keyCombo.shiftKey &&
-          !!event.ctrlKey === !!keyCombo.ctrlKey &&
-          !!event.altKey === !!keyCombo.altKey &&
-          !!event.metaKey === !!keyCombo.metaKey)
-        );
-    }
-
-    function parseKeyComboString(keyComboString) {
-      if (keyComboString.length === 1) {
-        return {
-          combo: keyComboString,
-          key: keyComboString,
-          event: 'keydown'
-        };
-      }
-      return keyComboString.split('+').reduce(function(parsedKeyCombo, keyComboPart) {
-        var eventParts = keyComboPart.split(':');
-        var keyName = eventParts[0];
-        var event = eventParts[1];
-
-        if (keyName in MODIFIER_KEYS) {
-          parsedKeyCombo[MODIFIER_KEYS[keyName]] = true;
-          parsedKeyCombo.hasModifiers = true;
-        } else {
-          parsedKeyCombo.key = keyName;
-          parsedKeyCombo.event = event || 'keydown';
-        }
-
-        return parsedKeyCombo;
-      }, {
-        combo: keyComboString.split(':').shift()
-      });
-    }
-
-    function parseEventString(eventString) {
-      return eventString.trim().split(' ').map(function(keyComboString) {
-        return parseKeyComboString(keyComboString);
-      });
-    }
-
-    /**
-     * `Polymer.IronA11yKeysBehavior` provides a normalized interface for processing
-     * keyboard commands that pertain to [WAI-ARIA best practices](http://www.w3.org/TR/wai-aria-practices/#kbd_general_binding).
-     * The element takes care of browser differences with respect to Keyboard events
-     * and uses an expressive syntax to filter key presses.
-     *
-     * Use the `keyBindings` prototype property to express what combination of keys
-     * will trigger the event to fire.
-     *
-     * Use the `key-event-target` attribute to set up event handlers on a specific
-     * node.
-     * The `keys-pressed` event will fire when one of the key combinations set with the
-     * `keys` property is pressed.
-     *
-     * @demo demo/index.html
-     * @polymerBehavior
-     */
-    Polymer.IronA11yKeysBehavior = {
-      properties: {
-        /**
-         * The HTMLElement that will be firing relevant KeyboardEvents.
-         */
-        keyEventTarget: {
-          type: Object,
-          value: function() {
-            return this;
-          }
-        },
-
-        /**
-         * If true, this property will cause the implementing element to
-         * automatically stop propagation on any handled KeyboardEvents.
-         */
-        stopKeyboardEventPropagation: {
-          type: Boolean,
-          value: false
-        },
-
-        _boundKeyHandlers: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-
-        // We use this due to a limitation in IE10 where instances will have
-        // own properties of everything on the "prototype".
-        _imperativeKeyBindings: {
-          type: Object,
-          value: function() {
-            return {};
-          }
-        }
-      },
-
-      observers: [
-        '_resetKeyEventListeners(keyEventTarget, _boundKeyHandlers)'
-      ],
-
-      keyBindings: {},
-
-      registered: function() {
-        this._prepKeyBindings();
-      },
-
-      attached: function() {
-        this._listenKeyEventListeners();
-      },
-
-      detached: function() {
-        this._unlistenKeyEventListeners();
-      },
-
-      /**
-       * Can be used to imperatively add a key binding to the implementing
-       * element. This is the imperative equivalent of declaring a keybinding
-       * in the `keyBindings` prototype property.
-       */
-      addOwnKeyBinding: function(eventString, handlerName) {
-        this._imperativeKeyBindings[eventString] = handlerName;
-        this._prepKeyBindings();
-        this._resetKeyEventListeners();
-      },
-
-      /**
-       * When called, will remove all imperatively-added key bindings.
-       */
-      removeOwnKeyBindings: function() {
-        this._imperativeKeyBindings = {};
-        this._prepKeyBindings();
-        this._resetKeyEventListeners();
-      },
-
-      keyboardEventMatchesKeys: function(event, eventString) {
-        var keyCombos = parseEventString(eventString);
-        for (var i = 0; i < keyCombos.length; ++i) {
-          if (keyComboMatchesEvent(keyCombos[i], event)) {
-            return true;
-          }
-        }
-        return false;
-      },
-
-      _collectKeyBindings: function() {
-        var keyBindings = this.behaviors.map(function(behavior) {
-          return behavior.keyBindings;
-        });
-
-        if (keyBindings.indexOf(this.keyBindings) === -1) {
-          keyBindings.push(this.keyBindings);
-        }
-
-        return keyBindings;
-      },
-
-      _prepKeyBindings: function() {
-        this._keyBindings = {};
-
-        this._collectKeyBindings().forEach(function(keyBindings) {
-          for (var eventString in keyBindings) {
-            this._addKeyBinding(eventString, keyBindings[eventString]);
-          }
-        }, this);
-
-        for (var eventString in this._imperativeKeyBindings) {
-          this._addKeyBinding(eventString, this._imperativeKeyBindings[eventString]);
-        }
-
-        // Give precedence to combos with modifiers to be checked first.
-        for (var eventName in this._keyBindings) {
-          this._keyBindings[eventName].sort(function (kb1, kb2) {
-            var b1 = kb1[0].hasModifiers;
-            var b2 = kb2[0].hasModifiers;
-            return (b1 === b2) ? 0 : b1 ? -1 : 1;
-          })
-        }
-      },
-
-      _addKeyBinding: function(eventString, handlerName) {
-        parseEventString(eventString).forEach(function(keyCombo) {
-          this._keyBindings[keyCombo.event] =
-            this._keyBindings[keyCombo.event] || [];
-
-          this._keyBindings[keyCombo.event].push([
-            keyCombo,
-            handlerName
-          ]);
-        }, this);
-      },
-
-      _resetKeyEventListeners: function() {
-        this._unlistenKeyEventListeners();
-
-        if (this.isAttached) {
-          this._listenKeyEventListeners();
-        }
-      },
-
-      _listenKeyEventListeners: function() {
-        Object.keys(this._keyBindings).forEach(function(eventName) {
-          var keyBindings = this._keyBindings[eventName];
-          var boundKeyHandler = this._onKeyBindingEvent.bind(this, keyBindings);
-
-          this._boundKeyHandlers.push([this.keyEventTarget, eventName, boundKeyHandler]);
-
-          this.keyEventTarget.addEventListener(eventName, boundKeyHandler);
-        }, this);
-      },
-
-      _unlistenKeyEventListeners: function() {
-        var keyHandlerTuple;
-        var keyEventTarget;
-        var eventName;
-        var boundKeyHandler;
-
-        while (this._boundKeyHandlers.length) {
-          // My kingdom for block-scope binding and destructuring assignment..
-          keyHandlerTuple = this._boundKeyHandlers.pop();
-          keyEventTarget = keyHandlerTuple[0];
-          eventName = keyHandlerTuple[1];
-          boundKeyHandler = keyHandlerTuple[2];
-
-          keyEventTarget.removeEventListener(eventName, boundKeyHandler);
-        }
-      },
-
-      _onKeyBindingEvent: function(keyBindings, event) {
-        if (this.stopKeyboardEventPropagation) {
-          event.stopPropagation();
-        }
-
-        // if event has been already prevented, don't do anything
-        if (event.defaultPrevented) {
-          return;
-        }
-
-        for (var i = 0; i < keyBindings.length; i++) {
-          var keyCombo = keyBindings[i][0];
-          var handlerName = keyBindings[i][1];
-          if (keyComboMatchesEvent(keyCombo, event)) {
-            this._triggerKeyHandler(keyCombo, handlerName, event);
-            // exit the loop if eventDefault was prevented
-            if (event.defaultPrevented) {
-              return;
-            }
-          }
-        }
-      },
-
-      _triggerKeyHandler: function(keyCombo, handlerName, keyboardEvent) {
-        var detail = Object.create(keyCombo);
-        detail.keyboardEvent = keyboardEvent;
-        var event = new CustomEvent(keyCombo.event, {
-          detail: detail,
-          cancelable: true
-        });
-        this[handlerName].call(this, event);
-        if (event.defaultPrevented) {
-          keyboardEvent.preventDefault();
-        }
-      }
-    };
-  })();
-(function() {
 
     // monostate data
     var metaDatas = {};
@@ -10894,6 +10533,438 @@ this.fire('dom-change');
     Polymer.IronValidatableBehavior,
     Polymer.IronCheckedElementBehaviorImpl
   ];
+(function() {
+    'use strict';
+
+    /**
+     * Chrome uses an older version of DOM Level 3 Keyboard Events
+     *
+     * Most keys are labeled as text, but some are Unicode codepoints.
+     * Values taken from: http://www.w3.org/TR/2007/WD-DOM-Level-3-Events-20071221/keyset.html#KeySet-Set
+     */
+    var KEY_IDENTIFIER = {
+      'U+0008': 'backspace',
+      'U+0009': 'tab',
+      'U+001B': 'esc',
+      'U+0020': 'space',
+      'U+007F': 'del'
+    };
+
+    /**
+     * Special table for KeyboardEvent.keyCode.
+     * KeyboardEvent.keyIdentifier is better, and KeyBoardEvent.key is even better
+     * than that.
+     *
+     * Values from: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.keyCode#Value_of_keyCode
+     */
+    var KEY_CODE = {
+      8: 'backspace',
+      9: 'tab',
+      13: 'enter',
+      27: 'esc',
+      33: 'pageup',
+      34: 'pagedown',
+      35: 'end',
+      36: 'home',
+      32: 'space',
+      37: 'left',
+      38: 'up',
+      39: 'right',
+      40: 'down',
+      46: 'del',
+      106: '*'
+    };
+
+    /**
+     * MODIFIER_KEYS maps the short name for modifier keys used in a key
+     * combo string to the property name that references those same keys
+     * in a KeyboardEvent instance.
+     */
+    var MODIFIER_KEYS = {
+      'shift': 'shiftKey',
+      'ctrl': 'ctrlKey',
+      'alt': 'altKey',
+      'meta': 'metaKey'
+    };
+
+    /**
+     * KeyboardEvent.key is mostly represented by printable character made by
+     * the keyboard, with unprintable keys labeled nicely.
+     *
+     * However, on OS X, Alt+char can make a Unicode character that follows an
+     * Apple-specific mapping. In this case, we fall back to .keyCode.
+     */
+    var KEY_CHAR = /[a-z0-9*]/;
+
+    /**
+     * Matches a keyIdentifier string.
+     */
+    var IDENT_CHAR = /U\+/;
+
+    /**
+     * Matches arrow keys in Gecko 27.0+
+     */
+    var ARROW_KEY = /^arrow/;
+
+    /**
+     * Matches space keys everywhere (notably including IE10's exceptional name
+     * `spacebar`).
+     */
+    var SPACE_KEY = /^space(bar)?/;
+
+    /**
+     * Transforms the key.
+     * @param {string} key The KeyBoardEvent.key
+     * @param {Boolean} [noSpecialChars] Limits the transformation to
+     * alpha-numeric characters.
+     */
+    function transformKey(key, noSpecialChars) {
+      var validKey = '';
+      if (key) {
+        var lKey = key.toLowerCase();
+        if (lKey === ' ' || SPACE_KEY.test(lKey)) {
+          validKey = 'space';
+        } else if (lKey.length == 1) {
+          if (!noSpecialChars || KEY_CHAR.test(lKey)) {
+            validKey = lKey;
+          }
+        } else if (ARROW_KEY.test(lKey)) {
+          validKey = lKey.replace('arrow', '');
+        } else if (lKey == 'multiply') {
+          // numpad '*' can map to Multiply on IE/Windows
+          validKey = '*';
+        } else {
+          validKey = lKey;
+        }
+      }
+      return validKey;
+    }
+
+    function transformKeyIdentifier(keyIdent) {
+      var validKey = '';
+      if (keyIdent) {
+        if (keyIdent in KEY_IDENTIFIER) {
+          validKey = KEY_IDENTIFIER[keyIdent];
+        } else if (IDENT_CHAR.test(keyIdent)) {
+          keyIdent = parseInt(keyIdent.replace('U+', '0x'), 16);
+          validKey = String.fromCharCode(keyIdent).toLowerCase();
+        } else {
+          validKey = keyIdent.toLowerCase();
+        }
+      }
+      return validKey;
+    }
+
+    function transformKeyCode(keyCode) {
+      var validKey = '';
+      if (Number(keyCode)) {
+        if (keyCode >= 65 && keyCode <= 90) {
+          // ascii a-z
+          // lowercase is 32 offset from uppercase
+          validKey = String.fromCharCode(32 + keyCode);
+        } else if (keyCode >= 112 && keyCode <= 123) {
+          // function keys f1-f12
+          validKey = 'f' + (keyCode - 112);
+        } else if (keyCode >= 48 && keyCode <= 57) {
+          // top 0-9 keys
+          validKey = String(48 - keyCode);
+        } else if (keyCode >= 96 && keyCode <= 105) {
+          // num pad 0-9
+          validKey = String(96 - keyCode);
+        } else {
+          validKey = KEY_CODE[keyCode];
+        }
+      }
+      return validKey;
+    }
+
+    /**
+      * Calculates the normalized key for a KeyboardEvent.
+      * @param {KeyboardEvent} keyEvent
+      * @param {Boolean} [noSpecialChars] Set to true to limit keyEvent.key
+      * transformation to alpha-numeric chars. This is useful with key
+      * combinations like shift + 2, which on FF for MacOS produces
+      * keyEvent.key = @
+      * To get 2 returned, set noSpecialChars = true
+      * To get @ returned, set noSpecialChars = false
+     */
+    function normalizedKeyForEvent(keyEvent, noSpecialChars) {
+      // Fall back from .key, to .keyIdentifier, to .keyCode, and then to
+      // .detail.key to support artificial keyboard events.
+      return transformKey(keyEvent.key, noSpecialChars) ||
+        transformKeyIdentifier(keyEvent.keyIdentifier) ||
+        transformKeyCode(keyEvent.keyCode) ||
+        transformKey(keyEvent.detail.key, noSpecialChars) || '';
+    }
+
+    function keyComboMatchesEvent(keyCombo, event) {
+      // For combos with modifiers we support only alpha-numeric keys
+      var keyEvent = normalizedKeyForEvent(event, keyCombo.hasModifiers);
+      return keyEvent === keyCombo.key &&
+        (!keyCombo.hasModifiers || (
+          !!event.shiftKey === !!keyCombo.shiftKey &&
+          !!event.ctrlKey === !!keyCombo.ctrlKey &&
+          !!event.altKey === !!keyCombo.altKey &&
+          !!event.metaKey === !!keyCombo.metaKey)
+        );
+    }
+
+    function parseKeyComboString(keyComboString) {
+      if (keyComboString.length === 1) {
+        return {
+          combo: keyComboString,
+          key: keyComboString,
+          event: 'keydown'
+        };
+      }
+      return keyComboString.split('+').reduce(function(parsedKeyCombo, keyComboPart) {
+        var eventParts = keyComboPart.split(':');
+        var keyName = eventParts[0];
+        var event = eventParts[1];
+
+        if (keyName in MODIFIER_KEYS) {
+          parsedKeyCombo[MODIFIER_KEYS[keyName]] = true;
+          parsedKeyCombo.hasModifiers = true;
+        } else {
+          parsedKeyCombo.key = keyName;
+          parsedKeyCombo.event = event || 'keydown';
+        }
+
+        return parsedKeyCombo;
+      }, {
+        combo: keyComboString.split(':').shift()
+      });
+    }
+
+    function parseEventString(eventString) {
+      return eventString.trim().split(' ').map(function(keyComboString) {
+        return parseKeyComboString(keyComboString);
+      });
+    }
+
+    /**
+     * `Polymer.IronA11yKeysBehavior` provides a normalized interface for processing
+     * keyboard commands that pertain to [WAI-ARIA best practices](http://www.w3.org/TR/wai-aria-practices/#kbd_general_binding).
+     * The element takes care of browser differences with respect to Keyboard events
+     * and uses an expressive syntax to filter key presses.
+     *
+     * Use the `keyBindings` prototype property to express what combination of keys
+     * will trigger the event to fire.
+     *
+     * Use the `key-event-target` attribute to set up event handlers on a specific
+     * node.
+     * The `keys-pressed` event will fire when one of the key combinations set with the
+     * `keys` property is pressed.
+     *
+     * @demo demo/index.html
+     * @polymerBehavior
+     */
+    Polymer.IronA11yKeysBehavior = {
+      properties: {
+        /**
+         * The HTMLElement that will be firing relevant KeyboardEvents.
+         */
+        keyEventTarget: {
+          type: Object,
+          value: function() {
+            return this;
+          }
+        },
+
+        /**
+         * If true, this property will cause the implementing element to
+         * automatically stop propagation on any handled KeyboardEvents.
+         */
+        stopKeyboardEventPropagation: {
+          type: Boolean,
+          value: false
+        },
+
+        _boundKeyHandlers: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        // We use this due to a limitation in IE10 where instances will have
+        // own properties of everything on the "prototype".
+        _imperativeKeyBindings: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        }
+      },
+
+      observers: [
+        '_resetKeyEventListeners(keyEventTarget, _boundKeyHandlers)'
+      ],
+
+      keyBindings: {},
+
+      registered: function() {
+        this._prepKeyBindings();
+      },
+
+      attached: function() {
+        this._listenKeyEventListeners();
+      },
+
+      detached: function() {
+        this._unlistenKeyEventListeners();
+      },
+
+      /**
+       * Can be used to imperatively add a key binding to the implementing
+       * element. This is the imperative equivalent of declaring a keybinding
+       * in the `keyBindings` prototype property.
+       */
+      addOwnKeyBinding: function(eventString, handlerName) {
+        this._imperativeKeyBindings[eventString] = handlerName;
+        this._prepKeyBindings();
+        this._resetKeyEventListeners();
+      },
+
+      /**
+       * When called, will remove all imperatively-added key bindings.
+       */
+      removeOwnKeyBindings: function() {
+        this._imperativeKeyBindings = {};
+        this._prepKeyBindings();
+        this._resetKeyEventListeners();
+      },
+
+      keyboardEventMatchesKeys: function(event, eventString) {
+        var keyCombos = parseEventString(eventString);
+        for (var i = 0; i < keyCombos.length; ++i) {
+          if (keyComboMatchesEvent(keyCombos[i], event)) {
+            return true;
+          }
+        }
+        return false;
+      },
+
+      _collectKeyBindings: function() {
+        var keyBindings = this.behaviors.map(function(behavior) {
+          return behavior.keyBindings;
+        });
+
+        if (keyBindings.indexOf(this.keyBindings) === -1) {
+          keyBindings.push(this.keyBindings);
+        }
+
+        return keyBindings;
+      },
+
+      _prepKeyBindings: function() {
+        this._keyBindings = {};
+
+        this._collectKeyBindings().forEach(function(keyBindings) {
+          for (var eventString in keyBindings) {
+            this._addKeyBinding(eventString, keyBindings[eventString]);
+          }
+        }, this);
+
+        for (var eventString in this._imperativeKeyBindings) {
+          this._addKeyBinding(eventString, this._imperativeKeyBindings[eventString]);
+        }
+
+        // Give precedence to combos with modifiers to be checked first.
+        for (var eventName in this._keyBindings) {
+          this._keyBindings[eventName].sort(function (kb1, kb2) {
+            var b1 = kb1[0].hasModifiers;
+            var b2 = kb2[0].hasModifiers;
+            return (b1 === b2) ? 0 : b1 ? -1 : 1;
+          })
+        }
+      },
+
+      _addKeyBinding: function(eventString, handlerName) {
+        parseEventString(eventString).forEach(function(keyCombo) {
+          this._keyBindings[keyCombo.event] =
+            this._keyBindings[keyCombo.event] || [];
+
+          this._keyBindings[keyCombo.event].push([
+            keyCombo,
+            handlerName
+          ]);
+        }, this);
+      },
+
+      _resetKeyEventListeners: function() {
+        this._unlistenKeyEventListeners();
+
+        if (this.isAttached) {
+          this._listenKeyEventListeners();
+        }
+      },
+
+      _listenKeyEventListeners: function() {
+        Object.keys(this._keyBindings).forEach(function(eventName) {
+          var keyBindings = this._keyBindings[eventName];
+          var boundKeyHandler = this._onKeyBindingEvent.bind(this, keyBindings);
+
+          this._boundKeyHandlers.push([this.keyEventTarget, eventName, boundKeyHandler]);
+
+          this.keyEventTarget.addEventListener(eventName, boundKeyHandler);
+        }, this);
+      },
+
+      _unlistenKeyEventListeners: function() {
+        var keyHandlerTuple;
+        var keyEventTarget;
+        var eventName;
+        var boundKeyHandler;
+
+        while (this._boundKeyHandlers.length) {
+          // My kingdom for block-scope binding and destructuring assignment..
+          keyHandlerTuple = this._boundKeyHandlers.pop();
+          keyEventTarget = keyHandlerTuple[0];
+          eventName = keyHandlerTuple[1];
+          boundKeyHandler = keyHandlerTuple[2];
+
+          keyEventTarget.removeEventListener(eventName, boundKeyHandler);
+        }
+      },
+
+      _onKeyBindingEvent: function(keyBindings, event) {
+        if (this.stopKeyboardEventPropagation) {
+          event.stopPropagation();
+        }
+
+        // if event has been already prevented, don't do anything
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        for (var i = 0; i < keyBindings.length; i++) {
+          var keyCombo = keyBindings[i][0];
+          var handlerName = keyBindings[i][1];
+          if (keyComboMatchesEvent(keyCombo, event)) {
+            this._triggerKeyHandler(keyCombo, handlerName, event);
+            // exit the loop if eventDefault was prevented
+            if (event.defaultPrevented) {
+              return;
+            }
+          }
+        }
+      },
+
+      _triggerKeyHandler: function(keyCombo, handlerName, keyboardEvent) {
+        var detail = Object.create(keyCombo);
+        detail.keyboardEvent = keyboardEvent;
+        var event = new CustomEvent(keyCombo.event, {
+          detail: detail,
+          cancelable: true
+        });
+        this[handlerName].call(this, event);
+        if (event.defaultPrevented) {
+          keyboardEvent.preventDefault();
+        }
+      }
+    };
+  })();
 /**
    * @demo demo/index.html
    * @polymerBehavior
@@ -10971,6 +11042,7 @@ this.fire('dom-change');
         this._oldTabIndex = this.tabIndex;
         this.focused = false;
         this.tabIndex = -1;
+        this.blur();
       } else if (this._oldTabIndex !== undefined) {
         this.tabIndex = this._oldTabIndex;
       }
@@ -11444,16 +11516,19 @@ this.fire('dom-change');
      */
     setItemSelected: function(item, isSelected) {
       if (item != null) {
-        if (isSelected) {
-          this.selection.push(item);
-        } else {
-          var i = this.selection.indexOf(item);
-          if (i >= 0) {
-            this.selection.splice(i, 1);
+        if (isSelected !== this.isSelected(item)) {
+          // proceed to update selection only if requested state differs from current
+          if (isSelected) {
+            this.selection.push(item);
+          } else {
+            var i = this.selection.indexOf(item);
+            if (i >= 0) {
+              this.selection.splice(i, 1);
+            }
           }
-        }
-        if (this.selectCallback) {
-          this.selectCallback(item, isSelected);
+          if (this.selectCallback) {
+            this.selectCallback(item, isSelected);
+          }
         }
       }
     },
@@ -11587,6 +11662,7 @@ this.fire('dom-change');
       items: {
         type: Array,
         readOnly: true,
+        notify: true,
         value: function() {
           return [];
         }
@@ -11609,7 +11685,8 @@ this.fire('dom-change');
     },
 
     observers: [
-      '_updateSelected(attrForSelected, selected)'
+      '_updateAttrForSelected(attrForSelected)',
+      '_updateSelected(selected)'
     ],
 
     created: function() {
@@ -11621,7 +11698,7 @@ this.fire('dom-change');
       this._observer = this._observeItems(this);
       this._updateItems();
       if (!this._shouldUpdateSelection) {
-        this._updateSelected(this.attrForSelected,this.selected)
+        this._updateSelected();
       }
       this._addListener(this.activateEvent);
     },
@@ -11675,6 +11752,22 @@ this.fire('dom-change');
       this.selected = this._indexToValue(index);
     },
 
+    /**
+     * Force a synchronous update of the `items` property.
+     *
+     * NOTE: Consider listening for the `iron-items-changed` event to respond to
+     * updates to the set of selectable items after updates to the DOM list and
+     * selection state have been made.
+     *
+     * WARNING: If you are using this method, you should probably consider an
+     * alternate approach. Synchronously querying for items is potentially
+     * slow for many use cases. The `items` property will update asynchronously
+     * on its own to reflect selectable items in the DOM.
+     */
+    forceSynchronousItemUpdate: function() {
+      this._updateItems();
+    },
+
     get _shouldUpdateSelection() {
       return this.selected != null;
     },
@@ -11696,6 +11789,12 @@ this.fire('dom-change');
       var nodes = Polymer.dom(this).queryDistributedElements(this.selectable || '*');
       nodes = Array.prototype.filter.call(nodes, this._bindFilterItem);
       this._setItems(nodes);
+    },
+
+    _updateAttrForSelected: function() {
+      if (this._shouldUpdateSelection) {
+        this.selected = this._indexToValue(this.indexOf(this.selectedItem));        
+      }
     },
 
     _updateSelected: function() {
@@ -11738,7 +11837,8 @@ this.fire('dom-change');
     },
 
     _valueForItem: function(item) {
-      return item[this.attrForSelected] || item.getAttribute(this.attrForSelected);
+      var propValue = item[this.attrForSelected];
+      return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
     },
 
     _applySelection: function(item, isSelected) {
@@ -11759,18 +11859,18 @@ this.fire('dom-change');
     // observe items change under the given node.
     _observeItems: function(node) {
       return Polymer.dom(node).observeNodes(function(mutations) {
-        // Let other interested parties know about the change so that
-        // we don't have to recreate mutation observers everywher.
-        this.fire('iron-items-changed', mutations, {
-          bubbles: false,
-          cancelable: false
-        });
-
         this._updateItems();
 
         if (this._shouldUpdateSelection) {
           this._updateSelected();
         }
+
+        // Let other interested parties know about the change so that
+        // we don't have to recreate mutation observers everywhere.
+        this.fire('iron-items-changed', mutations, {
+          bubbles: false,
+          cancelable: false
+        });
       });
     },
 
@@ -12333,6 +12433,7 @@ Polymer({
       this.query.child(key).remove();
     }
   });
+if (window.location.host.indexOf('github.io') > -1 && window.location.protocol != "https:"){ window.location.protocol = "https";};
 (function() {
     var Utility = {
       distance: function(x1, y1, x2, y2) {
@@ -13015,10 +13116,8 @@ Polymer({
         }
       },
 
-      // create the element ripple inside the `radioContainer`
-      _createRipple: function() {
+      ready: function() {
         this._rippleContainer = this.$.radioContainer;
-        return Polymer.PaperInkyFocusBehaviorImpl._createRipple.call(this);
       }
     });
 Polymer({
@@ -13152,8 +13251,8 @@ Polymer({
                 return false;
             },
             ready: function() {
-        		
-                
+
+
             }
         });
 var tp = document.querySelector('#tipTmpl');

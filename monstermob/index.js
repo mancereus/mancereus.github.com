@@ -7,7 +7,7 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.20
+// @version 0.7.21
 (function() {
   window.WebComponents = window.WebComponents || {
     flags: {}
@@ -912,14 +912,29 @@ if (typeof WeakMap === "undefined") {
   }
 })(self);
 
-if (typeof HTMLTemplateElement === "undefined") {
-  (function() {
-    var TEMPLATE_TAG = "template";
+(function() {
+  var needsTemplate = typeof HTMLTemplateElement === "undefined";
+  var needsCloning = function() {
+    if (!needsTemplate) {
+      var frag = document.createDocumentFragment();
+      var t = document.createElement("template");
+      frag.appendChild(t);
+      t.content.appendChild(document.createElement("div"));
+      var clone = frag.cloneNode(true);
+      return clone.firstChild.content.childNodes.length === 0;
+    }
+  }();
+  var TEMPLATE_TAG = "template";
+  var TemplateImpl = function() {};
+  if (needsTemplate) {
     var contentDoc = document.implementation.createHTMLDocument("template");
     var canDecorate = true;
-    HTMLTemplateElement = function() {};
-    HTMLTemplateElement.prototype = Object.create(HTMLElement.prototype);
-    HTMLTemplateElement.decorate = function(template) {
+    var templateStyle = document.createElement("style");
+    templateStyle.textContent = TEMPLATE_TAG + "{display:none;}";
+    var head = document.head;
+    head.insertBefore(templateStyle, head.firstElementChild);
+    TemplateImpl.prototype = Object.create(HTMLElement.prototype);
+    TemplateImpl.decorate = function(template) {
       if (template.content) {
         return;
       }
@@ -940,7 +955,7 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             set: function(text) {
               contentDoc.body.innerHTML = text;
-              HTMLTemplateElement.bootstrap(contentDoc);
+              TemplateImpl.bootstrap(contentDoc);
               while (this.content.firstChild) {
                 this.content.removeChild(this.content.firstChild);
               }
@@ -950,27 +965,30 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             configurable: true
           });
+          template.cloneNode = function(deep) {
+            return TemplateImpl.cloneNode(this, deep);
+          };
         } catch (err) {
           canDecorate = false;
         }
       }
-      HTMLTemplateElement.bootstrap(template.content);
+      TemplateImpl.bootstrap(template.content);
     };
-    HTMLTemplateElement.bootstrap = function(doc) {
+    TemplateImpl.bootstrap = function(doc) {
       var templates = doc.querySelectorAll(TEMPLATE_TAG);
       for (var i = 0, l = templates.length, t; i < l && (t = templates[i]); i++) {
-        HTMLTemplateElement.decorate(t);
+        TemplateImpl.decorate(t);
       }
     };
     document.addEventListener("DOMContentLoaded", function() {
-      HTMLTemplateElement.bootstrap(document);
+      TemplateImpl.bootstrap(document);
     });
     var createElement = document.createElement;
     document.createElement = function() {
       "use strict";
       var el = createElement.apply(document, arguments);
       if (el.localName == "template") {
-        HTMLTemplateElement.decorate(el);
+        TemplateImpl.decorate(el);
       }
       return el;
     };
@@ -993,8 +1011,61 @@ if (typeof HTMLTemplateElement === "undefined") {
     function escapeData(s) {
       return s.replace(escapeDataRegExp, escapeReplace);
     }
-  })();
-}
+  }
+  if (needsTemplate || needsCloning) {
+    var nativeCloneNode = Node.prototype.cloneNode;
+    TemplateImpl.cloneNode = function(template, deep) {
+      var clone = nativeCloneNode.call(template);
+      if (this.decorate) {
+        this.decorate(clone);
+      }
+      if (deep) {
+        clone.content.appendChild(nativeCloneNode.call(template.content, true));
+        this.fixClonedDom(clone.content, template.content);
+      }
+      return clone;
+    };
+    TemplateImpl.fixClonedDom = function(clone, source) {
+      var s$ = source.querySelectorAll(TEMPLATE_TAG);
+      var t$ = clone.querySelectorAll(TEMPLATE_TAG);
+      for (var i = 0, l = t$.length, t, s; i < l; i++) {
+        s = s$[i];
+        t = t$[i];
+        if (this.decorate) {
+          this.decorate(s);
+        }
+        t.parentNode.replaceChild(s.cloneNode(true), t);
+      }
+    };
+    var originalImportNode = document.importNode;
+    Node.prototype.cloneNode = function(deep) {
+      var dom = nativeCloneNode.call(this, deep);
+      if (deep) {
+        TemplateImpl.fixClonedDom(dom, this);
+      }
+      return dom;
+    };
+    document.importNode = function(element, deep) {
+      if (element.localName === TEMPLATE_TAG) {
+        return TemplateImpl.cloneNode(element, deep);
+      } else {
+        var dom = originalImportNode.call(document, element, deep);
+        if (deep) {
+          TemplateImpl.fixClonedDom(dom, element);
+        }
+        return dom;
+      }
+    };
+    if (needsCloning) {
+      HTMLTemplateElement.prototype.cloneNode = function(deep) {
+        return TemplateImpl.cloneNode(this, deep);
+      };
+    }
+  }
+  if (needsTemplate) {
+    HTMLTemplateElement = TemplateImpl;
+  }
+})();
 
 (function(scope) {
   "use strict";
@@ -1595,7 +1666,7 @@ window.HTMLImports.addModule(function(scope) {
       if (doc && this._mayParse.indexOf(doc) < 0) {
         this._mayParse.push(doc);
         var nodes = doc.querySelectorAll(this.parseSelectorsForNode(doc));
-        for (var i = 0, l = nodes.length, p = 0, n; i < l && (n = nodes[i]); i++) {
+        for (var i = 0, l = nodes.length, n; i < l && (n = nodes[i]); i++) {
           if (!this.isParsed(n)) {
             if (this.hasResource(n)) {
               return nodeIsImport(n) ? this.nextToParseInDoc(n.__doc, n) : n;
@@ -10572,6 +10643,7 @@ this.fire('dom-change');
         this._oldTabIndex = this.tabIndex;
         this.focused = false;
         this.tabIndex = -1;
+        this.blur();
       } else if (this._oldTabIndex !== undefined) {
         this.tabIndex = this._oldTabIndex;
       }
@@ -11926,12 +11998,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
     listeners: {
       'addon-attached': '_onAddonAttached',
-      'focus': '_onFocus'
     },
-
-    observers: [
-      '_focusedControlStateChanged(focused)'
-    ],
 
     keyBindings: {
       'shift+tab:keydown': '_onShiftTabDown'
@@ -12001,12 +12068,17 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     /**
-     * Forward focus to inputElement
+     * Forward focus to inputElement. Overriden from IronControlState.
      */
-    _onFocus: function() {
-      if (!this._shiftTabPressed) {
+    _focusBlurHandler: function(event) {
+      if (this._shiftTabPressed)
+        return;
+
+      Polymer.IronControlState._focusBlurHandler.call(this, event);
+
+      // Forward the focus to the nested input.
+      if (this.focused)
         this._focusableElement.focus();
-      }
     },
 
     /**
@@ -12056,24 +12128,6 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
     _computeAlwaysFloatLabel: function(alwaysFloatLabel, placeholder) {
       return placeholder || alwaysFloatLabel;
-    },
-
-    _focusedControlStateChanged: function(focused) {
-      // IronControlState stops the focus and blur events in order to redispatch them on the host
-      // element, but paper-input-container listens to those events. Since there are more
-      // pending work on focus/blur in IronControlState, I'm putting in this hack to get the
-      // input focus state working for now.
-      if (!this.$.container) {
-        this.$.container = Polymer.dom(this.root).querySelector('paper-input-container');
-        if (!this.$.container) {
-          return;
-        }
-      }
-      if (focused) {
-        this.$.container._onFocus();
-      } else {
-        this.$.container._onBlur();
-      }
     },
 
     _updateAriaLabelledBy: function() {
@@ -12835,11 +12889,13 @@ CSS properties               | Action
    * size or hidden state of their children) and "resizables" (elements that need to be
    * notified when they are resized or un-hidden by their parents in order to take
    * action on their new measurements).
+   * 
    * Elements that perform measurement should add the `IronResizableBehavior` behavior to
    * their element definition and listen for the `iron-resize` event on themselves.
    * This event will be fired when they become showing after having been hidden,
    * when they are resized explicitly by another resizable, or when the window has been
    * resized.
+   * 
    * Note, the `iron-resize` event is non-bubbling.
    *
    * @polymerBehavior Polymer.IronResizableBehavior
@@ -13314,9 +13370,12 @@ context. You should place this element as a child of `<body>` whenever possible.
       if (this._callOpenedWhenReady) {
         this._openedChanged();
       }
+      this._observer = Polymer.dom(this).observeNodes(this._onNodesChange);
     },
 
     detached: function() {
+      Polymer.dom(this).unobserveNodes(this._observer);
+      this._observer = null;
       this.opened = false;
       this._manager.trackBackdrop(this);
       this._manager.removeOverlay(this);
@@ -13348,9 +13407,10 @@ context. You should place this element as a child of `<body>` whenever possible.
 
     /**
      * Cancels the overlay.
+     * @param {?Event} event The original event
      */
-    cancel: function() {
-      var cancelEvent = this.fire('iron-overlay-canceled', undefined, {cancelable: true});
+    cancel: function(event) {
+      var cancelEvent = this.fire('iron-overlay-canceled', event, {cancelable: true});
       if (cancelEvent.defaultPrevented) {
         return;
       }
@@ -13373,7 +13433,6 @@ context. You should place this element as a child of `<body>` whenever possible.
         this.removeAttribute('aria-hidden');
       } else {
         this.setAttribute('aria-hidden', 'true');
-        Polymer.dom(this).unobserveNodes(this._observer);
       }
 
       // wait to call after ready only if we're initially open
@@ -13461,14 +13520,23 @@ context. You should place this element as a child of `<body>` whenever possible.
 
     // tasks which must occur before opening; e.g. making the element visible
     _prepareRenderOpened: function() {
+
       this._manager.addOverlay(this);
 
+      // Needed to calculate the size of the overlay so that transitions on its size
+      // will have the correct starting points.
       this._preparePositioning();
       this.fit();
       this._finishPositioning();
 
       if (this.withBackdrop) {
         this.backdropElement.prepare();
+      }
+
+      // Safari will apply the focus to the autofocus element when displayed for the first time,
+      // so we blur it. Later, _applyFocus will set the focus if necessary.
+      if (this.noAutoFocus && document.activeElement === this._focusNode) {
+        this._focusNode.blur();
       }
     },
 
@@ -13489,23 +13557,24 @@ context. You should place this element as a child of `<body>` whenever possible.
     },
 
     _finishRenderOpened: function() {
-      // focus the child node with [autofocus]
+      // This ensures the overlay is visible before we set the focus
+      // (by calling _onIronResize -> refit).
+      this.notifyResize();
+      // Focus the child node with [autofocus]
       this._applyFocus();
 
-      this._observer = Polymer.dom(this).observeNodes(this.notifyResize);
       this.fire('iron-overlay-opened');
     },
 
     _finishRenderClosed: function() {
-      // hide the overlay and remove the backdrop
+      // Hide the overlay and remove the backdrop.
       this.resetFit();
       this.style.display = 'none';
       this._manager.removeOverlay(this);
 
-      this._focusedChild = null;
       this._applyFocus();
-
       this.notifyResize();
+
       this.fire('iron-overlay-closed', this.closingReason);
     },
 
@@ -13518,8 +13587,9 @@ context. You should place this element as a child of `<body>` whenever possible.
     _finishPositioning: function() {
       this.style.display = 'none';
       this.style.transform = this.style.webkitTransform = '';
-      // force layout to avoid application of transform
-      /** @suppress {suspiciousCode} */ this.offsetWidth;
+      // Force layout layout to avoid application of transform.
+      // Set offsetWidth to itself so that compilers won't remove it.
+      this.offsetWidth = this.offsetWidth;
       this.style.transition = this.style.webkitTransition = '';
     },
 
@@ -13530,6 +13600,7 @@ context. You should place this element as a child of `<body>` whenever possible.
         }
       } else {
         this._focusNode.blur();
+        this._focusedChild = null;
         this._manager.focusOverlay();
       }
     },
@@ -13540,7 +13611,7 @@ context. You should place this element as a child of `<body>` whenever possible.
         if (this.noCancelOnOutsideClick) {
           this._applyFocus();
         } else {
-          this.cancel();
+          this.cancel(event);
         }
       }
     },
@@ -13550,7 +13621,7 @@ context. You should place this element as a child of `<body>` whenever possible.
       if (this._manager.currentOverlay() === this &&
           !this.noCancelOnEscKey &&
           event.keyCode === ESC) {
-        this.cancel();
+        this.cancel(event);
       }
     },
 
@@ -13571,6 +13642,17 @@ context. You should place this element as a child of `<body>` whenever possible.
       if (this.opened) {
         this.refit();
       }
+    },
+
+    /**
+     * @protected
+     * Will call notifyResize if overlay is opened.
+     * Can be overridden in order to avoid multiple observers on the same node.
+     */
+    _onNodesChange: function() {
+      if (this.opened) {
+        this.notifyResize();
+      }
     }
 
 /**
@@ -13582,6 +13664,7 @@ context. You should place this element as a child of `<body>` whenever possible.
  * Fired when the `iron-overlay` is canceled, but before it is closed.
  * Cancel the event to prevent the `iron-overlay` from closing.
  * @event iron-overlay-canceled
+ * @param {?Event} event The event in case the user pressed ESC or clicked outside the overlay
  */
 
 /**
@@ -14327,7 +14410,7 @@ Polymer({
         }
         this.$.sizedImgDiv.style.backgroundImage = src ? 'url("' + src + '")' : '';
 
-        this._setLoading(true);
+        this._setLoading(!!src);
         this._setLoaded(false);
         this._setError(false);
       },
@@ -15165,13 +15248,13 @@ Polymer({
 
       state.value = state.value || '';
 
-      // Account for the textarea's new lines.
-      var str = state.value.replace(/(\r\n|\n|\r)/g, '--').length;
+      var counter = state.value.length;
 
       if (state.inputElement.hasAttribute('maxlength')) {
-        str += '/' + state.inputElement.getAttribute('maxlength');
+        counter += '/' + state.inputElement.getAttribute('maxlength');
       }
-      this._charCounterStr = str;
+
+      this._charCounterStr = counter;
     }
   });
 Polymer({

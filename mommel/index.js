@@ -10303,6 +10303,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         this._oldTabIndex = this.tabIndex;
         this.focused = false;
         this.tabIndex = -1;
+        this.blur();
       } else if (this._oldTabIndex !== undefined) {
         this.tabIndex = this._oldTabIndex;
       }
@@ -10597,16 +10598,19 @@ is separate from validation, and `allowed-pattern` does not affect how the input
      */
     setItemSelected: function(item, isSelected) {
       if (item != null) {
-        if (isSelected) {
-          this.selection.push(item);
-        } else {
-          var i = this.selection.indexOf(item);
-          if (i >= 0) {
-            this.selection.splice(i, 1);
+        if (isSelected !== this.isSelected(item)) {
+          // proceed to update selection only if requested state differs from current
+          if (isSelected) {
+            this.selection.push(item);
+          } else {
+            var i = this.selection.indexOf(item);
+            if (i >= 0) {
+              this.selection.splice(i, 1);
+            }
           }
-        }
-        if (this.selectCallback) {
-          this.selectCallback(item, isSelected);
+          if (this.selectCallback) {
+            this.selectCallback(item, isSelected);
+          }
         }
       }
     },
@@ -10740,6 +10744,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       items: {
         type: Array,
         readOnly: true,
+        notify: true,
         value: function() {
           return [];
         }
@@ -10762,7 +10767,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     observers: [
-      '_updateSelected(attrForSelected, selected)'
+      '_updateAttrForSelected(attrForSelected)',
+      '_updateSelected(selected)'
     ],
 
     created: function() {
@@ -10774,7 +10780,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       this._observer = this._observeItems(this);
       this._updateItems();
       if (!this._shouldUpdateSelection) {
-        this._updateSelected(this.attrForSelected,this.selected)
+        this._updateSelected();
       }
       this._addListener(this.activateEvent);
     },
@@ -10828,6 +10834,22 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       this.selected = this._indexToValue(index);
     },
 
+    /**
+     * Force a synchronous update of the `items` property.
+     *
+     * NOTE: Consider listening for the `iron-items-changed` event to respond to
+     * updates to the set of selectable items after updates to the DOM list and
+     * selection state have been made.
+     *
+     * WARNING: If you are using this method, you should probably consider an
+     * alternate approach. Synchronously querying for items is potentially
+     * slow for many use cases. The `items` property will update asynchronously
+     * on its own to reflect selectable items in the DOM.
+     */
+    forceSynchronousItemUpdate: function() {
+      this._updateItems();
+    },
+
     get _shouldUpdateSelection() {
       return this.selected != null;
     },
@@ -10849,6 +10871,12 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       var nodes = Polymer.dom(this).queryDistributedElements(this.selectable || '*');
       nodes = Array.prototype.filter.call(nodes, this._bindFilterItem);
       this._setItems(nodes);
+    },
+
+    _updateAttrForSelected: function() {
+      if (this._shouldUpdateSelection) {
+        this.selected = this._indexToValue(this.indexOf(this.selectedItem));        
+      }
     },
 
     _updateSelected: function() {
@@ -10891,7 +10919,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     _valueForItem: function(item) {
-      return item[this.attrForSelected] || item.getAttribute(this.attrForSelected);
+      var propValue = item[this.attrForSelected];
+      return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
     },
 
     _applySelection: function(item, isSelected) {
@@ -10912,18 +10941,18 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     // observe items change under the given node.
     _observeItems: function(node) {
       return Polymer.dom(node).observeNodes(function(mutations) {
-        // Let other interested parties know about the change so that
-        // we don't have to recreate mutation observers everywher.
-        this.fire('iron-items-changed', mutations, {
-          bubbles: false,
-          cancelable: false
-        });
-
         this._updateItems();
 
         if (this._shouldUpdateSelection) {
           this._updateSelected();
         }
+
+        // Let other interested parties know about the change so that
+        // we don't have to recreate mutation observers everywhere.
+        this.fire('iron-items-changed', mutations, {
+          bubbles: false,
+          cancelable: false
+        });
       });
     },
 
@@ -10983,7 +11012,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     observers: [
-      '_updateSelected(attrForSelected, selectedValues)'
+      '_updateSelected(selectedValues)'
     ],
 
     /**
@@ -11014,6 +11043,18 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         (this.selectedValues != null && this.selectedValues.length);
     },
 
+    _updateAttrForSelected: function() {
+      if (!this.multi) {
+        Polymer.IronSelectableBehavior._updateAttrForSelected.apply(this);
+      } else if (this._shouldUpdateSelection) {
+        this.selectedValues = this.selectedItems.map(function(selectedItem) {
+          return this._indexToValue(this.indexOf(selectedItem));        
+        }, this).filter(function(unfilteredValue) {
+          return unfilteredValue != null;
+        }, this);
+      }
+    },
+
     _updateSelected: function() {
       if (this.multi) {
         this._selectMulti(this.selectedValues);
@@ -11023,11 +11064,16 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     _selectMulti: function(values) {
-      this._selection.clear();
       if (values) {
-        for (var i = 0; i < values.length; i++) {
-          this._selection.setItemSelected(this._valueToItem(values[i]), true);
+        var selectedItems = this._valuesToItems(values);
+        // clear all but the current selected items
+        this._selection.clear(selectedItems);
+        // select only those not selected yet
+        for (var i = 0; i < selectedItems.length; i++) {
+          this._selection.setItemSelected(selectedItems[i], true);
         }
+      } else {
+        this._selection.clear();
       }
     },
 
@@ -11050,6 +11096,12 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         this.splice('selectedValues',i,1);
       }
       this._selection.setItemSelected(this._valueToItem(value), unselected);
+    },
+
+    _valuesToItems: function(values) {
+      return (values == null) ? null : values.map(function(value) {
+        return this._valueToItem(value);
+      }, this);
     }
   };
 
@@ -11118,7 +11170,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
      * Selects the given value. If the `multi` property is true, then the selected state of the
      * `value` will be toggled; otherwise the `value` will be selected.
      *
-     * @param {string} value the value to select.
+     * @param {string|number} value the value to select.
      */
     select: function(value) {
       if (this._defaultFocusAsync) {
@@ -11283,6 +11335,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         return;
       }
 
+      // Do not focus the selected tab if the deepest target is part of the
+      // menu element's local DOM and is focusable.
+      var rootTarget = Polymer.dom(event).rootTarget;
+      if (rootTarget !== this && typeof rootTarget.tabIndex !== "undefined" && !this.isLightDescendant(rootTarget)) {
+        return;
+      }
+
       this.blur();
 
       // clear the cached focus item
@@ -11310,6 +11369,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     _onUpKey: function(event) {
       // up and down arrows moves the focus
       this._focusPrevious();
+      event.detail.keyboardEvent.preventDefault();
     },
 
     /**
@@ -11319,6 +11379,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
      */
     _onDownKey: function(event) {
       this._focusNext();
+      event.detail.keyboardEvent.preventDefault();
     },
 
     /**
@@ -12249,6 +12310,7 @@ var data = [
           atTop: {
             type: Boolean,
             value: true,
+            notify: true,
             readOnly: true
           }
         },

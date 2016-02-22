@@ -338,7 +338,7 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
     };
 
     --layout-around-justified: {
-      -ms-flex-pack: around;
+      -ms-flex-pack: distribute;
       -webkit-justify-content: space-around;
       justify-content: space-around;
     };
@@ -805,7 +805,7 @@ Example:
 ```
 
 `paper-toolbar` has a standard height, but can made be taller by setting `tall`
-class on the `paper-toolbar`.  This will make the toolbar 3x the normal height.
+class on the `paper-toolbar`. This will make the toolbar 3x the normal height.
 
 ```html
 <paper-toolbar class="tall">
@@ -846,6 +846,9 @@ with `bottom`.
 </paper-toolbar>
 ```
 
+When inside a `paper-header-panel` element, the class `.animate` is toggled to animate
+the height change in the toolbar.
+
 ### Styling
 
 The following custom properties and mixins are available for styling:
@@ -854,13 +857,14 @@ Custom property | Description | Default
 ----------------|-------------|----------
 `--paper-toolbar-title`      | Mixin applied to the title of the toolbar | `{}`
 `--paper-toolbar-background` | Toolbar background color     | `--primary-color`
-`--paper-toolbar-color`      | Toolbar foreground color     | `--primary-text-color`
+`--paper-toolbar-color`      | Toolbar foreground color     | `--dark-theme-text-color`
 `--paper-toolbar-height`     | Custom height for toolbar    | `64px`
 `--paper-toolbar-sm-height`  | Custom height for small screen toolbar | `56px`
 `--paper-toolbar`            | Mixin applied to the toolbar | `{}`
 `--paper-toolbar-content`    | Mixin applied to the content section of the toolbar | `{}`
 `--paper-toolbar-medium`     | Mixin applied to medium height toolbar | `{}`
 `--paper-toolbar-tall`       | Mixin applied to tall height toolbar | `{}`
+`--paper-toolbar-transition` | Transition applied to the `.animate` class | `height 0.18s ease-in`
 
 ### Accessibility
 
@@ -1938,10 +1942,8 @@ Example:
     </script>
 
 @group Iron Elements
-@class iron-pages
 @hero hero.svg
 @demo demo/index.html
-@extends iron-selector
 -->
 
 <!--
@@ -2694,14 +2696,14 @@ Custom property | Description | Default
         height: var(--paper-toolbar-height, 64px);
 
         background: var(--paper-toolbar-background, --primary-color);
-        color: var(--paper-toolbar-color, --primary-text-color);
+        color: var(--paper-toolbar-color, --dark-theme-text-color);
 
         @apply(--paper-toolbar);
       }
 
       :host(.animate) {
         /* transition */
-        transition: height 0.18s ease-in;
+        transition: var(--paper-toolbar-transition, height 0.18s ease-in);
       }
 
       :host(.medium-tall) {
@@ -2926,26 +2928,21 @@ Custom property | Description | Default
   </dom-module>
 <dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
-  <style>
-
-    :host {
-      display: block;
-    }
-
-    :host > ::content > :not(.iron-selected) {
-      display: none !important;
-    }
-
-  </style>
-
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
 
     <content></content>
-
   </template>
 
-</dom-module>
-
+  </dom-module>
 <dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
 
   <style>

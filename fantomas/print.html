@@ -207,7 +207,7 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
     };
 
     --layout-around-justified: {
-      -ms-flex-pack: around;
+      -ms-flex-pack: distribute;
       -webkit-justify-content: space-around;
       justify-content: space-around;
     };
@@ -571,10 +571,8 @@ Example:
     </script>
 
 @group Iron Elements
-@class iron-pages
 @hero hero.svg
 @demo demo/index.html
-@extends iron-selector
 -->
 
 <style>
@@ -1872,26 +1870,21 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </dom-module>
 <dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
-  <style>
-
-    :host {
-      display: block;
-    }
-
-    :host > ::content > :not(.iron-selected) {
-      display: none !important;
-    }
-
-  </style>
-
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
 
     <content></content>
-
   </template>
 
-</dom-module>
-
+  </dom-module>
 <dom-module id="fantomas-card" assetpath="/">
 	<style>
 		:host {

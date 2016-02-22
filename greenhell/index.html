@@ -24,10 +24,8 @@ Example:
     </script>
 
 @group Iron Elements
-@class iron-pages
 @hero hero.svg
 @demo demo/index.html
-@extends iron-selector
 -->
 
 <!--
@@ -416,7 +414,7 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
     };
 
     --layout-around-justified: {
-      -ms-flex-pack: around;
+      -ms-flex-pack: distribute;
       -webkit-justify-content: space-around;
       justify-content: space-around;
     };
@@ -1882,7 +1880,7 @@ Example:
 ```
 
 `paper-toolbar` has a standard height, but can made be taller by setting `tall`
-class on the `paper-toolbar`.  This will make the toolbar 3x the normal height.
+class on the `paper-toolbar`. This will make the toolbar 3x the normal height.
 
 ```html
 <paper-toolbar class="tall">
@@ -1923,6 +1921,9 @@ with `bottom`.
 </paper-toolbar>
 ```
 
+When inside a `paper-header-panel` element, the class `.animate` is toggled to animate
+the height change in the toolbar.
+
 ### Styling
 
 The following custom properties and mixins are available for styling:
@@ -1931,13 +1932,14 @@ Custom property | Description | Default
 ----------------|-------------|----------
 `--paper-toolbar-title`      | Mixin applied to the title of the toolbar | `{}`
 `--paper-toolbar-background` | Toolbar background color     | `--primary-color`
-`--paper-toolbar-color`      | Toolbar foreground color     | `--primary-text-color`
+`--paper-toolbar-color`      | Toolbar foreground color     | `--dark-theme-text-color`
 `--paper-toolbar-height`     | Custom height for toolbar    | `64px`
 `--paper-toolbar-sm-height`  | Custom height for small screen toolbar | `56px`
 `--paper-toolbar`            | Mixin applied to the toolbar | `{}`
 `--paper-toolbar-content`    | Mixin applied to the content section of the toolbar | `{}`
 `--paper-toolbar-medium`     | Mixin applied to medium height toolbar | `{}`
 `--paper-toolbar-tall`       | Mixin applied to tall height toolbar | `{}`
+`--paper-toolbar-transition` | Transition applied to the `.animate` class | `height 0.18s ease-in`
 
 ### Accessibility
 
@@ -2081,13 +2083,16 @@ Custom property | Description | Default
 `--paper-checkbox-unchecked-background-color` | Checkbox background color when the input is not checked | `transparent`
 `--paper-checkbox-unchecked-color` | Checkbox border color when the input is not checked | `--primary-text-color`
 `--paper-checkbox-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--primary-text-color`
-`--paper-checkbox-checked-color` | Checkbox color when the input is checked | `--default-primary-color`
-`--paper-checkbox-checked-ink-color` | Selected/focus ripple color when the input is checked | `--default-primary-color`
+`--paper-checkbox-checked-color` | Checkbox color when the input is checked | `--primary-color`
+`--paper-checkbox-checked-ink-color` | Selected/focus ripple color when the input is checked | `--primary-color`
 `--paper-checkbox-checkmark-color` | Checkmark color | `white`
 `--paper-checkbox-label-color` | Label color | `--primary-text-color`
 `--paper-checkbox-label-spacing` | Spacing between the label and the checkbox | `8px`
-`--paper-checkbox-error-color` | Checkbox color when invalid | `--google-red-500`
+`--paper-checkbox-error-color` | Checkbox color when invalid | `--error-color`
 `--paper-checkbox-size` | Size of the checkbox | `18px`
+
+This element applies the mixin `--paper-font-common-base` but does not import `paper-styles/typography.html`.
+In order to apply the `Roboto` font to this element, make sure you've imported `paper-styles/typography.html`.
 
 @demo demo/index.html
 -->
@@ -2234,26 +2239,21 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
 <body unresolved="" touch-action="auto" style="background-color: #4CBF80"><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
-  <style>
-
-    :host {
-      display: block;
-    }
-
-    :host > ::content > :not(.iron-selected) {
-      display: none !important;
-    }
-
-  </style>
-
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
 
     <content></content>
-
   </template>
 
-</dom-module>
-
+  </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
 
   <!--
@@ -2707,14 +2707,14 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         height: var(--paper-toolbar-height, 64px);
 
         background: var(--paper-toolbar-background, --primary-color);
-        color: var(--paper-toolbar-color, --primary-text-color);
+        color: var(--paper-toolbar-color, --dark-theme-text-color);
 
         @apply(--paper-toolbar);
       }
 
       :host(.animate) {
         /* transition */
-        transition: height 0.18s ease-in;
+        transition: var(--paper-toolbar-transition, height 0.18s ease-in);
       }
 
       :host(.medium-tall) {
@@ -3326,6 +3326,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         white-space: nowrap;
         cursor: pointer;
         --calculated-paper-checkbox-size: var(--paper-checkbox-size, 18px);
+        @apply(--paper-font-common-base);
+        line-height: 0;
       }
 
       :host(:focus) {
@@ -3366,7 +3368,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #ink[checked] {
-        color: var(--paper-checkbox-checked-ink-color, --default-primary-color);
+        color: var(--paper-checkbox-checked-ink-color, --primary-color);
       }
 
       #checkbox {
@@ -3406,8 +3408,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #checkbox.checked {
-        background-color: var(--paper-checkbox-checked-color, --default-primary-color);
-        border-color: var(--paper-checkbox-checked-color, --default-primary-color);
+        background-color: var(--paper-checkbox-checked-color, --primary-color);
+        border-color: var(--paper-checkbox-checked-color, --primary-color);
       }
 
       #checkmark {
@@ -3420,13 +3422,14 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         border-right-width: calc(2/15 * var(--calculated-paper-checkbox-size));
         border-bottom-width: calc(2/15 * var(--calculated-paper-checkbox-size));
         border-color: var(--paper-checkbox-checkmark-color, white);
-        transform-origin: 97% 86%;
         -webkit-transform-origin: 97% 86%;
+        transform-origin: 97% 86%;
+        box-sizing: content-box; /* protect against page-level box-sizing */
       }
 
       :host-context([dir="rtl"]) #checkmark {
-        transform-origin: 50% 14%;
         -webkit-transform-origin: 50% 14%;
+        transform-origin: 50% 14%;
       }
 
       /* label */
@@ -3436,7 +3439,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         vertical-align: middle;
         padding-left: var(--paper-checkbox-label-spacing, 8px);
         white-space: normal;
-        pointer-events: none;
+        line-height: normal;
         color: var(--paper-checkbox-label-color, --primary-text-color);
       }
 
@@ -3450,9 +3453,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       /* disabled state */
-      :host([disabled]) {
-        pointer-events: none;
-      }
 
       :host([disabled]) #checkbox {
         opacity: 0.5;
@@ -3470,7 +3470,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       /* invalid state */
       #checkbox.invalid:not(.checked) {
-        border-color: var(--paper-checkbox-error-color, --google-red-500);
+        border-color: var(--paper-checkbox-error-color, --error-color);
       }
     </style>
 

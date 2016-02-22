@@ -7,7 +7,7 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.20
+// @version 0.7.21
 (function() {
   window.WebComponents = window.WebComponents || {
     flags: {}
@@ -912,14 +912,29 @@ if (typeof WeakMap === "undefined") {
   }
 })(self);
 
-if (typeof HTMLTemplateElement === "undefined") {
-  (function() {
-    var TEMPLATE_TAG = "template";
+(function() {
+  var needsTemplate = typeof HTMLTemplateElement === "undefined";
+  var needsCloning = function() {
+    if (!needsTemplate) {
+      var frag = document.createDocumentFragment();
+      var t = document.createElement("template");
+      frag.appendChild(t);
+      t.content.appendChild(document.createElement("div"));
+      var clone = frag.cloneNode(true);
+      return clone.firstChild.content.childNodes.length === 0;
+    }
+  }();
+  var TEMPLATE_TAG = "template";
+  var TemplateImpl = function() {};
+  if (needsTemplate) {
     var contentDoc = document.implementation.createHTMLDocument("template");
     var canDecorate = true;
-    HTMLTemplateElement = function() {};
-    HTMLTemplateElement.prototype = Object.create(HTMLElement.prototype);
-    HTMLTemplateElement.decorate = function(template) {
+    var templateStyle = document.createElement("style");
+    templateStyle.textContent = TEMPLATE_TAG + "{display:none;}";
+    var head = document.head;
+    head.insertBefore(templateStyle, head.firstElementChild);
+    TemplateImpl.prototype = Object.create(HTMLElement.prototype);
+    TemplateImpl.decorate = function(template) {
       if (template.content) {
         return;
       }
@@ -940,7 +955,7 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             set: function(text) {
               contentDoc.body.innerHTML = text;
-              HTMLTemplateElement.bootstrap(contentDoc);
+              TemplateImpl.bootstrap(contentDoc);
               while (this.content.firstChild) {
                 this.content.removeChild(this.content.firstChild);
               }
@@ -950,27 +965,30 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             configurable: true
           });
+          template.cloneNode = function(deep) {
+            return TemplateImpl.cloneNode(this, deep);
+          };
         } catch (err) {
           canDecorate = false;
         }
       }
-      HTMLTemplateElement.bootstrap(template.content);
+      TemplateImpl.bootstrap(template.content);
     };
-    HTMLTemplateElement.bootstrap = function(doc) {
+    TemplateImpl.bootstrap = function(doc) {
       var templates = doc.querySelectorAll(TEMPLATE_TAG);
       for (var i = 0, l = templates.length, t; i < l && (t = templates[i]); i++) {
-        HTMLTemplateElement.decorate(t);
+        TemplateImpl.decorate(t);
       }
     };
     document.addEventListener("DOMContentLoaded", function() {
-      HTMLTemplateElement.bootstrap(document);
+      TemplateImpl.bootstrap(document);
     });
     var createElement = document.createElement;
     document.createElement = function() {
       "use strict";
       var el = createElement.apply(document, arguments);
       if (el.localName == "template") {
-        HTMLTemplateElement.decorate(el);
+        TemplateImpl.decorate(el);
       }
       return el;
     };
@@ -993,8 +1011,61 @@ if (typeof HTMLTemplateElement === "undefined") {
     function escapeData(s) {
       return s.replace(escapeDataRegExp, escapeReplace);
     }
-  })();
-}
+  }
+  if (needsTemplate || needsCloning) {
+    var nativeCloneNode = Node.prototype.cloneNode;
+    TemplateImpl.cloneNode = function(template, deep) {
+      var clone = nativeCloneNode.call(template);
+      if (this.decorate) {
+        this.decorate(clone);
+      }
+      if (deep) {
+        clone.content.appendChild(nativeCloneNode.call(template.content, true));
+        this.fixClonedDom(clone.content, template.content);
+      }
+      return clone;
+    };
+    TemplateImpl.fixClonedDom = function(clone, source) {
+      var s$ = source.querySelectorAll(TEMPLATE_TAG);
+      var t$ = clone.querySelectorAll(TEMPLATE_TAG);
+      for (var i = 0, l = t$.length, t, s; i < l; i++) {
+        s = s$[i];
+        t = t$[i];
+        if (this.decorate) {
+          this.decorate(s);
+        }
+        t.parentNode.replaceChild(s.cloneNode(true), t);
+      }
+    };
+    var originalImportNode = document.importNode;
+    Node.prototype.cloneNode = function(deep) {
+      var dom = nativeCloneNode.call(this, deep);
+      if (deep) {
+        TemplateImpl.fixClonedDom(dom, this);
+      }
+      return dom;
+    };
+    document.importNode = function(element, deep) {
+      if (element.localName === TEMPLATE_TAG) {
+        return TemplateImpl.cloneNode(element, deep);
+      } else {
+        var dom = originalImportNode.call(document, element, deep);
+        if (deep) {
+          TemplateImpl.fixClonedDom(dom, element);
+        }
+        return dom;
+      }
+    };
+    if (needsCloning) {
+      HTMLTemplateElement.prototype.cloneNode = function(deep) {
+        return TemplateImpl.cloneNode(this, deep);
+      };
+    }
+  }
+  if (needsTemplate) {
+    HTMLTemplateElement = TemplateImpl;
+  }
+})();
 
 (function(scope) {
   "use strict";
@@ -1595,7 +1666,7 @@ window.HTMLImports.addModule(function(scope) {
       if (doc && this._mayParse.indexOf(doc) < 0) {
         this._mayParse.push(doc);
         var nodes = doc.querySelectorAll(this.parseSelectorsForNode(doc));
-        for (var i = 0, l = nodes.length, p = 0, n; i < l && (n = nodes[i]); i++) {
+        for (var i = 0, l = nodes.length, n; i < l && (n = nodes[i]); i++) {
           if (!this.isParsed(n)) {
             if (this.hasResource(n)) {
               return nodeIsImport(n) ? this.nextToParseInDoc(n.__doc, n) : n;
@@ -10065,16 +10136,19 @@ Polymer({
      */
     setItemSelected: function(item, isSelected) {
       if (item != null) {
-        if (isSelected) {
-          this.selection.push(item);
-        } else {
-          var i = this.selection.indexOf(item);
-          if (i >= 0) {
-            this.selection.splice(i, 1);
+        if (isSelected !== this.isSelected(item)) {
+          // proceed to update selection only if requested state differs from current
+          if (isSelected) {
+            this.selection.push(item);
+          } else {
+            var i = this.selection.indexOf(item);
+            if (i >= 0) {
+              this.selection.splice(i, 1);
+            }
           }
-        }
-        if (this.selectCallback) {
-          this.selectCallback(item, isSelected);
+          if (this.selectCallback) {
+            this.selectCallback(item, isSelected);
+          }
         }
       }
     },
@@ -10208,6 +10282,7 @@ Polymer({
       items: {
         type: Array,
         readOnly: true,
+        notify: true,
         value: function() {
           return [];
         }
@@ -10230,7 +10305,8 @@ Polymer({
     },
 
     observers: [
-      '_updateSelected(attrForSelected, selected)'
+      '_updateAttrForSelected(attrForSelected)',
+      '_updateSelected(selected)'
     ],
 
     created: function() {
@@ -10242,7 +10318,7 @@ Polymer({
       this._observer = this._observeItems(this);
       this._updateItems();
       if (!this._shouldUpdateSelection) {
-        this._updateSelected(this.attrForSelected,this.selected)
+        this._updateSelected();
       }
       this._addListener(this.activateEvent);
     },
@@ -10296,6 +10372,22 @@ Polymer({
       this.selected = this._indexToValue(index);
     },
 
+    /**
+     * Force a synchronous update of the `items` property.
+     *
+     * NOTE: Consider listening for the `iron-items-changed` event to respond to
+     * updates to the set of selectable items after updates to the DOM list and
+     * selection state have been made.
+     *
+     * WARNING: If you are using this method, you should probably consider an
+     * alternate approach. Synchronously querying for items is potentially
+     * slow for many use cases. The `items` property will update asynchronously
+     * on its own to reflect selectable items in the DOM.
+     */
+    forceSynchronousItemUpdate: function() {
+      this._updateItems();
+    },
+
     get _shouldUpdateSelection() {
       return this.selected != null;
     },
@@ -10317,6 +10409,12 @@ Polymer({
       var nodes = Polymer.dom(this).queryDistributedElements(this.selectable || '*');
       nodes = Array.prototype.filter.call(nodes, this._bindFilterItem);
       this._setItems(nodes);
+    },
+
+    _updateAttrForSelected: function() {
+      if (this._shouldUpdateSelection) {
+        this.selected = this._indexToValue(this.indexOf(this.selectedItem));        
+      }
     },
 
     _updateSelected: function() {
@@ -10359,7 +10457,8 @@ Polymer({
     },
 
     _valueForItem: function(item) {
-      return item[this.attrForSelected] || item.getAttribute(this.attrForSelected);
+      var propValue = item[this.attrForSelected];
+      return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
     },
 
     _applySelection: function(item, isSelected) {
@@ -10380,18 +10479,18 @@ Polymer({
     // observe items change under the given node.
     _observeItems: function(node) {
       return Polymer.dom(node).observeNodes(function(mutations) {
-        // Let other interested parties know about the change so that
-        // we don't have to recreate mutation observers everywher.
-        this.fire('iron-items-changed', mutations, {
-          bubbles: false,
-          cancelable: false
-        });
-
         this._updateItems();
 
         if (this._shouldUpdateSelection) {
           this._updateSelected();
         }
+
+        // Let other interested parties know about the change so that
+        // we don't have to recreate mutation observers everywhere.
+        this.fire('iron-items-changed', mutations, {
+          bubbles: false,
+          cancelable: false
+        });
       });
     },
 
@@ -10451,7 +10550,7 @@ Polymer({
     },
 
     observers: [
-      '_updateSelected(attrForSelected, selectedValues)'
+      '_updateSelected(selectedValues)'
     ],
 
     /**
@@ -10482,6 +10581,18 @@ Polymer({
         (this.selectedValues != null && this.selectedValues.length);
     },
 
+    _updateAttrForSelected: function() {
+      if (!this.multi) {
+        Polymer.IronSelectableBehavior._updateAttrForSelected.apply(this);
+      } else if (this._shouldUpdateSelection) {
+        this.selectedValues = this.selectedItems.map(function(selectedItem) {
+          return this._indexToValue(this.indexOf(selectedItem));        
+        }, this).filter(function(unfilteredValue) {
+          return unfilteredValue != null;
+        }, this);
+      }
+    },
+
     _updateSelected: function() {
       if (this.multi) {
         this._selectMulti(this.selectedValues);
@@ -10491,11 +10602,16 @@ Polymer({
     },
 
     _selectMulti: function(values) {
-      this._selection.clear();
       if (values) {
-        for (var i = 0; i < values.length; i++) {
-          this._selection.setItemSelected(this._valueToItem(values[i]), true);
+        var selectedItems = this._valuesToItems(values);
+        // clear all but the current selected items
+        this._selection.clear(selectedItems);
+        // select only those not selected yet
+        for (var i = 0; i < selectedItems.length; i++) {
+          this._selection.setItemSelected(selectedItems[i], true);
         }
+      } else {
+        this._selection.clear();
       }
     },
 
@@ -10518,6 +10634,12 @@ Polymer({
         this.splice('selectedValues',i,1);
       }
       this._selection.setItemSelected(this._valueToItem(value), unselected);
+    },
+
+    _valuesToItems: function(values) {
+      return (values == null) ? null : values.map(function(value) {
+        return this._valueToItem(value);
+      }, this);
     }
   };
 
@@ -10587,11 +10709,13 @@ Polymer({
    * size or hidden state of their children) and "resizables" (elements that need to be
    * notified when they are resized or un-hidden by their parents in order to take
    * action on their new measurements).
+   * 
    * Elements that perform measurement should add the `IronResizableBehavior` behavior to
    * their element definition and listen for the `iron-resize` event on themselves.
    * This event will be fired when they become showing after having been hidden,
    * when they are resized explicitly by another resizable, or when the window has been
    * resized.
+   * 
    * Note, the `iron-resize` event is non-bubbling.
    *
    * @polymerBehavior Polymer.IronResizableBehavior
@@ -11251,7 +11375,7 @@ Polymer({
      * Selects the given value. If the `multi` property is true, then the selected state of the
      * `value` will be toggled; otherwise the `value` will be selected.
      *
-     * @param {string} value the value to select.
+     * @param {string|number} value the value to select.
      */
     select: function(value) {
       if (this._defaultFocusAsync) {
@@ -11416,6 +11540,13 @@ Polymer({
         return;
       }
 
+      // Do not focus the selected tab if the deepest target is part of the
+      // menu element's local DOM and is focusable.
+      var rootTarget = Polymer.dom(event).rootTarget;
+      if (rootTarget !== this && typeof rootTarget.tabIndex !== "undefined" && !this.isLightDescendant(rootTarget)) {
+        return;
+      }
+
       this.blur();
 
       // clear the cached focus item
@@ -11443,6 +11574,7 @@ Polymer({
     _onUpKey: function(event) {
       // up and down arrows moves the focus
       this._focusPrevious();
+      event.detail.keyboardEvent.preventDefault();
     },
 
     /**
@@ -11452,6 +11584,7 @@ Polymer({
      */
     _onDownKey: function(event) {
       this._focusNext();
+      event.detail.keyboardEvent.preventDefault();
     },
 
     /**
@@ -11795,12 +11928,26 @@ Polymer({
       event.detail.keyboardEvent.preventDefault();
     },
 
-    _onLeftKey: function() {
-      this._focusPrevious();
+    get _isRTL() {
+      return window.getComputedStyle(this)['direction'] === 'rtl';
     },
 
-    _onRightKey: function() {
-      this._focusNext();
+    _onLeftKey: function(event) {
+      if (this._isRTL) {
+        this._focusNext();
+      } else {
+        this._focusPrevious();
+      }
+      event.detail.keyboardEvent.preventDefault();
+    },
+
+    _onRightKey: function(event) {
+      if (this._isRTL) {
+        this._focusPrevious();
+      } else {
+        this._focusNext();
+      }
+      event.detail.keyboardEvent.preventDefault();
     },
 
     _onKeydown: function(event) {
@@ -11896,6 +12043,7 @@ Polymer({
         this._oldTabIndex = this.tabIndex;
         this.focused = false;
         this.tabIndex = -1;
+        this.blur();
       } else if (this._oldTabIndex !== undefined) {
         this.tabIndex = this._oldTabIndex;
       }
@@ -13152,6 +13300,7 @@ DraggableContainerBehavior = {
           atTop: {
             type: Boolean,
             value: true,
+            notify: true,
             readOnly: true
           }
         },
@@ -13384,34 +13533,34 @@ Polymer({
     })();
 Polymer({
 
-    is: 'iron-pages',
+      is: 'iron-pages',
 
-    behaviors: [
-      Polymer.IronResizableBehavior,
-      Polymer.IronSelectableBehavior
-    ],
+      behaviors: [
+        Polymer.IronResizableBehavior,
+        Polymer.IronSelectableBehavior
+      ],
 
-    properties: {
+      properties: {
 
-      // as the selected page is the only one visible, activateEvent
-      // is both non-sensical and problematic; e.g. in cases where a user
-      // handler attempts to change the page and the activateEvent
-      // handler immediately changes it back
-      activateEvent: {
-        type: String,
-        value: null
+        // as the selected page is the only one visible, activateEvent
+        // is both non-sensical and problematic; e.g. in cases where a user
+        // handler attempts to change the page and the activateEvent
+        // handler immediately changes it back
+        activateEvent: {
+          type: String,
+          value: null
+        }
+
+      },
+
+      observers: [
+        '_selectedPageChanged(selected)'
+      ],
+
+      _selectedPageChanged: function(selected, old) {
+        this.async(this.notifyResize);
       }
-
-    },
-
-    observers: [
-      '_selectedPageChanged(selected)'
-    ],
-
-    _selectedPageChanged: function(selected, old) {
-      this.async(this.notifyResize);
-    }
-  });
+    });
 Polymer({
 
       is: 'iron-icon',
@@ -14703,7 +14852,7 @@ Polymer({
         }
         this.$.sizedImgDiv.style.backgroundImage = src ? 'url("' + src + '")' : '';
 
-        this._setLoading(true);
+        this._setLoading(!!src);
         this._setLoaded(false);
         this._setError(false);
       },

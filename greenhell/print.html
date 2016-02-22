@@ -34,10 +34,8 @@ Example:
     </script>
 
 @group Iron Elements
-@class iron-pages
 @hero hero.svg
 @demo demo/index.html
-@extends iron-selector
 -->
 
 <!--
@@ -426,7 +424,7 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
     };
 
     --layout-around-justified: {
-      -ms-flex-pack: around;
+      -ms-flex-pack: distribute;
       -webkit-justify-content: space-around;
       justify-content: space-around;
     };
@@ -1753,26 +1751,21 @@ available in each ones, rather than the aggregated `paper-styles.html` as a whol
 
 <body><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
-  <style>
-
-    :host {
-      display: block;
-    }
-
-    :host > ::content > :not(.iron-selected) {
-      display: none !important;
-    }
-
-  </style>
-
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
 
     <content></content>
-
   </template>
 
-</dom-module>
-
+  </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
 
   <!--

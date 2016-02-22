@@ -207,7 +207,7 @@ A complete [guide](https://elements.polymer-project.org/guides/flex-layout) to `
     };
 
     --layout-around-justified: {
-      -ms-flex-pack: around;
+      -ms-flex-pack: distribute;
       -webkit-justify-content: space-around;
       justify-content: space-around;
     };
@@ -1617,7 +1617,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     <template id="tmpl" is="dom-bind">
         <div class="game">
             <template is="dom-repeat" items="{{cards}}">
-
                 <div class$="card {{item.color}}">
                     <div class="item">{{item.name}}</div>
                 </div>

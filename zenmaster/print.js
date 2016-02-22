@@ -7,7 +7,7 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.20
+// @version 0.7.21
 (function() {
   window.WebComponents = window.WebComponents || {
     flags: {}
@@ -912,14 +912,29 @@ if (typeof WeakMap === "undefined") {
   }
 })(self);
 
-if (typeof HTMLTemplateElement === "undefined") {
-  (function() {
-    var TEMPLATE_TAG = "template";
+(function() {
+  var needsTemplate = typeof HTMLTemplateElement === "undefined";
+  var needsCloning = function() {
+    if (!needsTemplate) {
+      var frag = document.createDocumentFragment();
+      var t = document.createElement("template");
+      frag.appendChild(t);
+      t.content.appendChild(document.createElement("div"));
+      var clone = frag.cloneNode(true);
+      return clone.firstChild.content.childNodes.length === 0;
+    }
+  }();
+  var TEMPLATE_TAG = "template";
+  var TemplateImpl = function() {};
+  if (needsTemplate) {
     var contentDoc = document.implementation.createHTMLDocument("template");
     var canDecorate = true;
-    HTMLTemplateElement = function() {};
-    HTMLTemplateElement.prototype = Object.create(HTMLElement.prototype);
-    HTMLTemplateElement.decorate = function(template) {
+    var templateStyle = document.createElement("style");
+    templateStyle.textContent = TEMPLATE_TAG + "{display:none;}";
+    var head = document.head;
+    head.insertBefore(templateStyle, head.firstElementChild);
+    TemplateImpl.prototype = Object.create(HTMLElement.prototype);
+    TemplateImpl.decorate = function(template) {
       if (template.content) {
         return;
       }
@@ -940,7 +955,7 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             set: function(text) {
               contentDoc.body.innerHTML = text;
-              HTMLTemplateElement.bootstrap(contentDoc);
+              TemplateImpl.bootstrap(contentDoc);
               while (this.content.firstChild) {
                 this.content.removeChild(this.content.firstChild);
               }
@@ -950,27 +965,30 @@ if (typeof HTMLTemplateElement === "undefined") {
             },
             configurable: true
           });
+          template.cloneNode = function(deep) {
+            return TemplateImpl.cloneNode(this, deep);
+          };
         } catch (err) {
           canDecorate = false;
         }
       }
-      HTMLTemplateElement.bootstrap(template.content);
+      TemplateImpl.bootstrap(template.content);
     };
-    HTMLTemplateElement.bootstrap = function(doc) {
+    TemplateImpl.bootstrap = function(doc) {
       var templates = doc.querySelectorAll(TEMPLATE_TAG);
       for (var i = 0, l = templates.length, t; i < l && (t = templates[i]); i++) {
-        HTMLTemplateElement.decorate(t);
+        TemplateImpl.decorate(t);
       }
     };
     document.addEventListener("DOMContentLoaded", function() {
-      HTMLTemplateElement.bootstrap(document);
+      TemplateImpl.bootstrap(document);
     });
     var createElement = document.createElement;
     document.createElement = function() {
       "use strict";
       var el = createElement.apply(document, arguments);
       if (el.localName == "template") {
-        HTMLTemplateElement.decorate(el);
+        TemplateImpl.decorate(el);
       }
       return el;
     };
@@ -993,8 +1011,61 @@ if (typeof HTMLTemplateElement === "undefined") {
     function escapeData(s) {
       return s.replace(escapeDataRegExp, escapeReplace);
     }
-  })();
-}
+  }
+  if (needsTemplate || needsCloning) {
+    var nativeCloneNode = Node.prototype.cloneNode;
+    TemplateImpl.cloneNode = function(template, deep) {
+      var clone = nativeCloneNode.call(template);
+      if (this.decorate) {
+        this.decorate(clone);
+      }
+      if (deep) {
+        clone.content.appendChild(nativeCloneNode.call(template.content, true));
+        this.fixClonedDom(clone.content, template.content);
+      }
+      return clone;
+    };
+    TemplateImpl.fixClonedDom = function(clone, source) {
+      var s$ = source.querySelectorAll(TEMPLATE_TAG);
+      var t$ = clone.querySelectorAll(TEMPLATE_TAG);
+      for (var i = 0, l = t$.length, t, s; i < l; i++) {
+        s = s$[i];
+        t = t$[i];
+        if (this.decorate) {
+          this.decorate(s);
+        }
+        t.parentNode.replaceChild(s.cloneNode(true), t);
+      }
+    };
+    var originalImportNode = document.importNode;
+    Node.prototype.cloneNode = function(deep) {
+      var dom = nativeCloneNode.call(this, deep);
+      if (deep) {
+        TemplateImpl.fixClonedDom(dom, this);
+      }
+      return dom;
+    };
+    document.importNode = function(element, deep) {
+      if (element.localName === TEMPLATE_TAG) {
+        return TemplateImpl.cloneNode(element, deep);
+      } else {
+        var dom = originalImportNode.call(document, element, deep);
+        if (deep) {
+          TemplateImpl.fixClonedDom(dom, element);
+        }
+        return dom;
+      }
+    };
+    if (needsCloning) {
+      HTMLTemplateElement.prototype.cloneNode = function(deep) {
+        return TemplateImpl.cloneNode(this, deep);
+      };
+    }
+  }
+  if (needsTemplate) {
+    HTMLTemplateElement = TemplateImpl;
+  }
+})();
 
 (function(scope) {
   "use strict";
@@ -1595,7 +1666,7 @@ window.HTMLImports.addModule(function(scope) {
       if (doc && this._mayParse.indexOf(doc) < 0) {
         this._mayParse.push(doc);
         var nodes = doc.querySelectorAll(this.parseSelectorsForNode(doc));
-        for (var i = 0, l = nodes.length, p = 0, n; i < l && (n = nodes[i]); i++) {
+        for (var i = 0, l = nodes.length, n; i < l && (n = nodes[i]); i++) {
           if (!this.isParsed(n)) {
             if (this.hasResource(n)) {
               return nodeIsImport(n) ? this.nextToParseInDoc(n.__doc, n) : n;
@@ -9895,47 +9966,53 @@ this._insertChildren();
 this.fire('dom-change');
 }
 });
-var dataform = [
-    { type: "Form", type2: "Oberfläche", name: "ist lang und dünn oder stabförmig" },
-    { type: "Form", type2: "Oberfläche", name: "ist im wesentlichen flach" },
-    { type: "Form", type2: "Oberfläche", name: "ist kugel- oder eiförmig" },
-    { type: "Form", type2: "Oberfläche", name: "ist Kistenförmig oder rechteckig" },
-    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist grösstenteils pelzig oder haarig" },
-    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist warm oder heiss" },
-    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend glatt" },
-    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend rauh" },
-    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend hart" },
-    { type: "Form", type2: "Oberfläche", name: "Oberfläche ist vorwiegend elastisch" },
-];
+var data =
+{
+    form: {type: "Form",type2: "Oberfläche",
+    cards:[
+    { name: "ist lang und dünn oder stabförmig" },
+    { name: "ist im wesentlichen flach" },
+    { name: "ist kugel- oder eiförmig" },
+    { name: "ist Kistenförmig oder rechteckig" },
+    { name: "Oberfläche ist grösstenteils pelzig oder haarig" },
+    { name: "Oberfläche ist warm oder heiss" },
+    { name: "Oberfläche ist vorwiegend glatt" },
+    { name: "Oberfläche ist vorwiegend rauh" },
+    { name: "Oberfläche ist vorwiegend hart" },
+    { name: "Oberfläche ist vorwiegend elastisch" },
+]},
 
-var datainhalt = [
-    { type: "Inhalt", type2: "Bewegung", name: "hat Zähne oder spitze Teile" },
-    { type: "Inhalt", type2: "Bewegung", name: "mit Rad oder vollständig drehbarem Teil" },
-    { type: "Inhalt", type2: "Bewegung", name: "mit Gelenk oder beweglichem Teil" },
-    { type: "Inhalt", type2: "Bewegung", name: "darauf sind Buchstaben, Zeichen oder Zahlen" },
-    { type: "Inhalt", type2: "Bewegung", name: "bewegt sich selbständig" },
-    { type: "Inhalt", type2: "Bewegung", name: "bewegt sich selbständig, aber eher langsam" },
-    { type: "Inhalt", type2: "Bewegung", name: "schwimmt im Wasser oben" },
-];
-var dataort = [
-    { type: "Ort", type2: "Zeit", name: "kann ich innerhalb von 5 Minuten hierherbringen" },
-    { type: "Ort", type2: "Zeit", name: "ist nicht im Umkreis von 100 Metern zu finden" },
-    { type: "Ort", type2: "Zeit", name: "gibt es eher im Wald als in der Stadt" },
-    { type: "Ort", type2: "Zeit", name: "gibt es häufiger in der Stadt als auf dem Land" },
-    { type: "Ort", type2: "Zeit", name: "wird eher im Winter als im Sommer verwendet" },
-    { type: "Ort", type2: "Zeit", name: "wird eher im Sommer als im Winter verwendet" },
-    { type: "Ort", type2: "Zeit", name: "gab es schon bei den alten Griechen oder Römern" },
-    { type: "Ort", type2: "Zeit", name: "es gibt jetzt mehr als vor 100 Jahren" },
-];
-var dataextra = [
-    { type2: "Größe", type: "Gewicht", name: "grösser als eine Katze" },
-    { type2: "Größe", type: "Gewicht", name: "passt in ein Gartenhäuschen" },
-    { type2: "Größe", type: "Gewicht", name: "höher als ein 2-stöckiges Reihenhaus" },
-    { type2: "Größe", type: "Gewicht", name: "passt in einen Schuhkarton" },
-    { type2: "Größe", type: "Gewicht", name: "ist 10kg oder leichter" },
-    { type2: "Größe", type: "Gewicht", name: "ist zwischen 10kg und 100kg" },
-    { type2: "Größe", type: "Gewicht", name: "ist 100kg oder schwerer" },
-];
+inhalt: {type: "Inhalt",type2: "Bewegung",
+cards:[
+    { name: "hat Zähne oder spitze Teile" },
+    { name: "mit Rad oder vollständig drehbarem Teil" },
+    { name: "mit Gelenk oder beweglichem Teil" },
+    { name: "darauf sind Buchstaben, Zeichen oder Zahlen" },
+    { name: "bewegt sich selbständig" },
+    { name: "bewegt sich selbständig, aber eher langsam" },
+    { name: "schwimmt im Wasser oben" },
+]},
+ort: {type: "Ort",type2: "Zeit",
+cards:[
+    {name: "kann ich innerhalb von 5 Minuten hierherbringen" },
+    {name: "ist nicht im Umkreis von 100 Metern zu finden" },
+    {name: "gibt es eher im Wald als in der Stadt" },
+    {name: "gibt es häufiger in der Stadt als auf dem Land" },
+    {name: "wird eher im Winter als im Sommer verwendet" },
+    {name: "wird eher im Sommer als im Winter verwendet" },
+    {name: "gab es schon bei den alten Griechen oder Römern" },
+    {name: "es gibt jetzt mehr als vor 100 Jahren" },
+]},
+extra: {type: "Größe",type2: "Gewicht",
+cards: [
+    { name: "grösser als eine Katze" },
+    { name: "passt in ein Gartenhäuschen" },
+    { name: "höher als ein 2-stöckiges Reihenhaus" },
+    { name: "passt in einen Schuhkarton" },
+    { name: "ist 10kg oder leichter" },
+    { name: "ist zwischen 10kg und 100kg" },
+    { name: "ist 100kg oder schwerer" },
+]}};
 Polymer({
 		    is: 'page-break-div',
             properties: {

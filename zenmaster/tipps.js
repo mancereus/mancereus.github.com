@@ -13255,4 +13255,3 @@ Polymer({
 
             }
         });
-var tp = document.querySelector('#tipTmpl');

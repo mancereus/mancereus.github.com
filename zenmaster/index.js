@@ -9987,11 +9987,14 @@ Polymer({
                     type: Array,
                     notify:true
                 },
-                data: Object,
+                data: Object
             },
             shuffle: function(o) {
                 for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
                 return o;
+            },
+            startGame: function() {
+                this.set("data.started", true);
             },
             newCards: function() {
                 this.shuffle(data.form.cards);
@@ -10010,6 +10013,7 @@ Polymer({
                 this.set("data.cards", []);
                 this.set("data.tips", []);
                 this.set("data.solution", "");
+                this.set("data.started", false);
                 this.newCards();
                 this.push('data.tips',
                 {name: 'tip',value:"", form:false,inhalt:false,ort:false,gewicht:false},

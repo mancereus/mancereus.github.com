@@ -230,7 +230,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         <br>
         <h3>2. Schreibe deine Lösung auf:</h3>
         <input style="width: 250px;" class="try inp" value="{{data.solution::input}}">
-        <button on-click="finishTurn">Fertig</button>
+        <button on-click="startGame">Fertig</button>
     </template>
 
     </dom-module><dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
@@ -658,6 +658,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster" data="{{data}}" log=""></firebase-document>
+        <template is="dom-if" if="{{data.started}}">
+            <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
+        </template>
         <table>
             <tbody><tr>
                 <th></th>

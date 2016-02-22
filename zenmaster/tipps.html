@@ -542,6 +542,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster" data="{{data}}" log=""></firebase-document>
+        <template is="dom-if" if="{{data.started}}">
+            <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
+        </template>
         <table>
             <tbody><tr>
                 <th></th>
@@ -624,7 +627,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </div>
 	<h1 style="text-align:center;width: 450px;">ZenMeister Tipp Seite</h1>
     <zenmaster-tipps></zenmaster-tipps>
-	<template id="tipTmpl" is="dom-bind">
 
-	</template>
-	</body></html>
+
+</body></html>

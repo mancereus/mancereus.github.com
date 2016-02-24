@@ -1,4 +1,12 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8">
+<!DOCTYPE html><html><head><script src="help.js" defer=""></script><meta charset="UTF-8"><!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
     <title>ZenMeister Beta</title>
     <style>
 body {margin: 0; padding: 1px}
@@ -93,9 +101,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             border: 1px solid black;
             background-color: lightgray;
         }
+
         p {
             font-size: 125%;
         }
+
         .header {
             text-align: center;
             width: 240px;
@@ -107,25 +117,25 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </head>
 
 <body>
+    test
+    <template id="tmpl" is="dom-bind">
         <div style="display:flex;flex-wrap: wrap;">
             <div class="card">
-                <h2>A) Form oder Größe</h2>
-                <p>Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Welche Größe hat es? Ist es klein, mittelgroß oder groß? </p>
+                <h2>A) {{data.form.type}} oder {{data.form.type2}}</h2>
+                <p>{{data.form.desc}} </p>
             </div>
             <div class="card">
-                <h2>B) Inhalt oder Bestandteil</h2>
-                <p>Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Welches Gewicht hat es? Ist es leicht, mittel oder schwer?</p>
+                <h2>B) {{data.inhalt.type}} oder {{data.inhalt.type2}}</h2>
+                <p>{{data.inhalt.desc}} </p>
             </div>
             <div class="card">
-                <h2>C) Ort oder Zeit</h2>
-                <p>Zu welcher Zeit gibt es das Ding häufiger? Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding  häufiger? Stadt oder Wald? In der Nähe oder weiter weg?</p>
+                <h2>C) {{data.ort.type}} oder {{data.ort.type2}}</h2>
+                <p>{{data.ort.desc}} </p>
             </div>
             <div class="card">
-                <h2>D) Bewegung oder Oberfläche</h2>
-                <p>Kann sich das Ding selbständig bewegen? Schnell oder langsam? Schwimmt es? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Warm? Mit Haaren?</p>
+                <h2>D) {{data.extra.type}} oder {{data.extra.type2}}</h2>
+                <p>{{data.extra.desc}} </p>
             </div>
         </div>
-
-
-
-</body></html>
+    </template>
+    </body></html>

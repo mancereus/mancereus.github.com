@@ -10033,40 +10033,5 @@ cards: [
     { name: "ist zwischen 10kg und 100kg" },
     { name: "ist 100kg oder schwerer" },
 ]}};
-Polymer({
-		    is: 'page-break-div',
-            properties: {
-              nmbr: {
-                  type: Number
-              },
-              max: {
-                  type: Number
-              },
-              pageBreak: {
-                  type: Boolean,
-                  computed: "isPageBreak(nmbr)"
-              }
-            },
-            ready: function() {
-
-	        },
-	        isPageBreak: function() {
-	            return (this.nmbr+1) % this.max == 0;
-	        }
-		});
 var t = document.querySelector('#tmpl');
-        t.enhance = function(stack) {
-                stack.cards.forEach(function(item){
-                    item.type = stack.type;
-                    item.type2 = stack.type2;
-                });
-            };
-		t.cards = [];
-        t.enhance(data.form);
-        t.enhance(data.inhalt);
-        t.enhance(data.ort);
-        t.enhance(data.extra);
-		t.cards = t.cards.concat(data.form.cards);
-		t.cards = t.cards.concat(data.inhalt.cards);
-		t.cards = t.cards.concat(data.ort.cards);
-		t.cards = t.cards.concat(data.extra.cards);
+		t.data = data;

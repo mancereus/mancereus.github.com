@@ -1,0 +1,14 @@
+{
+  "background_color": "#0080c0",
+  "name": "ZenMeister",
+  "short_name": "ZenMeister",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "YOU-NEED-TO-HAVE-A-144-x-144-ICON.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait"
+}

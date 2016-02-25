@@ -5,7 +5,7 @@
   "display": "fullscreen",
   "icons": [
     {
-      "src": "YOU-NEED-TO-HAVE-A-144-x-144-ICON.png",
+      "src": "icon.png",
       "sizes": "144x144",
       "type": "image/png"
     }

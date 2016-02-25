@@ -29,7 +29,7 @@
 
 
 /* eslint-disable quotes, comma-spacing */
-var PrecacheConfig = [["help.html","2bac57907ec1a3856a1c94b58f294bd0"],["help.js","db2835338bc8c1410e0d4e023971e6bb"],["index.html","1fc9a1679aec413e85ee3449fa78d8b5"],["index.js","f3a6b36a51f2b3aaab2ae88d646f025f"],["manifest.json","ae4aa5c0691b8537f1c33189037861d8"],["print.html","41c1eee63a783b5ecf1ee014654d97f3"],["print.js","2045941212e9ab85226087967aa08860"],["service-worker.js","587fbf6e243dda21562ab2f75f3fc5e7"],["tipps.html","22f7b39125685d35cc1e3b63cfb51ec4"],["tipps.js","88052f1cf8c746d40c3448144b6ff189"]];
+var PrecacheConfig = [["help.html","2bac57907ec1a3856a1c94b58f294bd0"],["help.js","db2835338bc8c1410e0d4e023971e6bb"],["icon.png","7f8407302bf7823bf0b9bb259489dfe5"],["index.html","1fc9a1679aec413e85ee3449fa78d8b5"],["index.js","f3a6b36a51f2b3aaab2ae88d646f025f"],["manifest.json","5e80a6c3da5ddaca46e7a9ebadba238a"],["print.html","41c1eee63a783b5ecf1ee014654d97f3"],["print.js","2045941212e9ab85226087967aa08860"],["service-worker.js","27b6b55a8e42636dd1468f83e5c1ee13"],["tipps.html","22f7b39125685d35cc1e3b63cfb51ec4"],["tipps.js","88052f1cf8c746d40c3448144b6ff189"]];
 /* eslint-enable quotes, comma-spacing */
 var CacheNamePrefix = 'sw-precache-v1-sw-precache-' + (self.registration ? self.registration.scope : '') + '-';
 

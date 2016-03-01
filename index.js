@@ -10088,98 +10088,417 @@ this._insertChildren();
 this.fire('dom-change');
 }
 });
-var data = {
-    dict: [
-        {solution: "Kugelschreiber", form:"stabförmig", inhalt:"mehrere Teile", ort:"jetzt mehr als früher", extra:"leicht"},
-        {solution: "Sonne", form:"kugelförmig", inhalt:"heiss", ort:"schon beiden römern", extra:"grösser als ein rehienhaus"},
-        {solution: "Lagerfeuer", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Kugel Vanille-Eis", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Skateboard", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Stinktier", form:"mit Haaren", inhalt:"stinkt", ort:"in freier Wildbahn", extra:"Katze"},
-        {solution: "Puzzle", form:"mehrere Teile", inhalt:"papier", ort:"", extra:""},
-        {solution: "Kartenspiel", form:"Rechteckig", inhalt:"papier", ort:"Gaststätte", extra:"weniger als 100g"},
-        {solution: "Plastiktier", form:"4 Beine", inhalt:"hart", ort:"zoo", extra:"weniger als 1kg"},
-        ],
-    form: {
-        type: "Form",
-        type2: "Oberfläche",
-        desc: "Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Fühlt es sich warm an? Besteht es aus mehreren Teilen?",
-        cards: [
-            { name: "ist lang und dünn oder stabförmig" },
-            { name: "ist im wesentlichen flach" },
-            { name: "ist kugel- oder eiförmig" },
-            { name: "ist Kistenförmig oder rechteckig" },
-            { name: "steht auf 4 Beinen" },
-            { name: "besteht aus mehreren Teilen, die sich trennen lassen" },
-            { name: "Oberfläche ist warm oder heiss" },
-            { name: "Oberfläche teilweise mit Haaren oder Pelz" },
-            { name: "Oberfläche ist vorwiegend glatt" },
-            { name: "Oberfläche ist vorwiegend rauh" },
-            { name: "Oberfläche ist vorwiegend hart" },
-            { name: "Oberfläche ist vorwiegend elastisch" },
-        ]
-    },
-    inhalt: {
-        type: "Inhalt",
-        type2: "Extra",
-        desc: "Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon?",
-        cards: [
-            { name: "enthält Papier oder Karton" },
-            { name: "hat Zähne oder spitze Teile" },
-            { name: "mit Rad oder vollständig drehbarem Teil" },
-            { name: "mit Gelenk oder beweglichem Teil" },
-            { name: "darauf sind Buchstaben, Zeichen oder Zahlen" },
-            { name: "macht Geräusche, selbständig oder bei normalen Gebrauch" },
-            { name: "glänzt, strahlt oder leuchtet" },
-            { name: "tritt meist in größeren Mengen auf" },
-            { name: "geht kaputt, wenn man sich darauf setzt" },
-            { name: "riecht eher schlecht, stinkt" },
-            { name: "schmeckt gut" },
-            { name: "kostet mehr als 100 Euro" },
-            { name: "kann ohne Elektrizität kaum verwendet werden" },
-            { name: "bewegt sich selbständig" },
-            { name: "bewegt sich selbständig, aber eher langsam" },
-            { name: "schwimmt im Wasser oben" },
-        ]
-    },
-    ort: {
-        type: "Ort",
-        type2: "Zeit",
-        desc: "Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause?",
-        cards: [
-            { name: "kann ich innerhalb von 5 Minuten hierherbringen" },
-            { name: "ist nicht im Umkreis von 100 Metern zu finden" },
-            { name: "gibt es eher im Wald als in der Stadt" },
-            { name: "gibt es eher in freier Wildbahn" },
-            { name: "gibt es im Zoo" },
-            { name: "gibt es im Büro" },
-            { name: "gibt es in der Gaststätte oder Cafe" },
-            { name: "gibt es zu Hause" },
-            { name: "gibt es Freibad" },
-            { name: "gibt es häufiger in der Stadt als auf dem Land" },
-            { name: "wird eher im Winter als im Sommer verwendet" },
-            { name: "wird eher im Sommer als im Winter verwendet" },
-            { name: "gab es schon bei den alten Griechen oder Römern" },
-            { name: "es gibt jetzt mehr als vor 100 Jahren" },
-        ]
-    },
-    extra: {
-        type: "Größe",
-        type2: "Gewicht",
-        desc: "Wie gross ist es? Klein, Mittel, groß oder sehr groß? Wie schwer ist es? Leicht, mittel oder schwer?",
-        cards: [
-            { name: "kleiner als eine Maus" },
-            { name: "kleiner als eine Katze" },
-            { name: "höher als ein Tisch" },
-            { name: "passt in ein Gartenhäuschen" },
-            { name: "höher als ein 2-stöckiges Reihenhaus" },
-            { name: "passt in eine quadratische Kiste mit 1 Meter Seitenlänge" },
-            { name: "passt in einen Schuhkarton" },
-            { name: "ist 10kg oder leichter" },
-            { name: "ist zwischen 10kg und 100kg" },
-            { name: "ist 100kg oder schwerer" },
-        ]
+var active = [
+    { name: "ZenMaster", type: "Kommunikation", link: "zenmaster/index.html", pitch: " MasterMind mit Wörter", desc: "Finde ein Wort das vier spezifischen Kriterien genügt.", status: "test" },
+    { name: "Servietten", type: "Servietten Spiele", link: "servietten/index.html", pitch: "", desc: "", status: "dev" },
+    { name: "MonsterMob", type: "Minimal", link: "monstermob/index.html", pitch: "", desc: "", status: "dev" },
+    { name: "Dorf Building", type: "Family", link: "", pitch: "Siedler - Dominion - Carcassone", desc: "", status: "dev" },
+    { name: "Green Hell", type: "SoloCardGame", link: "greenhell/index.html", pitch: "", desc: "", status: "test" },
+];
+var pipeline = [
+    { name: "CrimeScene", type: "Deduktion, Memory", link: "crimescene/index.html", desc: "", status: "test" },
+    { name: "Heisse Würfel", type: "cantStop", link: "hotdice/index.html", desc: "", status: "dev" },
+    { name: "Dracula", type: "SoloCardGame", link: "dracula/index.html", desc: "Neue Version des SoloCardGames mit Dracula", status: "concept" },
+    { name: "StadtChronik", type: "Partieübergreifend", link: "", desc: "Ergebnis der Partie wird in den folgenden Partien verwendet.", status: "concept" },
+    { name: "Wiege der Zivilisation", type: "Civi", link: "/index.html", desc: "", status: "dev" },
+];
+var archive = [
+    { name: "Tiger", type: "SoloCardGame", link: "tiger/index.html", desc: "Erste Version des SoloCardGames", status: "test" },
+];
+Polymer({
+      is: 'iron-image',
+
+      properties: {
+        /**
+         * The URL of an image.
+         */
+        src: {
+          observer: '_srcChanged',
+          type: String,
+          value: ''
+        },
+
+        /**
+         * A short text alternative for the image.
+         */
+        alt: {
+          type: String,
+          value: null
+        },
+
+        /**
+         * When true, the image is prevented from loading and any placeholder is
+         * shown.  This may be useful when a binding to the src property is known to
+         * be invalid, to prevent 404 requests.
+         */
+        preventLoad: {
+          type: Boolean,
+          value: false,
+          observer: '_preventLoadChanged'
+        },
+
+        /**
+         * Sets a sizing option for the image.  Valid values are `contain` (full
+         * aspect ratio of the image is contained within the element and
+         * letterboxed) or `cover` (image is cropped in order to fully cover the
+         * bounds of the element), or `null` (default: image takes natural size).
+         */
+        sizing: {
+          type: String,
+          value: null,
+          reflectToAttribute: true
+        },
+
+        /**
+         * When a sizing option is used (`cover` or `contain`), this determines
+         * how the image is aligned within the element bounds.
+         */
+        position: {
+          type: String,
+          value: 'center'
+        },
+
+        /**
+         * When `true`, any change to the `src` property will cause the `placeholder`
+         * image to be shown until the new image has loaded.
+         */
+        preload: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * This image will be used as a background/placeholder until the src image has
+         * loaded.  Use of a data-URI for placeholder is encouraged for instant rendering.
+         */
+        placeholder: {
+          type: String,
+          value: null,
+          observer: '_placeholderChanged'
+        },
+
+        /**
+         * When `preload` is true, setting `fade` to true will cause the image to
+         * fade into place.
+         */
+        fade: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Read-only value that is true when the image is loaded.
+         */
+        loaded: {
+          notify: true,
+          readOnly: true,
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Read-only value that tracks the loading state of the image when the `preload`
+         * option is used.
+         */
+        loading: {
+          notify: true,
+          readOnly: true,
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Read-only value that indicates that the last set `src` failed to load.
+         */
+        error: {
+          notify: true,
+          readOnly: true,
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Can be used to set the width of image (e.g. via binding); size may also be
+         * set via CSS.
+         */
+        width: {
+          observer: '_widthChanged',
+          type: Number,
+          value: null
+        },
+
+        /**
+         * Can be used to set the height of image (e.g. via binding); size may also be
+         * set via CSS.
+         *
+         * @attribute height
+         * @type number
+         * @default null
+         */
+        height: {
+          observer: '_heightChanged',
+          type: Number,
+          value: null
+        },
+      },
+
+      observers: [
+        '_transformChanged(sizing, position)'
+      ],
+
+      ready: function() {
+        var img = this.$.img;
+
+        img.onload = function() {
+          if (this.$.img.src !== this._resolveSrc(this.src)) return;
+
+          this._setLoading(false);
+          this._setLoaded(true);
+          this._setError(false);
+        }.bind(this);
+
+        img.onerror = function() {
+          if (this.$.img.src !== this._resolveSrc(this.src)) return;
+
+          this._reset();
+
+          this._setLoading(false);
+          this._setLoaded(false);
+          this._setError(true);
+        }.bind(this);
+
+        this._resolvedSrc = '';
+      },
+
+      _load: function(src) {
+        if (src) {
+          this.$.img.src = src;
+        } else {
+          this.$.img.removeAttribute('src');
+        }
+        this.$.sizedImgDiv.style.backgroundImage = src ? 'url("' + src + '")' : '';
+
+        this._setLoading(!!src);
+        this._setLoaded(false);
+        this._setError(false);
+      },
+
+      _reset: function() {
+        this.$.img.removeAttribute('src');
+        this.$.sizedImgDiv.style.backgroundImage = '';
+
+        this._setLoading(false);
+        this._setLoaded(false);
+        this._setError(false);
+      },
+
+      _computePlaceholderHidden: function() {
+        return !this.preload || (!this.fade && !this.loading && this.loaded);
+      },
+
+      _computePlaceholderClassName: function() {
+        return (this.preload && this.fade && !this.loading && this.loaded) ? 'faded-out' : '';
+      },
+
+      _computeImgDivHidden: function() {
+        return !this.sizing;
+      },
+
+      _computeImgDivARIAHidden: function() {
+        return this.alt === '' ? 'true' : undefined;
+      },
+
+      _computeImgDivARIALabel: function() {
+        if (this.alt !== null) {
+          return this.alt;
+        }
+
+        // Polymer.ResolveUrl.resolveUrl will resolve '' relative to a URL x to
+        // that URL x, but '' is the default for src.
+        if (this.src === '') {
+          return '';
+        }
+
+        var pathComponents = (new URL(this._resolveSrc(this.src))).pathname.split("/");
+        return pathComponents[pathComponents.length - 1];
+      },
+
+      _computeImgHidden: function() {
+        return !!this.sizing;
+      },
+
+      _widthChanged: function() {
+        this.style.width = isNaN(this.width) ? this.width : this.width + 'px';
+      },
+
+      _heightChanged: function() {
+        this.style.height = isNaN(this.height) ? this.height : this.height + 'px';
+      },
+
+      _preventLoadChanged: function() {
+        if (this.preventLoad || this.loaded) return;
+
+        this._reset();
+        this._load(this.src);
+      },
+
+      _srcChanged: function(newSrc, oldSrc) {
+        var newResolvedSrc = this._resolveSrc(newSrc);
+        if (newResolvedSrc === this._resolvedSrc) return;
+        this._resolvedSrc = newResolvedSrc;
+
+        this._reset();
+        if (!this.preventLoad) {
+          this._load(newSrc);
+        }
+      },
+
+      _placeholderChanged: function() {
+        this.$.placeholder.style.backgroundImage =
+          this.placeholder ? 'url("' + this.placeholder + '")' : '';
+      },
+
+      _transformChanged: function() {
+        var sizedImgDivStyle = this.$.sizedImgDiv.style;
+        var placeholderStyle = this.$.placeholder.style;
+
+        sizedImgDivStyle.backgroundSize =
+        placeholderStyle.backgroundSize =
+          this.sizing;
+
+        sizedImgDivStyle.backgroundPosition =
+        placeholderStyle.backgroundPosition =
+          this.sizing ? this.position : '';
+
+        sizedImgDivStyle.backgroundRepeat =
+        placeholderStyle.backgroundRepeat =
+          this.sizing ? 'no-repeat' : '';
+      },
+
+      _resolveSrc: function(testSrc) {
+        return Polymer.ResolveUrl.resolveUrl(testSrc, this.ownerDocument.baseURI);
+      }
+    });
+Polymer({
+    is: 'paper-material',
+
+    properties: {
+      /**
+       * The z-depth of this element, from 0-5. Setting to 0 will remove the
+       * shadow, and each increasing number greater than 0 will be "deeper"
+       * than the last.
+       *
+       * @attribute elevation
+       * @type number
+       * @default 1
+       */
+      elevation: {
+        type: Number,
+        reflectToAttribute: true,
+        value: 1
+      },
+
+      /**
+       * Set this to true to animate the shadow when setting a new
+       * `elevation` value.
+       *
+       * @attribute animated
+       * @type boolean
+       * @default false
+       */
+      animated: {
+        type: Boolean,
+        reflectToAttribute: true,
+        value: false
+      }
     }
-};
+  });
+Polymer({
+      is: 'paper-card',
+
+      properties: {
+        /**
+         * The title of the card.
+         */
+        heading: {
+          type: String,
+          value: '',
+          observer: '_headingChanged'
+        },
+
+        /**
+         * The url of the title image of the card.
+         */
+        image: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * When `true`, any change to the image url property will cause the
+         * `placeholder` image to be shown until the image is fully rendered.
+         */
+        preloadImage: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * When `preloadImage` is true, setting `fadeImage` to true will cause the
+         * image to fade into place.
+         */
+        fadeImage: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * The z-depth of the card, from 0-5.
+         */
+        elevation: {
+          type: Number,
+          value: 1,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Set this to true to animate the card shadow when setting a new
+         * `z` value.
+         */
+        animatedShadow: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Read-only property used to pass down the `animatedShadow` value to
+         * the underlying paper-material style (since they have different names).
+         */
+        animated: {
+          type: Boolean,
+          reflectToAttribute: true,
+          readOnly: true,
+          computed: '_computeAnimated(animatedShadow)'
+        }
+      },
+
+      _headingChanged: function(heading) {
+        var label = this.getAttribute('aria-label');
+        this.setAttribute('aria-label', heading);
+      },
+
+      _computeHeadingClass: function(image) {
+        var cls = 'title-text';
+        if (image)
+          cls += ' over-image';
+        return cls;
+      },
+
+      _computeAnimated: function(animatedShadow) {
+        return animatedShadow;
+      }
+    });
 var t = document.querySelector('#tmpl');
-		t.data = data;
+		t.active = active;
+		t.archive = archive;
+		t.pipeline = pipeline;

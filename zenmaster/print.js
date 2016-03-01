@@ -10089,6 +10089,17 @@ this.fire('dom-change');
 }
 });
 var data = {
+    dict: [
+        {solution: "Kugelschreiber", form:"stabförmig", inhalt:"mehrere Teile", ort:"jetzt mehr als früher", extra:"leicht"},
+        {solution: "Sonne", form:"kugelförmig", inhalt:"heiss", ort:"schon beiden römern", extra:"grösser als ein rehienhaus"},
+        {solution: "Lagerfeuer", form:"", inhalt:"", ort:"", extra:""},
+        {solution: "Kugel Vanille-Eis", form:"", inhalt:"", ort:"", extra:""},
+        {solution: "Skateboard", form:"", inhalt:"", ort:"", extra:""},
+        {solution: "Stinktier", form:"mit Haaren", inhalt:"stinkt", ort:"in freier Wildbahn", extra:"Katze"},
+        {solution: "Puzzle", form:"mehrere Teile", inhalt:"papier", ort:"", extra:""},
+        {solution: "Kartenspiel", form:"Rechteckig", inhalt:"papier", ort:"Gaststätte", extra:"weniger als 100g"},
+        {solution: "Plastiktier", form:"4 Beine", inhalt:"hart", ort:"zoo", extra:"weniger als 1kg"},
+        ],
     form: {
         type: "Form",
         type2: "Oberfläche",
@@ -10098,8 +10109,10 @@ var data = {
             { name: "ist im wesentlichen flach" },
             { name: "ist kugel- oder eiförmig" },
             { name: "ist Kistenförmig oder rechteckig" },
-            { name: "besteht aus mehreren Teilen, die sich trennen lassen?" },
+            { name: "steht auf 4 Beinen" },
+            { name: "besteht aus mehreren Teilen, die sich trennen lassen" },
             { name: "Oberfläche ist warm oder heiss" },
+            { name: "Oberfläche teilweise mit Haaren oder Pelz" },
             { name: "Oberfläche ist vorwiegend glatt" },
             { name: "Oberfläche ist vorwiegend rauh" },
             { name: "Oberfläche ist vorwiegend hart" },
@@ -10111,6 +10124,7 @@ var data = {
         type2: "Extra",
         desc: "Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon?",
         cards: [
+            { name: "enthält Papier oder Karton" },
             { name: "hat Zähne oder spitze Teile" },
             { name: "mit Rad oder vollständig drehbarem Teil" },
             { name: "mit Gelenk oder beweglichem Teil" },
@@ -10136,8 +10150,10 @@ var data = {
             { name: "kann ich innerhalb von 5 Minuten hierherbringen" },
             { name: "ist nicht im Umkreis von 100 Metern zu finden" },
             { name: "gibt es eher im Wald als in der Stadt" },
+            { name: "gibt es eher in freier Wildbahn" },
             { name: "gibt es im Zoo" },
             { name: "gibt es im Büro" },
+            { name: "gibt es in der Gaststätte oder Cafe" },
             { name: "gibt es zu Hause" },
             { name: "gibt es Freibad" },
             { name: "gibt es häufiger in der Stadt als auf dem Land" },
@@ -10154,7 +10170,7 @@ var data = {
         cards: [
             { name: "kleiner als eine Maus" },
             { name: "kleiner als eine Katze" },
-            { name: "grösser als ein Tisch" },
+            { name: "höher als ein Tisch" },
             { name: "passt in ein Gartenhäuschen" },
             { name: "höher als ein 2-stöckiges Reihenhaus" },
             { name: "passt in eine quadratische Kiste mit 1 Meter Seitenlänge" },

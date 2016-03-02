@@ -15,9 +15,9 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-  <title>Mommel</title>
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+    <title>Mommel</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
 
 
@@ -893,7 +893,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
 </style>
 
-  </head>
+    </head>
 
 <body class="fullbleed layout vertical"><div hidden="" by-vulcanize=""><dom-module id="paper-header-panel" assetpath="../../bower_components/paper-header-panel/">
   <template>
@@ -1734,102 +1734,102 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </template>
 </dom-module>
 <dom-module id="game-dice" assetpath="/">
-  <style>
-		:host {
-			overflow: hidden;
-			/*cursor: move;*/
-			 float: left;
-			z-index: 2000;
-			width: 80px;
-			max-width: 120px;
-			margin: 2px;
-		}
-		h1 {
-			width: 90%;
-			border-radius: 10%;
-			color: black;
-			margin: 2px;
-			background-color: white;
-			border: 3px solid black;
-			font-size: 36pt;
-			text-align: center;
-			vertical-align: middle;
-		}
-	</style>
-  <template>
-	<div name="dice" draggable="true" on-click="clicker">
-		<h1>{{diceValue}}</h1>
-	</div>
-</template>
-  </dom-module><dom-module id="mommel-board" assetpath="/">
-  <style>
-    :host {
-      display: block;
-    }
+    <style>
+        :host {
+            overflow: hidden;
+            /*cursor: move;*/
+            float: left;
+            z-index: 2000;
+            width: 80px;
+            max-width: 120px;
+            margin: 2px;
+        }
 
-    .card {
-      height: 80px;
-      width: 200px;
-      font-size: 20px;
-      font-weight: bold;
-      background-color: white;
-      border: 1px solid black;
-      padding: 20px 10px 0 10px;
-      margin: 10px;
-      text-align: center;
-      vertical-align: middle;
-      box-shadow: 3px;
-    }
-  </style>
-  <template>
-    <div id="diceout">
-      <span id="shuffler"></span>
-    </div>
-    <div layout="" vertical="" center="">
+        h1 {
+            width: 90%;
+            border-radius: 10%;
+            color: black;
+            margin: 2px;
+            background-color: white;
+            border: 3px solid black;
+            font-size: 36pt;
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+    <template>
+        <div name="dice" draggable="true" on-click="clicker">
+            <h1>{{diceValue}}</h1>
+        </div>
+    </template>
+    </dom-module><dom-module id="mommel-board" assetpath="/">
+    <style>
+        :host {
+            display: block;
+        }
+        .card {
+            height: 80px;
+            width: 200px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: white;
+            border: 1px solid black;
+            padding: 20px 10px 0 10px;
+            margin: 10px;
+            text-align: center;
+            vertical-align: middle;
+            box-shadow: 3px;
+        }
+    </style>
+    <template>
+        <div id="diceout">
+            <span id="shuffler"></span>
+        </div>
+        <div layout="" vertical="" center="">
       <span layout="" horizontal="" center="">
         <div class="card">{{category}}</div>
       </span>
       <span>Konsonanten: <span>{{kons}}</span> (<span>{{kons.length}}</span>)
       <br>Vokale: <span>{{vok}}</span> (<span>{{vok.length}}</span>)
       <br>Anzahl: <span>{{count}}</span></span>
-      <div id="dicerow" style="width: 100%">
-        <game-dice charset="{{kons}}"></game-dice>
-        <game-dice charset="{{kons}}"></game-dice>
-        <game-dice charset="{{vok}}"></game-dice>
-        <game-dice charset="{{kons}}"></game-dice>
-        <game-dice charset="{{kons}}"></game-dice>
-        <game-dice charset="{{vok}}"></game-dice>
-        <game-dice charset="{{kons}}"></game-dice>
-        <game-dice charset="{{kons}}"></game-dice>
-        <game-dice charset="{{vok}}"></game-dice>
-      </div>
-    </div>
-    <div style="text-align: center">Die Buchstaben können mit der Maus verschoben werden.</div>
-    <div style="font-size: 40px;width:8ßßpx; text-align: center;">↓</div>
-    <div style="width: 800px; height: 300px;background-color:#526E9C; border: 1px solid black; ">Ablage:</div>
-  </template>
-  </dom-module></div>
-  <paper-header-panel class="flex">
+            <div id="dicerow" style="width: 100%">
+                <game-dice charset="{{kons}}"></game-dice>
+                <game-dice charset="{{kons}}"></game-dice>
+                <game-dice charset="{{vok}}"></game-dice>
+                <game-dice charset="{{kons}}"></game-dice>
+                <game-dice charset="{{kons}}"></game-dice>
+                <game-dice charset="{{vok}}"></game-dice>
+                <game-dice charset="{{kons}}"></game-dice>
+                <game-dice charset="{{kons}}"></game-dice>
+                <game-dice charset="{{vok}}"></game-dice>
+            </div>
+        </div>
+        <div style="text-align: center">Die Buchstaben können mit der Maus verschoben werden.</div>
+        <div style="font-size: 40px;width:8ßßpx; text-align: center;">↓</div>
+        <div style="width: 800px; height: 300px;background-color:#526E9C; border: 1px solid black; ">Ablage:</div>
+    </template>
+    </dom-module></div>
+<paper-header-panel class="flex">
     <paper-toolbar>Buchstabensets</paper-toolbar>
     <paper-menu>
-      <paper-item undefined="Scrabble">
-        <a href="?kons=NNNNNNNNNSSSSSSSRRRRRRTTTTTTDDDDHHHHGGGLLLMMMMBBWZCCFFKKPJVXQY&amp;vok=EEEEEEEEEEEEEEEIIIIIIUUUUUUAAAAAOOOÄÖÜ" target="_self"></a>
-      </paper-item>
-      <paper-item undefined="Unser Vorschlag">
-        <a href="?kons=NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ&amp;vok=EEEEEEEIIIIIIAAAAAUUUOOÄÖÜ" target="_self"></a>
-      </paper-item>
-      <paper-item undefined="Flache Verteilung">
-        <a href="?kons=BBCCDDFFGGHHJJKKLLMMNNPPQQRRSSTTVVWWXXYYZZ&amp;vok=AAEEIIOOUUÄÄÖÖÜÜ" target="_self"></a>
-      </paper-item>
-      <paper-item undefined=""></paper-item>
-      <div style="font-size: 16px;">Über die Browser URL können auch eigene Verteilungen ausprobiert werden!</div>
-      <paper-item undefined=""></paper-item>
-      <paper-item undefined="Neues Beispiel laden">
-        <a href="javascript:history.go(0)" target="_self"></a>
-      </paper-item>
+        <paper-item undefined="Scrabble">
+            <a href="?kons=NNNNNNNNNSSSSSSSRRRRRRTTTTTTDDDDHHHHGGGLLLMMMMBBWZCCFFKKPJVXQY&amp;vok=EEEEEEEEEEEEEEEIIIIIIUUUUUUAAAAAOOOÄÖÜ" target="_self"></a>
+        </paper-item>
+        <paper-item undefined="Unser Vorschlag">
+            <a href="?kons=NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ&amp;vok=EEEEEEEIIIIIIAAAAAUUUOOÄÖÜ" target="_self"></a>
+        </paper-item>
+        <paper-item undefined="Flache Verteilung">
+            <a href="?kons=BBCCDDFFGGHHJJKKLLMMNNPPQQRRSSTTVVWWXXYYZZ&amp;vok=AAEEIIOOUUÄÄÖÖÜÜ" target="_self"></a>
+        </paper-item>
+        <paper-item undefined=""></paper-item>
+        <div style="font-size: 16px;">Über die Browser URL können auch eigene Verteilungen ausprobiert werden!</div>
+        <paper-item undefined=""></paper-item>
+        <paper-item undefined="Neues Beispiel laden">
+            <a href="javascript:history.go(0)" target="_self"></a>
+        </paper-item>
     </paper-menu>
-  </paper-header-panel>
-    <mommel-board>
+</paper-header-panel>
+<mommel-board>
 
 
 </mommel-board></body></html>

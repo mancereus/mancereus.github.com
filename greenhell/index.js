@@ -17616,6 +17616,42 @@ Polymer({
 
 })();
 Polymer({
+    is: 'paper-button',
+
+    behaviors: [
+      Polymer.PaperButtonBehavior
+    ],
+
+    properties: {
+      /**
+       * If true, the button should be styled with a shadow.
+       */
+      raised: {
+        type: Boolean,
+        reflectToAttribute: true,
+        value: false,
+        observer: '_calculateElevation'
+      }
+    },
+
+    _calculateElevation: function() {
+      if (!this.raised) {
+        this._setElevation(0);
+      } else {
+        Polymer.PaperButtonBehaviorImpl._calculateElevation.apply(this);
+      }
+    }
+    /**
+
+    Fired when the animation finishes.
+    This is useful if you want to wait until
+    the ripple animation finishes to perform some action.
+
+    @event transitionend
+    @param {{node: Object}} detail Contains the animated node.
+    */
+  });
+Polymer({
       is: 'game-show-details',
       properties: {
         cardData: { notify: true },
@@ -17625,9 +17661,9 @@ Polymer({
           notify: true
         },
         symbol: { notify: true },
-        text: { notify: true },
-        flavour: { notify: true },
-        titleText: { notify: true }
+        text: { type: String, notify: true },
+        flavour: {  type: String, notify: true },
+        titleText: { type: String, notify: true }
       },
       ready: function () {
       },
@@ -17643,6 +17679,9 @@ Polymer({
       },
       computeSrc: function (imgSrc) {
         return 'img/' + imgSrc + '.png';
+      },
+      voiceText: function (text, flavour) {
+        return this.text + " " + this.flavour;
       },
       handleDetails: function(e, detail, sender) {
         this.message = 'heard: ' + detail.message;
@@ -17693,7 +17732,9 @@ function get(name) {
                     type: String,
                     value: '1480px',
                     notify: true
-                }
+                },
+                secret: String,
+                level: String,
             },
             observers: [
                 "configChanged(config.*)"
@@ -17708,7 +17749,7 @@ function get(name) {
                 this.notifyPath('config.akt',this.config.path);
             },
             attached: function () {
-              
+
                 if (this.config.akt == 1) {
                     this.data = data1;
                 }

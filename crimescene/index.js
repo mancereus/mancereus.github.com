@@ -13070,6 +13070,7 @@ Polymer({
 		    is: 'crime-scene-board',
 			properties: {
 				solution: {},
+                cards: Array,
 				tipps: {
 					type: Number,
 					value: 1

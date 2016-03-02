@@ -13362,17 +13362,17 @@ Polymer({
             is: 'zenmaster-tipps',
             properties: {
                 master: {
-                    type:Boolean,
+                    type: Boolean,
                     value: false
                 },
-                data: {type:Object, notify: true},
+                data: {type: Object, notify: true},
             },
-            isTipp: function (o){
-                if(o.name == 'tip')
+            isTipp: function (o) {
+                if (o.name == 'tip')
                     return true;
                 return false;
             },
-            ready: function() {
+            ready: function () {
 
 
             }

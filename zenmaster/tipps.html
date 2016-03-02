@@ -847,25 +847,12 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 background-color: lightgray;
             }
 
-            .page-break {
-                page-break-after: always;
-                background-color: red;
-                width: 650px;
-            }
-
             img {
                 width: 120px;
                 height: 200px;
             }
-
-            .info {
-                width: 250px;
-                margin: 5px;
-                border: 1px solid black;
-                background-color: lightgray;
-            }
         </style>
-        <firebase-document location="https://protogames.firebaseio.com/zenmaster" data="{{data}}" log=""></firebase-document>
+        <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
         <template is="dom-if" if="{{data.started}}">
             <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
         </template>
@@ -925,15 +912,18 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             <div style="float:left;margin-top: 30px;margin-left: 24px;">
                 <div class="card">
                     <h2>A) Form oder Oberfläche</h2>
-                    <p>Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Fühlt es sich warm an? Besteht es aus mehreren Teilen?</p>
+                    <p>Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder
+                        elastisch? Fühlt es sich warm an? Besteht es aus mehreren Teilen?</p>
                 </div>
                 <div class="card">
                     <h2>B) Inhalt oder Extra</h2>
-                    <p>Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon?</p>
+                    <p>Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es
+                        Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon?</p>
                 </div>
                 <div class="card">
                     <h2>C) Ort oder Zeit</h2>
-                    <p>Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause?</p>
+                    <p>Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt
+                        oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause?</p>
                 </div>
                 <div class="card">
                     <h2>D) Größe oder Gewicht</h2>

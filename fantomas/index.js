@@ -10791,6 +10791,7 @@ Polymer({
 Polymer({
 		    is: 'fantomas-board',
 			properties: {
+                data: Array,
 				solution: {},
 				tipps: {
 					type: Number,
@@ -10800,6 +10801,7 @@ Polymer({
 			attached: function() {
 	        },
 			ready: function() {
+                this.data = data;
 	        	this.cards = [];
 				this.tipps = 0;
 				this.push('cards', {front: 7, back: 5, open: op, empty: true});

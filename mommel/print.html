@@ -15,9 +15,9 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-  <title>Mommel</title>
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+    <title>Mommel</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
 
 
@@ -354,72 +354,49 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </head>
 
 <body unresolved="" touch-action="auto"><div hidden="" by-vulcanize=""><dom-module id="mommel-print" assetpath="/">
-  <style>
-    /* TODO(polyup): For speed, consider reworking these styles with .classes
-                     and #ids rather than [attributes].
-    */
-    [layout] {
-      @apply(--layout);
-    }
-    [layout][horizontal] {
-      @apply(--layout-horizontal);
-    }
-    [layout][wrap] {
-      @apply(--layout-wrap);
-    }
-    [layout][vertical] {
-      @apply(--layout-vertical);
-    }
-    [layout][center] {
-      @apply(--layout-center);
-    }
-  </style>
-  <style>
-      :host {
-        display: block;
-      }
+    <style>
+        :host {
+            display: block;
+        }
 
-      .Familie {
-        color: green;
-      }
+        .Familie {
+            color: green;
+        }
 
-      .Erwachsene {
-        color: red;
-      }
+        .Erwachsene {
+            color: red;
+        }
 
-      .header {
-        font-size: 50%;
-      }
+        .header {
+            font-size: 50%;
+        }
 
-      .card {
-        height: 90px;
-        width: 200px;
-        font-size: 20px;
-        font-weight: bold;
-        background-color: white;
-        border: 1px solid black;
-        padding: 20px 10px 0 10px;
-        margin: 1px;
-        text-align: center;
-        vertical-align: middle;
-        box-shadow: 3px;
-      }
+        .card {
+            height: 90px;
+            width: 200px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: white;
+            border: 1px solid black;
+            padding: 20px 10px 0 10px;
+            margin: 1px;
+            text-align: center;
+            vertical-align: middle;
+            box-shadow: 3px;
+        }
     </style>
-  <template>
-    <div horizontal="" layout="" wrap="" style="width: 1000px">
-    <template is="dom-repeat" items="{{categories}}" as="cat">
-      <div layout="" vertical="" center="" class$="{{computeClass(cat)}}">
-        <div class="header">{{cat.type}}</div>
-        <div>{{cat.name}}</div>
-      </div>
+    <template>
+        <div class="horizontal layout wrap" style="width: 1000px">
+            <template is="dom-repeat" items="{{categories}}" as="cat">
+                <div class="layout vertical center=" class$="{{computeClass(cat)}}">
+                    <div class="header">{{cat.type}}</div>
+                    <div>{{cat.name}}</div>
+                </div>
+            </template>
+        </div>
     </template>
-    </div>
-  </template>
-  </dom-module></div>
-  <mommel-print>
-
-
-  </mommel-print>
+    </dom-module></div>
+    <mommel-print></mommel-print>
 
 
 </body></html>

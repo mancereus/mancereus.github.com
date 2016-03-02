@@ -3005,67 +3005,63 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
 
     </dom-module></div>
-    <h1>Hot Dice</h1>
-    <template is="dom-bind">
-        <tst-data data="{{data}}"></tst-data>
-        <div class="container">
-            <hotdice-container container="roll" data="{{data}}">
-            </hotdice-container>
-            <hotdice-container container="stack" data="{{data}}">
-            </hotdice-container>
-        </div>
-        <div class="container">
-            <div class="item field">2</div>
-            <div class="item field">3</div>
-            <div class="item field">4</div>
-            <div class="item field">5</div>
-            <div class="item field">6</div>
-            <div class="item field">7</div>
-            <div class="item field">8</div>
-            <div class="item field">9</div>
-            <div class="item field">10</div>
-            <div class="item field">11</div>
-            <div class="item field">12</div>
-        </div>
-    </template>
-    <style>
-        .container {
-            display: flex;
-            cursor: pointer;
-            max-width: 800px;
-            justify-content: space-around;
-            align-content: space-between;
-            padding: 4px;
-            background-color: lightgray;
-        }
+<h1>Hot Dice</h1>
+<template is="dom-bind">
+    <tst-data data="{{data}}"></tst-data>
+    <div class="container">
+        <hotdice-container container="roll" data="{{data}}">
+        </hotdice-container>
+        <hotdice-container container="stack" data="{{data}}">
+        </hotdice-container>
+    </div>
+    <div class="container">
+        <div class="item field">2</div>
+        <div class="item field">3</div>
+        <div class="item field">4</div>
+        <div class="item field">5</div>
+        <div class="item field">6</div>
+        <div class="item field">7</div>
+        <div class="item field">8</div>
+        <div class="item field">9</div>
+        <div class="item field">10</div>
+        <div class="item field">11</div>
+        <div class="item field">12</div>
+    </div>
+</template>
+<style>
+    .container {
+        display: flex;
+        cursor: pointer;
+        max-width: 800px;
+        justify-content: space-around;
+        align-content: space-between;
+        padding: 4px;
+        background-color: lightgray;
+    }
 
-        .item {
-            padding: 10px;
-            border-radius: 20%;
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            font-size: 32px;
-            color: darkslategray;
-            text-shadow: 12px;
-            font-weight: bold;
-            vertical-align: baseline;
-            border: 1px solid darkslategray;
-            background-color: white;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-    </style>
-    <dom-module id="tst-data">
-        </dom-module>
-
-
-    <hr>
-
+    .item {
+        padding: 10px;
+        border-radius: 20%;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        font-size: 32px;
+        color: darkslategray;
+        text-shadow: 12px;
+        font-weight: bold;
+        vertical-align: baseline;
+        border: 1px solid darkslategray;
+        background-color: white;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+</style>
+<dom-module id="tst-data">
+    </dom-module>
 
 
 

@@ -24,6 +24,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
     <title>Grüne Hölle</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
@@ -3044,6 +3045,64 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </template>
 </dom-module>
 
+<dom-module id="paper-button" assetpath="../../bower_components/paper-button/">
+  <template strip-whitespace="">
+
+    <style include="paper-material">
+      :host {
+        display: inline-block;
+        position: relative;
+        box-sizing: border-box;
+        min-width: 5.14em;
+        margin: 0 0.29em;
+        background: transparent;
+        text-align: center;
+        font: inherit;
+        text-transform: uppercase;
+        outline-width: 0;
+        border-radius: 3px;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        z-index: 0;
+        padding: 0.7em 0.57em;
+
+        @apply(--paper-button);
+      }
+
+      :host([raised].keyboard-focus) {
+        font-weight: bold;
+        @apply(--paper-button-raised-keyboard-focus);
+      }
+
+      :host(:not([raised]).keyboard-focus) {
+        font-weight: bold;
+        @apply(--paper-button-flat-keyboard-focus);
+      }
+
+      :host([disabled]) {
+        background: #eaeaea;
+        color: #a8a8a8;
+        cursor: auto;
+        pointer-events: none;
+
+        @apply(--paper-button-disabled);
+      }
+
+      paper-ripple {
+        color: var(--paper-button-ink-color);
+      }
+
+      :host > ::content * {
+        text-transform: inherit;
+      }
+    </style>
+    <content></content>
+  </template>
+</dom-module>
+
 <dom-module id="game-show-details" assetpath="/">
     <style>
         :host {
@@ -3057,25 +3116,25 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             font-size: 1em;
             font-weight: 150;
             line-height: 1.2em;
-             -webkit-touch-callout: none;
+            -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
         }
-        
+
         h2 {
             margin: 0;
             font-size: 1.8rem;
             font-weight: 150;
         }
-        
+
         .card-header .picture {
             width: 35px;
             margin: 5px;
         }
-        
+
         .card-header .picture.symbol {
             border-radius: 50%;
             border: 2px solid green;
@@ -3085,7 +3144,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     <template>
         <div class="card-header" on-showdetails="handleDetails">
             <div class="layout vertical center" on-tap="talk">
-                <voice-player id="player" accent="de-DE" text="{{ text }} {{flavour}}"></voice-player>
+                <voice-player id="player" accent="de-DE" text="{{voiceText(text,flavour)}}"></voice-player>
                 <h2>{{titleText}}</h2>
                 <img src="{{computeSrc(imgSrc)}}" style="width:60%;height:100px;margin: 5px;" class$="{{computeClass(cardData)}}">
 

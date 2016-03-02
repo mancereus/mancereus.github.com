@@ -13355,102 +13355,100 @@ Polymer({
     });
   })();
 Polymer({
-      is: 'game-dice',
-      properties: {
-        charset: String,
-        diceValue: {
-          type: String,
-          value: ''
-        }
-      },
-      clicker: function (ev) {
-        var input = document.getElementById('wordInput');
-        input.value = input.value + this.diceValue;
-        ev.preventDefault();
-        ev.stopPropagation();
-        return false;
-      },
-      ready: function () {
-        console.log('game-dice ready ');
-        var draggie = new Draggabilly(this);
-        this.diceValue = this.charset.charAt(Math.floor(Math.random() * this.charset.length));
-      }
-    });
+            is: 'game-dice',
+            properties: {
+                charset: String,
+                diceValue: {
+                    type: String,
+                    value: ''
+                }
+            },
+            clicker: function (ev) {
+                var input = document.getElementById('wordInput');
+                input.value = input.value + this.diceValue;
+                ev.preventDefault();
+                ev.stopPropagation();
+                return false;
+            },
+            ready: function () {
+                console.log('game-dice ready ');
+                var draggie = new Draggabilly(this);
+                this.diceValue = this.charset.charAt(Math.floor(Math.random() * this.charset.length));
+            }
+        });
 function get(name) {
-      if (name = new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)').exec(location.search))
-        return decodeURIComponent(name[1]);
-    }
+            if (name = new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)').exec(location.search))
+                return decodeURIComponent(name[1]);
+        }
 
-    Polymer({
-      is: 'mommel-board',
-      properties: {
-         category: {
-          type: String,
-          value: ''
-        },
-        kons: {
-          type: String,
-          value: 'NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ'
-        },
-        vok: {
-          type: String,
-          value: 'EEEEEEEIIIIIIAAAAAUUUOO\xC4\xD6\xDC'
-        },
-        categories: {
-          type: Array,
-          value: getData()
-        },
-        konsonant: {
-          type: String,
-          computed: 'getKons(kons)'
-        },
-        vokal: {
-          type: String,
-          computed: 'getVok(vok)'
-        }
-      },
-      getKons: function () {
-        if(this.kons == undefined)
-          return "c";
-        var idx = Math.floor(Math.random() * this.kons.length);
-        var res = this.kons.slice(idx, idx + 1);
-        this.kons = this.kons.slice(0, idx) + this.kons.slice(idx + 1, this.kons.length);
-        return res;
-      },
-      getVok: function () {
-        if(this.vok == undefined)
-          return "a";
-        var idx = Math.floor(Math.random() * this.vok.length);
-        var res = this.vok.slice(idx, idx + 1);
-        this.vok = this.vok.slice(0, idx) + this.vok.slice(idx + 1, this.vok.length);
-        return res;
-      },
-      count: function () {
-        if (this.kons == undefined)
-          return 0;
-        return this.kons.length + this.vok.length;
-      },
-      attached: function() {
-		      console.log(this.kons);
-      },
-      ready: function () {
-        var k = get('kons');
-        if (k != undefined) {
-          this.kons = k;
-        }
-        else {
-          this.kons = 'NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ';
-        }
-        ;
-        var v = get('vok');
-        if (v != undefined) {
-          this.vok = v;
-        }
-        else {
-          this.vok = 'EEEEEEEIIIIIIAAAAAUUUOO\xC4\xD6\xDC';
-        }
-        ;
-        var idx = Math.floor(Math.random() * this.categories.length);
-        this.category = this.categories[idx].name;
-      }
-    });
+        Polymer({
+            is: 'mommel-board',
+            properties: {
+                category: {
+                    type: String,
+                    value: ''
+                },
+                kons: {
+                    type: String,
+                    value: 'NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ'
+                },
+                vok: {
+                    type: String,
+                    value: 'EEEEEEEIIIIIIAAAAAUUUOO\xC4\xD6\xDC'
+                },
+                categories: {
+                    type: Array,
+                    value: getData()
+                },
+                konsonant: {
+                    type: String,
+                    computed: 'getKons(kons)'
+                },
+                vokal: {
+                    type: String,
+                    computed: 'getVok(vok)'
+                }
+            },
+            getKons: function () {
+                if (this.kons == undefined)
+                    return "c";
+                var idx = Math.floor(Math.random() * this.kons.length);
+                var res = this.kons.slice(idx, idx + 1);
+                this.kons = this.kons.slice(0, idx) + this.kons.slice(idx + 1, this.kons.length);
+                return res;
+            },
+            getVok: function () {
+                if (this.vok == undefined)
+                    return "a";
+                var idx = Math.floor(Math.random() * this.vok.length);
+                var res = this.vok.slice(idx, idx + 1);
+                this.vok = this.vok.slice(0, idx) + this.vok.slice(idx + 1, this.vok.length);
+                return res;
+            },
+            count: function () {
+                if (this.kons == undefined)
+                    return 0;
+                return this.kons.length + this.vok.length;
+            },
+            attached: function () {
+                console.log(this.kons);
+            },
+            ready: function () {
+                var k = get('kons');
+                if (k != undefined) {
+                    this.kons = k;
+                }
+                else {
+                    this.kons = 'NNNNNNSSSSSRRRRRTTTTDDDDHHHLLLCCGGMMBBWWFKZPVJYXQ';
+                }
+                var v = get('vok');
+                if (v != undefined) {
+                    this.vok = v;
+                }
+                else {
+                    this.vok = 'EEEEEEEIIIIIIAAAAAUUUOO\xC4\xD6\xDC';
+                }
+                var idx = Math.floor(Math.random() * this.categories.length);
+                this.category = this.categories[idx].name;
+            }
+        });

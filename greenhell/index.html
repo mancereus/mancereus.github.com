@@ -1752,7 +1752,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         }
     </style>
     <template>
-        <div id="piece" draggable="true" on-tap="clicker" class$="{{computeClass(imgclass)}}">
+        <div id="piece" draggable="true" on-tap="clicker" class$="fab green symbol {{imgclass}}">
             <img id="image" src="img/{{img}}.png" style="width: 60px;">
         </div>
     </template>
@@ -1842,7 +1842,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 </template>
             </div>
             <div class="card-header">
-                <voice-player id="player" accent="de-DE" text="{{carddata.Aktion}}"></voice-player>
+                <voice-player id="player" accent="de-DE" text="{{carddata.Aktion}} {{carddata.flavour}}"></voice-player>
                 <div class$="layout vertical center {{carddata.info}}">
                     <span>{{carddata.name}}</span>
                     <template is="dom-if" if="{{akt}}">
@@ -1865,7 +1865,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                         <div class="fit" style="top: 139px;"><img src="img/horiz.jpg" style="height:15px; width: 104px;" alt=""></div>
                     </template>
                     <template is="dom-if" if="{{item}}">
-                        <game-piece top="-100" left="-25" img="{{carddata.name}}" imgclass="{{carddata.imgclass}}"></game-piece>
+                        <game-piece top="-100" left="-25" img="{{symbolName}}" imgclass="{{carddata.imgclass}}"></game-piece>
                     </template>
                 </div>
             </div>
@@ -3123,18 +3123,18 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             -ms-user-select: none;
             user-select: none;
         }
-
+        
         h2 {
             margin: 0;
             font-size: 1.8rem;
             font-weight: 150;
         }
-
+        
         .card-header .picture {
             width: 35px;
             margin: 5px;
         }
-
+        
         .card-header .picture.symbol {
             border-radius: 50%;
             border: 2px solid green;
@@ -3144,9 +3144,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     <template>
         <div class="card-header" on-showdetails="handleDetails">
             <div class="layout vertical center" on-tap="talk">
-                <voice-player id="player" accent="de-DE" text="{{voiceText(text,flavour)}}"></voice-player>
+                <voice-player id="player" accent="de-DE" text="{{text}} {{flavour}}"></voice-player>
                 <h2>{{titleText}}</h2>
-                <img src="{{computeSrc(imgSrc)}}" style="width:60%;height:100px;margin: 5px;" class$="{{computeClass(cardData)}}">
+                <img src="{{computeSrc(imgSrc)}}" style="width:60%;height:100px;margin: 5px;" class$=" picture {{cardData.imgClass}}">
 
                 <div style="font-size:18px;line-height: 1.2em;">{{text}} <span style="font-style:italic;">{{flavour}}</span></div>
 

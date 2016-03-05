@@ -3141,7 +3141,7 @@ return value != null ? value : undefined;
 }
 }
 });
-Polymer.version = '1.3.0';
+Polymer.version = '1.3.1';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -8160,7 +8160,8 @@ this._encapsulateStyle = !nativeShadow && Boolean(this._template);
 if (this._template) {
 this._styles = this._collectStyles();
 var cssText = styleTransformer.elementStyles(this);
-var needsStatic = this._needsStaticStyles(this._styles);
+this._prepStyleProperties();
+var needsStatic = this._styles.length && !this._needsStyleProperties();
 if (needsStatic || !nativeShadow) {
 cssText = needsStatic ? cssText : ' ';
 var style = styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null);
@@ -8300,9 +8301,10 @@ return any;
 }
 },
 collectCssText: function (rule) {
-var cssText = rule.parsedCssText;
-cssText = cssText.replace(this.rx.BRACKETED, '').replace(this.rx.VAR_ASSIGN, '');
-return cssText;
+return this.collectConsumingCssText(rule.parsedCssText);
+},
+collectConsumingCssText: function (cssText) {
+return cssText.replace(this.rx.BRACKETED, '').replace(this.rx.VAR_ASSIGN, '');
 },
 collectPropertiesInCssText: function (cssText, props) {
 var m;
@@ -8457,7 +8459,7 @@ self._scopeSelector(rule, hostRx, hostSelector, element._scopeCssViaAttr, scopeS
 _elementKeyframeTransforms: function (element, scopeSelector) {
 var keyframesRules = element._styles._keyframes;
 var keyframeTransforms = {};
-if (!nativeShadow) {
+if (!nativeShadow && keyframesRules) {
 for (var i = 0, keyframesRule = keyframesRules[i]; i < keyframesRules.length; keyframesRule = keyframesRules[++i]) {
 this._scopeKeyframes(keyframesRule, scopeSelector);
 keyframeTransforms[keyframesRule.keyframesName] = this._keyframesRuleTransformer(keyframesRule);
@@ -8646,24 +8648,12 @@ return api;
 'use strict';
 var serializeValueToAttribute = Polymer.Base.serializeValueToAttribute;
 var propertyUtils = Polymer.StyleProperties;
-var styleUtil = Polymer.StyleUtil;
 var styleTransformer = Polymer.StyleTransformer;
 var styleDefaults = Polymer.StyleDefaults;
 var nativeShadow = Polymer.Settings.useNativeShadow;
 Polymer.Base._addFeature({
-_needsStaticStyles: function (styles) {
-var needsStatic;
-for (var i = 0, l = styles.length, css; i < l; i++) {
-css = styleUtil.parser._clean(styles[i].textContent);
-needsStatic = needsStatic || Boolean(css);
-if (css.match(propertyUtils.rx.MIXIN_MATCH) || css.match(propertyUtils.rx.VAR_MATCH)) {
-return false;
-}
-}
-return needsStatic;
-},
 _prepStyleProperties: function () {
-this._ownStylePropertyNames = this._styles ? propertyUtils.decorateStyles(this._styles) : null;
+this._ownStylePropertyNames = this._styles && this._styles.length ? propertyUtils.decorateStyles(this._styles) : null;
 },
 customStyle: null,
 getComputedStyleValue: function (property) {
@@ -8822,7 +8812,6 @@ this._prepIs();
 this._prepConstructor();
 this._prepTemplate();
 this._prepStyles();
-this._prepStyleProperties();
 this._prepAnnotations();
 this._prepEffects();
 this._prepBehaviors();
@@ -10018,7 +10007,13 @@ _template: null,
 created: function () {
 var self = this;
 Polymer.RenderStatus.whenReady(function () {
+if (document.readyState == 'loading') {
+document.addEventListener('DOMContentLoaded', function () {
 self._markImportsReady();
+});
+} else {
+self._markImportsReady();
+}
 });
 },
 _ensureReady: function () {
@@ -11622,17 +11617,17 @@ var data1 = {
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jane: Prof. Hampton ist ein berühmter Archeoöloge.", hor: true },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: true },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: true, ver: true },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Nur mit der Fackel kann man durch die Höhle direkt zu anderen Höhlen gehen.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
@@ -11655,12 +11650,12 @@ var data1 = {
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: true },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: true  },
     ],
     initActions: [
         { name: "Fluss", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 beenden.", task: true },
-        { name: "Minenfahrt", order: "home", Aktion: "Wenn alle 4 Höhlen im Spielplan gefunden sind und ihr das Tagebuch und eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
+        { name: "Minenfahrt", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, alle 4 Höhlen im Spielplan gefunden sind und ihr eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
         { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", imgclass: "symbol", task: true },
         { name: "Tempel", Aktion: "Ihr habt die alte Tempelruine gefunden. Lege das Tagebuch hier ab, dann kennt ihr den Weg zum 'Tal der Kannibalen'.", task: true },
         { name: "Lager", Aktion: "Du findest ein verlassenes Lager. Du kannst bis zu 2 Dinge aus dem Vorrat auf passende leere Karten legen. (z.B.: Liane auf Lianenkarte)", task: true },
@@ -11672,7 +11667,6 @@ var data1 = {
         { name: "Überfall", order: "star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
         { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Whiskykiste. Er hat Alkoholprobleme, weil seine Frau vor 3 Jahren in einem Hinterhalt erschossen wurde. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
         { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weist ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
-        { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
     ],
     start: { name: "Akt I", Aktion: "Jane hat den Piloten Jack für eine geheime Expedition in den Dschungel engagiert.  Das Flugzeug stürzt kurz vor dem Ziel ab. Jemand hat die Tanks durchlöchert...", task: true, type: "Startkarte" },
 };
@@ -11692,7 +11686,6 @@ var data2 = {
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true,  imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true,  imgclass: "symbol" },
-        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluß fahren.", hor: true, imgclass: "symbol" },
         { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
@@ -11700,11 +11693,12 @@ var data2 = {
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", hor: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", hor: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", hor: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", hor: true, info: "info" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
@@ -11735,14 +11729,17 @@ var data2 = {
 
         { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true },
         { name: "Leiche", order: "build", Aktion: "Jack findet eine halbverweste Leiche. Es ist der Geschäftspartner des Jägers Stoephasius. Er wurde offensichtlich von hinten erschossen. Jack findet einen Brief, der beweist, dass Stoephasius für den Tod von Jacks Frau verantwortlich ist. Jane ist entsetzt. 1 Bounspunkt.", task: true },
-
+        { name: "Abendrot", order: "build", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
         { name: "Treibsand", order: "build", Aktion: "Jack bleibt im Treibsand stecken. Jane muss eine Liane hierherbringen, um ihn zu retten. Gib die Liane dazu ab. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist Jane nicht dabei, stirbt Jack und das Abenteuer ist zu Ende.", task: true },
 
         { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine große Diamanten. Wenn du Sie herausholst, verlierst du die Fackel. Du erhälst einen Bonuspunkt.", info: "warn", imgclass: "symbol", task: true },
+        { name: "Altar", order: "select-all", Aktion: "Ihr findet einen geheimen Zeremonienaltar der Kannibalen. Von dort könnt ihr euch 2 Macheten mitnehmen.", info: "warn", imgclass: "Machete", task: true },
+        { name: "Schlangengrube", order: "select-all", Aktion: "In einer Höhle seid ihr von Schlangen umzingelt. Gebt eine Fackel ab oder legt 3 Dinge vom Inventar auf ihre Felder zurück oder in den Vorrat, um den Schlangen zu entkommen. Habt ihr beides nicht, sterbt ihr in der Schlangengrube.", info: "warn", task: true },
 
 
         { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Jane erzählt dir von einer geheimen Schatzkammer der Kannibalen. Die Fackel geht in den Vorrat.", task: true },
-
+        { name: "Befreit", order: "gesture", Aktion: "Der Jäger Stoephsius hat Jane aus dem Dorf der Kannibalen befreit, dabei hat er allerdings mehrere Kannibalen getötet. Der Schrumpfkopf schützt euch nun nicht mehr vor den Kannibalen. Du kannst Janes Inventarkarte nun wieder verwenden.", task: true },
+        
         { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluß das Abenteuer beenden. Wenn du mind. 2 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
         { name: "Schatzkammer", order:"exit-to-app", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 3 Artefakte hier ablegt und Jack und Jane dabei sind, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
     ],
@@ -16584,7 +16581,8 @@ Polymer({
          * @type {!Polymer.IronMeta}
          */
         _meta: {
-          value: Polymer.Base.create('iron-meta', {type: 'iconset'})
+          value: Polymer.Base.create('iron-meta', {type: 'iconset'}),
+          observer: '_updateIcon'
         }
 
       },
@@ -16609,7 +16607,14 @@ Polymer({
       /** @suppress {visibility} */
       _updateIcon: function() {
         if (this._usesIconset()) {
-          if (this._iconsetName) {
+          if (this._img && this._img.parentNode) {
+            Polymer.dom(this.root).removeChild(this._img);
+          }
+          if (this._iconName === "") {
+            if (this._iconset) {
+              this._iconset.removeIcon(this);
+            }
+          } else if (this._iconsetName && this._meta) {
             this._iconset = /** @type {?Polymer.Iconset} */ (
               this._meta.byKey(this._iconsetName));
             if (this._iconset) {
@@ -16620,6 +16625,9 @@ Polymer({
             }
           }
         } else {
+          if (this._iconset) {
+            this._iconset.removeIcon(this);
+          }
           if (!this._img) {
             this._img = document.createElement('img');
             this._img.style.width = '100%';
@@ -16692,6 +16700,10 @@ Polymer({
           type: Object,
           notify: true
         },
+        symbolName: {
+        type: String,
+        computed: 'getSymbolName(carddata)'
+        },
         akt: String,
         item: { notify: true },
         selected: {
@@ -16721,6 +16733,11 @@ Polymer({
       show: function () {
         var card = this.$.card;
         card.selected = 1;
+      },
+      getSymbolName: function (carddata) {
+        if(carddata.imgclass == 'symbol')
+            return carddata.name;
+        return carddata.imgclass;
       },
       toggle: function () {
         var card = this.$.card;
@@ -17662,6 +17679,7 @@ Polymer({
         },
         symbol: { notify: true },
         text: { type: String, notify: true },
+        message: { type: String, notify: true },
         flavour: {  type: String, notify: true },
         titleText: { type: String, notify: true }
       },
@@ -17674,14 +17692,8 @@ Polymer({
         this.titleText = details.card.name;
       },
       listeners: { handleShowcard: 'showCard' },
-      computeClass: function (cardData) {
-        return 'picture ' + cardData.imgclass;
-      },
       computeSrc: function (imgSrc) {
         return 'img/' + imgSrc + '.png';
-      },
-      voiceText: function (text, flavour) {
-        return this.text + " " + this.flavour;
       },
       handleDetails: function(e, detail, sender) {
         this.message = 'heard: ' + detail.message;

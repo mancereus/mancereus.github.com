@@ -640,7 +640,7 @@ return value != null ? value : undefined;
 }
 }
 });
-Polymer.version = '1.3.0';
+Polymer.version = '1.3.1';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -5659,7 +5659,8 @@ this._encapsulateStyle = !nativeShadow && Boolean(this._template);
 if (this._template) {
 this._styles = this._collectStyles();
 var cssText = styleTransformer.elementStyles(this);
-var needsStatic = this._needsStaticStyles(this._styles);
+this._prepStyleProperties();
+var needsStatic = this._styles.length && !this._needsStyleProperties();
 if (needsStatic || !nativeShadow) {
 cssText = needsStatic ? cssText : ' ';
 var style = styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null);
@@ -5799,9 +5800,10 @@ return any;
 }
 },
 collectCssText: function (rule) {
-var cssText = rule.parsedCssText;
-cssText = cssText.replace(this.rx.BRACKETED, '').replace(this.rx.VAR_ASSIGN, '');
-return cssText;
+return this.collectConsumingCssText(rule.parsedCssText);
+},
+collectConsumingCssText: function (cssText) {
+return cssText.replace(this.rx.BRACKETED, '').replace(this.rx.VAR_ASSIGN, '');
 },
 collectPropertiesInCssText: function (cssText, props) {
 var m;
@@ -5956,7 +5958,7 @@ self._scopeSelector(rule, hostRx, hostSelector, element._scopeCssViaAttr, scopeS
 _elementKeyframeTransforms: function (element, scopeSelector) {
 var keyframesRules = element._styles._keyframes;
 var keyframeTransforms = {};
-if (!nativeShadow) {
+if (!nativeShadow && keyframesRules) {
 for (var i = 0, keyframesRule = keyframesRules[i]; i < keyframesRules.length; keyframesRule = keyframesRules[++i]) {
 this._scopeKeyframes(keyframesRule, scopeSelector);
 keyframeTransforms[keyframesRule.keyframesName] = this._keyframesRuleTransformer(keyframesRule);
@@ -6145,24 +6147,12 @@ return api;
 'use strict';
 var serializeValueToAttribute = Polymer.Base.serializeValueToAttribute;
 var propertyUtils = Polymer.StyleProperties;
-var styleUtil = Polymer.StyleUtil;
 var styleTransformer = Polymer.StyleTransformer;
 var styleDefaults = Polymer.StyleDefaults;
 var nativeShadow = Polymer.Settings.useNativeShadow;
 Polymer.Base._addFeature({
-_needsStaticStyles: function (styles) {
-var needsStatic;
-for (var i = 0, l = styles.length, css; i < l; i++) {
-css = styleUtil.parser._clean(styles[i].textContent);
-needsStatic = needsStatic || Boolean(css);
-if (css.match(propertyUtils.rx.MIXIN_MATCH) || css.match(propertyUtils.rx.VAR_MATCH)) {
-return false;
-}
-}
-return needsStatic;
-},
 _prepStyleProperties: function () {
-this._ownStylePropertyNames = this._styles ? propertyUtils.decorateStyles(this._styles) : null;
+this._ownStylePropertyNames = this._styles && this._styles.length ? propertyUtils.decorateStyles(this._styles) : null;
 },
 customStyle: null,
 getComputedStyleValue: function (property) {
@@ -6321,7 +6311,6 @@ this._prepIs();
 this._prepConstructor();
 this._prepTemplate();
 this._prepStyles();
-this._prepStyleProperties();
 this._prepAnnotations();
 this._prepEffects();
 this._prepBehaviors();
@@ -7517,7 +7506,13 @@ _template: null,
 created: function () {
 var self = this;
 Polymer.RenderStatus.whenReady(function () {
+if (document.readyState == 'loading') {
+document.addEventListener('DOMContentLoaded', function () {
 self._markImportsReady();
+});
+} else {
+self._markImportsReady();
+}
 });
 },
 _ensureReady: function () {

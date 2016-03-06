@@ -11202,7 +11202,7 @@ var data = {
     form: {
         type: "Form",
         type2: "Oberfläche",
-        desc: "Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Fühlt es sich warm an? Besteht es aus mehreren Teilen?",
+        desc: "Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Fühlt es sich warm an? Hat es Haare? Steht es auf 4 Beinen? Besteht es aus mehreren Teilen?",
         cards: [
             { name: "ist lang und dünn oder stabförmig" },
             { name: "ist im wesentlichen flach" },
@@ -11221,7 +11221,7 @@ var data = {
     inhalt: {
         type: "Inhalt",
         type2: "Extra",
-        desc: "Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon?",
+        desc: "Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon? ",
         cards: [
             { name: "enthält Papier oder Karton" },
             { name: "hat Zähne oder spitze Teile" },
@@ -11244,7 +11244,7 @@ var data = {
     ort: {
         type: "Ort",
         type2: "Zeit",
-        desc: "Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause?",
+        desc: "Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause? Im Cafe?",
         cards: [
             { name: "kann ich innerhalb von 5 Minuten hierherbringen" },
             { name: "ist nicht im Umkreis von 100 Metern zu finden" },
@@ -11265,18 +11265,20 @@ var data = {
     extra: {
         type: "Größe",
         type2: "Gewicht",
-        desc: "Wie gross ist es? Klein, Mittel, groß oder sehr groß? Wie schwer ist es? Leicht, mittel oder schwer?",
+        desc: "Wie gross ist es? Klein, Mittel, groß oder sehr groß? Wie schwer ist es? Leicht, mittel oder schwer? Passt es in eine Kiste?",
         cards: [
-            { name: "kleiner als eine Maus" },
-            { name: "kleiner als eine Katze" },
-            { name: "höher als ein Tisch" },
-            { name: "passt in ein Gartenhäuschen" },
-            { name: "höher als ein 2-stöckiges Reihenhaus" },
+            { name: "zwischen halb so groß und doppelt so groß wie eine Maus" },
+            { name: "zwischen halb so groß und doppelt so groß wie eine Katze" },
+            { name: "zwischen halb so groß und doppelt so groß wie ein Tisch" },
+            { name: "zwischen halb so groß und doppelt so groß wie ein Gartenhäuschen" },
+            { name: "zwischen halb so groß und doppelt so groß wie 2-stöckiges Reihenhaus" },
             { name: "passt in eine quadratische Kiste mit 1 Meter Seitenlänge" },
             { name: "passt in einen Schuhkarton" },
-            { name: "ist 10kg oder leichter" },
+            { name: "leichter als 100gr" },
+            { name: "ist zwischen 100gr und 1kg" },
+            { name: "ist zwischen 1kg und 10kg" },
             { name: "ist zwischen 10kg und 100kg" },
-            { name: "ist 100kg oder schwerer" },
+            { name: "schwerer als 100kg" },
         ]
     }
 };

@@ -193,6 +193,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       align-items: flex-end;
     };
 
+    --layout-baseline: {
+      -ms-flex-align: baseline;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+    };
+
     /* alignment in main axis */
 
     --layout-start-justified: {
@@ -254,6 +260,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       -ms-align-self: stretch;
       -webkit-align-self: stretch;
       align-self: stretch;
+    };
+
+    --layout-self-baseline: {
+      -ms-align-self: baseline;
+      -webkit-align-self: baseline;
+      align-self: baseline;
+    };
+
+    /* multi-line alignment in main axis */
+
+    --layout-start-aligned: {
+      -ms-flex-line-pack: start;  /* IE10 */
+      -ms-align-content: flex-start;
+      -webkit-align-content: flex-start;
+      align-content: flex-start;
+    };
+
+    --layout-end-aligned: {
+      -ms-flex-line-pack: end;  /* IE10 */
+      -ms-align-content: flex-end;
+      -webkit-align-content: flex-end;
+      align-content: flex-end;
+    };
+
+    --layout-center-aligned: {
+      -ms-flex-line-pack: center;  /* IE10 */
+      -ms-align-content: center;
+      -webkit-align-content: center;
+      align-content: center;
+    };
+
+    --layout-between-aligned: {
+      -ms-flex-line-pack: justify;  /* IE10 */
+      -ms-align-content: space-between;
+      -webkit-align-content: space-between;
+      align-content: space-between;
+    };
+
+    --layout-around-aligned: {
+      -ms-flex-line-pack: distribute;  /* IE10 */
+      -ms-align-content: space-around;
+      -webkit-align-content: space-around;
+      align-content: space-around;
     };
 
     /*******************************
@@ -899,12 +948,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   <template>
     <style>
       :host {
-        --paper-header-panel-shadow: {
-          height: 6px;
-          bottom: -6px;
-          box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
-        };
-
         @apply(--layout-vertical);
 
         position: relative;
@@ -994,19 +1037,18 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #dropShadow {
+        transition: opacity 0.5s;
+        height: 6px;
+        box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
+
         @apply(--paper-header-panel-shadow);
 
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 6px;
-        pointer-events: none;
-
-        -webkit-transition: opacity 0.5s;
-        transition: opacity 0.5s;
-
         opacity: 0;
+        pointer-events: none;
       }
 
       #dropShadow.has-shadow {
@@ -1536,6 +1578,20 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 <g id="zoom-out"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"></path></g>
 </defs></svg>
 </iron-iconset-svg>
+<dom-module id="iron-a11y-announcer" assetpath="../../bower_components/iron-a11y-announcer/">
+  <style>
+    :host {
+      display: inline-block;
+      position: fixed;
+      clip: rect(0px,0px,0px,0px);
+    }
+  </style>
+
+  <template>
+    <div aria-live$="[[mode]]">[[_text]]</div>
+  </template>
+
+  </dom-module>
 <dom-module id="paper-item-shared-styles" assetpath="../../bower_components/paper-item/">
   <template>
     <style>

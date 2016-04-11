@@ -14,30 +14,22 @@ addEventListener('DOMContentLoaded', resolve);
 }());
 window.Polymer = {
 Settings: function () {
-var user = window.Polymer || {};
+var settings = window.Polymer || {};
 var parts = location.search.slice(1).split('&');
 for (var i = 0, o; i < parts.length && (o = parts[i]); i++) {
 o = o.split('=');
-o[0] && (user[o[0]] = o[1] || true);
+o[0] && (settings[o[0]] = o[1] || true);
 }
-var wantShadow = user.dom === 'shadow';
-var hasShadow = Boolean(Element.prototype.createShadowRoot);
-var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
-var useShadow = wantShadow && hasShadow;
-var hasNativeImports = Boolean('import' in document.createElement('link'));
-var useNativeImports = hasNativeImports;
-var useNativeCustomElements = !window.CustomElements || window.CustomElements.useNative;
-var usePolyfillProto = !useNativeCustomElements && !Object.__proto__;
-return {
-wantShadow: wantShadow,
-hasShadow: hasShadow,
-nativeShadow: nativeShadow,
-useShadow: useShadow,
-useNativeShadow: useShadow && nativeShadow,
-useNativeImports: useNativeImports,
-useNativeCustomElements: useNativeCustomElements,
-usePolyfillProto: usePolyfillProto
-};
+settings.wantShadow = settings.dom === 'shadow';
+settings.hasShadow = Boolean(Element.prototype.createShadowRoot);
+settings.nativeShadow = settings.hasShadow && !window.ShadowDOMPolyfill;
+settings.useShadow = settings.wantShadow && settings.hasShadow;
+settings.hasNativeImports = Boolean('import' in document.createElement('link'));
+settings.useNativeImports = settings.hasNativeImports;
+settings.useNativeCustomElements = !window.CustomElements || window.CustomElements.useNative;
+settings.useNativeShadow = settings.useShadow && settings.nativeShadow;
+settings.usePolyfillProto = !settings.useNativeCustomElements && !Object.__proto__;
+return settings;
 }()
 };
 (function () {
@@ -164,6 +156,9 @@ Polymer.RenderStatus._catchFirstRender();
 }
 Polymer.ImportStatus = Polymer.RenderStatus;
 Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;
+(function () {
+'use strict';
+var settings = Polymer.Settings;
 Polymer.Base = {
 __isPolymerInstance__: true,
 _addFeature: function (feature) {
@@ -173,13 +168,30 @@ registerCallback: function () {
 this._desugarBehaviors();
 this._doBehavior('beforeRegister');
 this._registerFeatures();
-this._doBehavior('registered');
+if (!settings.lazyRegister) {
+this.ensureRegisterFinished();
+}
 },
 createdCallback: function () {
+if (!this.__hasRegisterFinished) {
+this._ensureRegisterFinished(this.__proto__);
+}
 Polymer.telemetry.instanceCount++;
 this.root = this;
 this._doBehavior('created');
 this._initFeatures();
+},
+ensureRegisterFinished: function () {
+this._ensureRegisterFinished(this);
+},
+_ensureRegisterFinished: function (proto) {
+if (proto.__hasRegisterFinished !== proto.is) {
+proto.__hasRegisterFinished = proto.is;
+if (proto._finishRegisterFeatures) {
+proto._finishRegisterFeatures();
+}
+proto._doBehavior('registered');
+}
 },
 attachedCallback: function () {
 var self = this;
@@ -259,6 +271,7 @@ Polymer.isInstance = function (obj) {
 return Boolean(obj && obj.__isPolymerInstance__);
 };
 Polymer.telemetry.instanceCount = 0;
+}());
 (function () {
 var modules = {};
 var lcModules = {};
@@ -640,7 +653,7 @@ return value != null ? value : undefined;
 }
 }
 });
-Polymer.version = '1.3.0';
+Polymer.version = '1.4.0';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -1993,7 +2006,11 @@ get localTarget() {
 return this.event.target;
 },
 get path() {
-return this.event.path;
+var path = this.event.path;
+if (!Array.isArray(path)) {
+path = Array.prototype.slice.call(path);
+}
+return path;
 }
 };
 } else {
@@ -4457,7 +4474,12 @@ if (prop.notify) {
 this._addPropertyEffect(p, 'notify', { event: Polymer.CaseMap.camelToDashCase(p) + '-changed' });
 }
 if (prop.reflectToAttribute) {
-this._addPropertyEffect(p, 'reflect', { attribute: Polymer.CaseMap.camelToDashCase(p) });
+var attr = Polymer.CaseMap.camelToDashCase(p);
+if (attr[0] === '-') {
+this._warn(this._logf('_addPropertyEffects', 'Property ' + p + ' cannot be reflected to attribute ' + attr + ' because "-" is not a valid starting attribute name. Use a lowercase first letter for the property instead.'));
+} else {
+this._addPropertyEffect(p, 'reflect', { attribute: attr });
+}
 }
 if (prop.readOnly) {
 Polymer.Bind.ensurePropertyEffects(this, p);
@@ -4540,6 +4562,9 @@ var part = note.parts[i];
 if (part.signature) {
 this._addAnnotatedComputationEffect(note, part, index);
 } else if (!part.literal) {
+if (note.kind === 'attribute' && note.name[0] === '-') {
+this._warn(this._logf('_addAnnotationEffect', 'Cannot set attribute ' + note.name + ' because "-" is not a valid attribute starting character'));
+} else {
 this._addPropertyEffect(part.model, 'annotation', {
 kind: note.kind,
 index: index,
@@ -4552,6 +4577,7 @@ event: part.event,
 customEvent: part.customEvent,
 negate: part.negate
 });
+}
 }
 }
 },
@@ -5323,19 +5349,29 @@ this.forEachRule(r, styleRuleCallback, keyframesRuleCallback);
 }
 }
 },
-applyCss: function (cssText, moniker, target, afterNode) {
+applyCss: function (cssText, moniker, target, contextNode) {
+var style = this.createScopeStyle(cssText, moniker);
+target = target || document.head;
+var after = contextNode && contextNode.nextSibling || target.firstChild;
+this.__lastHeadApplyNode = style;
+return target.insertBefore(style, after);
+},
+createScopeStyle: function (cssText, moniker) {
 var style = document.createElement('style');
 if (moniker) {
 style.setAttribute('scope', moniker);
 }
 style.textContent = cssText;
-target = target || document.head;
-if (!afterNode) {
-var n$ = target.querySelectorAll('style[scope]');
-afterNode = n$[n$.length - 1];
-}
-target.insertBefore(style, afterNode && afterNode.nextSibling || target.firstChild);
 return style;
+},
+__lastHeadApplyNode: null,
+applyStylePlaceHolder: function (moniker) {
+var placeHolder = document.createComment(' Shady DOM styles for ' + moniker + ' ');
+var after = this.__lastHeadApplyNode ? this.__lastHeadApplyNode.nextSibling : null;
+var scope = document.head;
+scope.insertBefore(placeHolder, after || scope.firstChild);
+this.__lastHeadApplyNode = placeHolder;
+return placeHolder;
 },
 cssFromModules: function (moduleIds, warnIfNotFound) {
 var modules = moduleIds.trim().split(' ');
@@ -5653,19 +5689,20 @@ styleTransformer.element(element, this.is, this._scopeCssViaAttr);
 prepElement.call(this, element);
 },
 _prepStyles: function () {
-if (this._encapsulateStyle === undefined) {
-this._encapsulateStyle = !nativeShadow && Boolean(this._template);
+if (!nativeShadow) {
+this._scopeStyle = styleUtil.applyStylePlaceHolder(this.is);
 }
+},
+_prepShimStyles: function () {
 if (this._template) {
+if (this._encapsulateStyle === undefined) {
+this._encapsulateStyle = !nativeShadow;
+}
 this._styles = this._collectStyles();
 var cssText = styleTransformer.elementStyles(this);
-var needsStatic = this._needsStaticStyles(this._styles);
-if (needsStatic || !nativeShadow) {
-cssText = needsStatic ? cssText : ' ';
-var style = styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null);
-if (!nativeShadow) {
-this._scopeStyle = style;
-}
+this._prepStyleProperties();
+if (!this._needsStyleProperties() && this._styles.length) {
+styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null, this._scopeStyle);
 }
 } else {
 this._styles = [];
@@ -5799,9 +5836,10 @@ return any;
 }
 },
 collectCssText: function (rule) {
-var cssText = rule.parsedCssText;
-cssText = cssText.replace(this.rx.BRACKETED, '').replace(this.rx.VAR_ASSIGN, '');
-return cssText;
+return this.collectConsumingCssText(rule.parsedCssText);
+},
+collectConsumingCssText: function (cssText) {
+return cssText.replace(this.rx.BRACKETED, '').replace(this.rx.VAR_ASSIGN, '');
 },
 collectPropertiesInCssText: function (cssText, props) {
 var m;
@@ -5956,7 +5994,7 @@ self._scopeSelector(rule, hostRx, hostSelector, element._scopeCssViaAttr, scopeS
 _elementKeyframeTransforms: function (element, scopeSelector) {
 var keyframesRules = element._styles._keyframes;
 var keyframeTransforms = {};
-if (!nativeShadow) {
+if (!nativeShadow && keyframesRules) {
 for (var i = 0, keyframesRule = keyframesRules[i]; i < keyframesRules.length; keyframesRule = keyframesRules[++i]) {
 this._scopeKeyframes(keyframesRule, scopeSelector);
 keyframeTransforms[keyframesRule.keyframesName] = this._keyframesRuleTransformer(keyframesRule);
@@ -6145,24 +6183,12 @@ return api;
 'use strict';
 var serializeValueToAttribute = Polymer.Base.serializeValueToAttribute;
 var propertyUtils = Polymer.StyleProperties;
-var styleUtil = Polymer.StyleUtil;
 var styleTransformer = Polymer.StyleTransformer;
 var styleDefaults = Polymer.StyleDefaults;
 var nativeShadow = Polymer.Settings.useNativeShadow;
 Polymer.Base._addFeature({
-_needsStaticStyles: function (styles) {
-var needsStatic;
-for (var i = 0, l = styles.length, css; i < l; i++) {
-css = styleUtil.parser._clean(styles[i].textContent);
-needsStatic = needsStatic || Boolean(css);
-if (css.match(propertyUtils.rx.MIXIN_MATCH) || css.match(propertyUtils.rx.VAR_MATCH)) {
-return false;
-}
-}
-return needsStatic;
-},
 _prepStyleProperties: function () {
-this._ownStylePropertyNames = this._styles ? propertyUtils.decorateStyles(this._styles) : null;
+this._ownStylePropertyNames = this._styles && this._styles.length ? propertyUtils.decorateStyles(this._styles) : null;
 },
 customStyle: null,
 getComputedStyleValue: function (property) {
@@ -6319,9 +6345,11 @@ Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepConstructor();
-this._prepTemplate();
 this._prepStyles();
-this._prepStyleProperties();
+},
+_finishRegisterFeatures: function () {
+this._prepTemplate();
+this._prepShimStyles();
 this._prepAnnotations();
 this._prepEffects();
 this._prepBehaviors();
@@ -7517,7 +7545,13 @@ _template: null,
 created: function () {
 var self = this;
 Polymer.RenderStatus.whenReady(function () {
+if (document.readyState == 'loading') {
+document.addEventListener('DOMContentLoaded', function () {
 self._markImportsReady();
+});
+} else {
+self._markImportsReady();
+}
 });
 },
 _ensureReady: function () {
@@ -9424,8 +9458,14 @@ if ( typeof define === 'function' && define.amd ) {
     properties: {
 
       /**
-       * If you want to use the attribute value of an element for `selected` instead of the index,
-       * set this to the name of the attribute.
+       * If you want to use an attribute value or property of an element for
+       * `selected` instead of the index, set this to the name of the attribute
+       * or property. Hyphenated values are converted to camel case when used to
+       * look up the property of a selectable element. Camel cased values are
+       * *not* converted to hyphenated values for attribute lookup. It's
+       * recommended that you provide the hyphenated form of the name so that
+       * selection works in both cases. (Use `attr-or-property-name` instead of
+       * `attrOrPropertyName`.)
        */
       attrForSelected: {
         type: String,
@@ -9666,7 +9706,7 @@ if ( typeof define === 'function' && define.amd ) {
     },
 
     _valueForItem: function(item) {
-      var propValue = item[this.attrForSelected];
+      var propValue = item[Polymer.CaseMap.dashToCamelCase(this.attrForSelected)];
       return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
     },
 
@@ -10261,6 +10301,13 @@ if ( typeof define === 'function' && define.amd ) {
     var SPACE_KEY = /^space(bar)?/;
 
     /**
+     * Matches ESC key.
+     *
+     * Value from: http://w3c.github.io/uievents-key/#key-Escape
+     */
+    var ESC_KEY = /^escape$/;
+
+    /**
      * Transforms the key.
      * @param {string} key The KeyBoardEvent.key
      * @param {Boolean} [noSpecialChars] Limits the transformation to
@@ -10272,6 +10319,8 @@ if ( typeof define === 'function' && define.amd ) {
         var lKey = key.toLowerCase();
         if (lKey === ' ' || SPACE_KEY.test(lKey)) {
           validKey = 'space';
+        } else if (ESC_KEY.test(lKey)) {
+          validKey = 'esc';
         } else if (lKey.length == 1) {
           if (!noSpecialChars || KEY_CHAR.test(lKey)) {
             validKey = lKey;
@@ -10315,10 +10364,10 @@ if ( typeof define === 'function' && define.amd ) {
           validKey = 'f' + (keyCode - 112);
         } else if (keyCode >= 48 && keyCode <= 57) {
           // top 0-9 keys
-          validKey = String(48 - keyCode);
+          validKey = String(keyCode - 48);
         } else if (keyCode >= 96 && keyCode <= 105) {
           // num pad 0-9
-          validKey = String(96 - keyCode);
+          validKey = String(keyCode - 96);
         } else {
           validKey = KEY_CODE[keyCode];
         }
@@ -10483,6 +10532,13 @@ if ( typeof define === 'function' && define.amd ) {
         this._resetKeyEventListeners();
       },
 
+      /**
+       * Returns true if a keyboard event matches `eventString`.
+       *
+       * @param {KeyboardEvent} event
+       * @param {string} eventString
+       * @return {boolean}
+       */
       keyboardEventMatchesKeys: function(event, eventString) {
         var keyCombos = parseEventString(eventString);
         for (var i = 0; i < keyCombos.length; ++i) {
@@ -10641,9 +10697,6 @@ Polymer({
                 if ('speechSynthesis' in window) {
                     this.speech = new SpeechSynthesisUtterance();
                 }
-                else {
-                    console.error('Your browser does not support the Web Speech API');
-                }
             },
             ready: function() {
                 // Initialize attributes
@@ -10661,31 +10714,45 @@ Polymer({
 
             /* -- Private Methods ------------------------------------------- */
             _accentChanged: function() {
-                this.speech.lang = this.accent;
+                if ('speechSynthesis' in window) {
+                    this.speech.lang = this.accent;
+                }
             },
             _textChanged: function() {
-                this.speech.text = this.text;
+                if ('speechSynthesis' in window) {
+                    this.speech.text = this.text;
+                }
             },
             _propagateEvent: function (eventName) {
                 var that = this;
 
-                this.speech.addEventListener(eventName, function(e) {
-                    that.fire(eventName, e);
-                });
+                if ('speechSynthesis' in window) {
+                    this.speech.addEventListener(eventName, function(e) {
+                        that.fire(eventName, e);
+                    });
+                }
             },
 
             /* -- Public Methods -------------------------------------------- */
             speak: function() {
+                if ('speechSynthesis' in window) {
                 window.speechSynthesis.speak(this.speech);
+                }
             },
             cancel: function() {
-                window.speechSynthesis.cancel();
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
             },
             pause: function() {
+                if ('speechSynthesis' in window) {
                 window.speechSynthesis.pause();
+                }
             },
             resume: function() {
+                if ('speechSynthesis' in window) {
                 window.speechSynthesis.resume();
+                }
             }
         });
 console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-layout-classes.html`, and one of the specific dom-modules instead');
@@ -10758,7 +10825,8 @@ Polymer({
          * @type {!Polymer.IronMeta}
          */
         _meta: {
-          value: Polymer.Base.create('iron-meta', {type: 'iconset'})
+          value: Polymer.Base.create('iron-meta', {type: 'iconset'}),
+          observer: '_updateIcon'
         }
 
       },
@@ -10783,7 +10851,14 @@ Polymer({
       /** @suppress {visibility} */
       _updateIcon: function() {
         if (this._usesIconset()) {
-          if (this._iconsetName) {
+          if (this._img && this._img.parentNode) {
+            Polymer.dom(this.root).removeChild(this._img);
+          }
+          if (this._iconName === "") {
+            if (this._iconset) {
+              this._iconset.removeIcon(this);
+            }
+          } else if (this._iconsetName && this._meta) {
             this._iconset = /** @type {?Polymer.Iconset} */ (
               this._meta.byKey(this._iconsetName));
             if (this._iconset) {
@@ -10794,6 +10869,9 @@ Polymer({
             }
           }
         } else {
+          if (this._iconset) {
+            this._iconset.removeIcon(this);
+          }
           if (!this._img) {
             this._img = document.createElement('img');
             this._img.style.width = '100%';
@@ -11539,17 +11617,17 @@ var data1 = {
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jane: Prof. Hampton ist ein berühmter Archeoöloge.", hor: true },
-        { name: "Weg", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: true },
+        { name: "Weg", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: true, ver: true },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Nur mit der Fackel kann man durch die Höhle direkt zu anderen Höhlen gehen.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
         { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
@@ -11572,12 +11650,12 @@ var data1 = {
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: true },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
-        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem" },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
+        { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: true  },
     ],
     initActions: [
         { name: "Fluss", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 beenden.", task: true },
-        { name: "Minenfahrt", order: "home", Aktion: "Wenn alle 4 Höhlen im Spielplan gefunden sind und ihr das Tagebuch und eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
+        { name: "Minenfahrt", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, alle 4 Höhlen im Spielplan gefunden sind und ihr eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
         { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", imgclass: "symbol", task: true },
         { name: "Tempel", Aktion: "Ihr habt die alte Tempelruine gefunden. Lege das Tagebuch hier ab, dann kennt ihr den Weg zum 'Tal der Kannibalen'.", task: true },
         { name: "Lager", Aktion: "Du findest ein verlassenes Lager. Du kannst bis zu 2 Dinge aus dem Vorrat auf passende leere Karten legen. (z.B.: Liane auf Lianenkarte)", task: true },
@@ -11589,7 +11667,6 @@ var data1 = {
         { name: "Überfall", order: "star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
         { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Whiskykiste. Er hat Alkoholprobleme, weil seine Frau vor 3 Jahren in einem Hinterhalt erschossen wurde. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
         { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weist ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
-        { name: "Abendrot", order: "star", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
     ],
     start: { name: "Akt I", Aktion: "Jane hat den Piloten Jack für eine geheime Expedition in den Dschungel engagiert.  Das Flugzeug stürzt kurz vor dem Ziel ab. Jemand hat die Tanks durchlöchert...", task: true, type: "Startkarte" },
 };
@@ -11609,7 +11686,6 @@ var data2 = {
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true,  imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true,  imgclass: "symbol" },
-        { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluß fahren.", hor: true, imgclass: "symbol" },
         { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: true, imgclass: "symbol" },
@@ -11617,11 +11693,12 @@ var data2 = {
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", hor: true, info: "info" },
-        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", hor: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", hor: true, info: "info" },
+        { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", hor: true, info: "info" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
+        { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
         { name: "Kannibalen", Aktion: "Die Kannibalen durchstreifen das Tal. Habt ihr den Schrunpfkopf bei euch, lassen sie euch vorbeiziehen. Ansonsten könnt ihr das Feld nicht betreten.", info: "problem" },
@@ -11650,16 +11727,19 @@ var data2 = {
         { name: "Jäger", order: "accessibility", Aktion: "Der Jäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Aktionskarte. Mit der Pistole kannst du sie ihm dort abnehmen. Er ist auf der Suche nach der geheimen Schatzkammer der Kannibalen.",  task: true },
         { name: "Jäger", order: "accessibility", Aktion: "Der Jäger Stoephasius wurde von Kannibalen gefangen genommen und wird in ihr Dorf transportiert. Mit der Pistole kannst du ihn retten. Aus Dankbarkeit erhälst du einen Bonuspunkt. Ansonsten wird er von den Kannibalen getötet.", info: "warn",  task: true },
 
-        { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. ", task: true },
-        { name: "Leiche", order: "build", Aktion: "Jack findet eine halbverweste Leiche. Es ist der Geschäftspartner des Jägers Stoephasius. Er wurde offensichtlich von hinten erschossen. Jack findet einen Brief, der beweist, dass Stoephasius für den Tod von Jacks Frau verantwortlich ist. Jane ist entsetzt. 1 Bounspunkt.", task: true },
-
+        { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist auch Jane gefangen, dann ist das Abenteuer nun beendet.", task: true },
+        { name: "Leiche", order: "build", Aktion: "Jack findet eine halbverweste Leiche. Es ist der Geschäftspartner des Jägers Stoephasius. Er wurde offensichtlich von hinten erschossen. Jack findet einen Brief, der beweist, dass Stoephasius für den Tod von Jacks Frau verantwortlich ist. Jane ist entsetzt. 1 Bonuspunkt.", task: true },
+        { name: "Abendrot", order: "build", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
         { name: "Treibsand", order: "build", Aktion: "Jack bleibt im Treibsand stecken. Jane muss eine Liane hierherbringen, um ihn zu retten. Gib die Liane dazu ab. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist Jane nicht dabei, stirbt Jack und das Abenteuer ist zu Ende.", task: true },
 
         { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine große Diamanten. Wenn du Sie herausholst, verlierst du die Fackel. Du erhälst einen Bonuspunkt.", info: "warn", imgclass: "symbol", task: true },
+        { name: "Altar", order: "select-all", Aktion: "Ihr findet einen geheimen Zeremonienaltar der Kannibalen. Von dort könnt ihr euch 2 Macheten mitnehmen.", info: "warn", imgclass: "Machete", task: true },
+        { name: "Schlangengrube", order: "select-all", Aktion: "In einer Höhle seid ihr von Schlangen umzingelt. Gebt eine Fackel ab oder legt 3 Dinge vom Inventar auf ihre Felder zurück oder in den Vorrat, um den Schlangen zu entkommen. Habt ihr beides nicht, sterbt ihr in der Schlangengrube.", info: "warn", task: true },
 
 
         { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Jane erzählt dir von einer geheimen Schatzkammer der Kannibalen. Die Fackel geht in den Vorrat.", task: true },
-
+        { name: "Befreit", order: "gesture", Aktion: "Der Jäger Stoephsius hat Jane aus dem Dorf der Kannibalen befreit, dabei hat er allerdings mehrere Kannibalen getötet. Der Schrumpfkopf schützt euch nun nicht mehr vor den Kannibalen. Du kannst Janes Inventarkarte nun wieder verwenden.", task: true },
+        
         { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluß das Abenteuer beenden. Wenn du mind. 2 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
         { name: "Schatzkammer", order:"exit-to-app", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 3 Artefakte hier ablegt und Jack und Jane dabei sind, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
     ],

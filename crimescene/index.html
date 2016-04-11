@@ -86,22 +86,22 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     </template>
 </dom-module>
 <dom-module id="crime-scene-card" assetpath="/">
-	<style>
-		:host {
-		}
-		img {
-			height:160px;
-			width:160px;
-		}
-	</style>
-	<template>
-	    <board-game-card open="{{open}}">
-			<div style="background-color: green"><img src="{{frontUrl}}"></div>
-			<div style="background-color: red"><img src="{{backUrl}}"></div>
-		</board-game-card>
-	</template>
+    <style>
+        :host {}
+
+        img {
+            height: 160px;
+            width: 160px;
+        }
+    </style>
+    <template>
+        <board-game-card open="{{open}}">
+            <div style="background-color: green"><img src="{{frontUrl}}"></div>
+            <div style="background-color: red"><img src="{{backUrl}}"></div>
+        </board-game-card>
+    </template>
 </dom-module>
-	<dom-module id="crime-scene-board" assetpath="/">
+<dom-module id="crime-scene-board" assetpath="/">
 	<style>
 		:host {}
 

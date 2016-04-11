@@ -1,5 +1,13 @@
 <!DOCTYPE html><html><head><script src="help.js" defer=""></script><meta charset="UTF-8"><!--
 @license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
 Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -48,36 +56,48 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             width: 120px;
         }
 
-        .Inhalt {
-            border-bottom: 1px solid lightblue;
+         .Inhalt {
+            border: 6px solid lightblue;
+            border-radius: 4px;
             padding: 0;
-            margin: 5px;
+            margin: 0;
+            width: 94%;
+            height: 102px;
         }
 
         .Form {
-            border-bottom: 1px solid lightcoral;
+            border: 6px solid lightcoral;
+            border-radius: 4px;
             padding: 0;
-            margin: 5px;
+            margin: 0;
+            width: 94%;
+            height: 102px;
         }
 
         .Ort {
-            border-bottom: 1px solid lightgreen;
+            border: 6px solid lightgreen;
+            border-radius: 4px;
             padding: 0;
-            margin: 5px;
+            margin: 0;
+            width: 94%;
+            height: 102px;
         }
 
-        .Bewegung {
-            border-bottom: 1px solid yellow;
+        .Größe {
+            border: 6px solid yellow;
+            border-radius: 4px;
             padding: 0;
-            margin: 5px;
+            margin: 0;
+            width: 94%;
+            height: 102px;
         }
+
 
         .card {
             margin: 2px;
             padding: 20px;
             width: 300px;
             height: 280px;
-            border: 1px solid black;
             display: flex;
             justify-content: space-around;
             flex-direction: column;
@@ -120,19 +140,19 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     test
     <template id="tmpl" is="dom-bind">
         <div style="display:flex;flex-wrap: wrap;">
-            <div class="card">
+            <div class="card Form">
                 <h2>A) {{data.form.type}} oder {{data.form.type2}}</h2>
                 <p>{{data.form.desc}} </p>
             </div>
-            <div class="card">
+            <div class="card Inhalt">
                 <h2>B) {{data.inhalt.type}} oder {{data.inhalt.type2}}</h2>
                 <p>{{data.inhalt.desc}} </p>
             </div>
-            <div class="card">
+            <div class="card Ort">
                 <h2>C) {{data.ort.type}} oder {{data.ort.type2}}</h2>
                 <p>{{data.ort.desc}} </p>
             </div>
-            <div class="card">
+            <div class="card Größe">
                 <h2>D) {{data.extra.type}} oder {{data.extra.type2}}</h2>
                 <p>{{data.extra.desc}} </p>
             </div>

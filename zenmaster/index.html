@@ -25,7 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 	<title>ZenMeister</title>
     <link rel="manifest" href="manifest.json">
-	<style>
+    <style>
 body {margin: 0; padding: 1px}
 body,h5,h6,p{font-size:13px;line-height:20px}
 a,body,paper-toolbar{color:#424242}
@@ -863,6 +863,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         transform: scale(0);
         transition: -webkit-transform ease 0.28s;
         transition: transform ease 0.28s;
+        will-change: transform;
       }
 
       :host([checked]) #offRadio {

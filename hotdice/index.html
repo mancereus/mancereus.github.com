@@ -188,6 +188,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       align-items: flex-end;
     };
 
+    --layout-baseline: {
+      -ms-flex-align: baseline;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+    };
+
     /* alignment in main axis */
 
     --layout-start-justified: {
@@ -249,6 +255,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       -ms-align-self: stretch;
       -webkit-align-self: stretch;
       align-self: stretch;
+    };
+
+    --layout-self-baseline: {
+      -ms-align-self: baseline;
+      -webkit-align-self: baseline;
+      align-self: baseline;
+    };
+
+    /* multi-line alignment in main axis */
+
+    --layout-start-aligned: {
+      -ms-flex-line-pack: start;  /* IE10 */
+      -ms-align-content: flex-start;
+      -webkit-align-content: flex-start;
+      align-content: flex-start;
+    };
+
+    --layout-end-aligned: {
+      -ms-flex-line-pack: end;  /* IE10 */
+      -ms-align-content: flex-end;
+      -webkit-align-content: flex-end;
+      align-content: flex-end;
+    };
+
+    --layout-center-aligned: {
+      -ms-flex-line-pack: center;  /* IE10 */
+      -ms-align-content: center;
+      -webkit-align-content: center;
+      align-content: center;
+    };
+
+    --layout-between-aligned: {
+      -ms-flex-line-pack: justify;  /* IE10 */
+      -ms-align-content: space-between;
+      -webkit-align-content: space-between;
+      align-content: space-between;
+    };
+
+    --layout-around-aligned: {
+      -ms-flex-line-pack: distribute;  /* IE10 */
+      -ms-align-content: space-around;
+      -webkit-align-content: space-around;
+      align-content: space-around;
     };
 
     /*******************************
@@ -1624,6 +1673,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .left-drawer.narrow-layout > #drawer:not(.iron-selected) {
+        visibility: hidden;
+
         -webkit-transform: translateX(-100%);
         transform: translateX(-100%);
       }
@@ -1636,8 +1687,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transform: translateX(100%);
       }
 
-      .right-drawer.narrow-layout.dragging > #drawer:not(.iron-selected),
-      .right-drawer.narrow-layout.peeking > #drawer:not(.iron-selected) {
+      .left-drawer.dragging > #drawer:not(.iron-selected),
+      .left-drawer.peeking > #drawer:not(.iron-selected),
+      .right-drawer.dragging > #drawer:not(.iron-selected),
+      .right-drawer.peeking > #drawer:not(.iron-selected) {
         visibility: visible;
       }
 
@@ -1666,7 +1719,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         box-sizing: border-box;
       }
 
-      iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
+      iron-selector:not(.narrow-layout) ::content [paper-drawer-toggle] {
         display: none;
       }
     </style>
@@ -1676,13 +1729,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-selector attr-for-selected="id" class$="[[_computeIronSelectorClass(narrow, _transition, dragging, rightDrawer, peeking)]]" activate-event="" selected="[[selected]]">
 
-      <div id="main" style$="[[_computeMainStyle(narrow, rightDrawer, drawerWidth)]]" on-transitionend="_onMainTransitionEnd">
+      <div id="main" style$="[[_computeMainStyle(narrow, rightDrawer, drawerWidth)]]">
         <content select="[main]"></content>
         <div id="scrim" on-tap="closeDrawer"></div>
       </div>
 
       <div id="drawer" style$="[[_computeDrawerStyle(drawerWidth)]]">
-        <content select="[drawer]"></content>
+        <content id="drawerContent" select="[drawer]"></content>
       </div>
 
     </iron-selector>
@@ -1693,12 +1746,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
       :host {
-        --paper-header-panel-shadow: {
-          height: 6px;
-          bottom: -6px;
-          box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
-        };
-
         @apply(--layout-vertical);
 
         position: relative;
@@ -1788,19 +1835,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #dropShadow {
+        transition: opacity 0.5s;
+        height: 6px;
+        box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
+
         @apply(--paper-header-panel-shadow);
 
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 6px;
-        pointer-events: none;
-
-        -webkit-transition: opacity 0.5s;
-        transition: opacity 0.5s;
-
         opacity: 0;
+        pointer-events: none;
       }
 
       #dropShadow.has-shadow {
@@ -2194,12 +2240,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         cursor: pointer;
         z-index: 0;
         line-height: 1;
-        
+
         width: 40px;
         height: 40px;
 
         /* Because of polymer/2558, this style has lower specificity than * */
         box-sizing: border-box !important;
+
         @apply(--paper-icon-button);
       }
 
@@ -2212,10 +2259,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: var(--paper-icon-button-disabled-text, --disabled-text-color);
         pointer-events: none;
         cursor: auto;
+
         @apply(--paper-icon-button-disabled);
       }
-      
-      :host(:hover) { 
+
+      :host(:hover) {
         @apply(--paper-icon-button-hover);
       }
 
@@ -2224,6 +2272,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --iron-icon-height: 100%;
       }
     </style>
+
     <iron-icon id="icon" src="[[src]]" icon="[[icon]]" alt$="[[alt]]"></iron-icon>
   </template>
 
@@ -2247,6 +2296,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 0 12px;
         overflow: hidden;
         cursor: pointer;
+        vertical-align: middle;
 
         @apply(--paper-font-common-base);
         @apply(--paper-tab);
@@ -2310,9 +2360,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         font-size: 14px;
         font-weight: 500;
         overflow: hidden;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
         user-select: none;
 
         /* NOTE: Both values are needed, since some phones require the value to be `transparent`. */

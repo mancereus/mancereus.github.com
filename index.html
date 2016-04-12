@@ -1171,6 +1171,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   </dom-module>
+<dom-module id="google-tracking" assetpath="components/tracking/">
+    <template>
+        <template is="dom-if" if="[[include]]">
+            </template>
+    </template>
+</dom-module>
 </div>
     <span style="font-size:36px;font-weight: bold;">Brettspielprototypen</span>
     <b>Status:</b><span class="concept">in Konzeption</span><span class="dev">in Entwicklung</span><span class="test">im Test</span>
@@ -1215,4 +1221,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </template>
 
-    </body></html>
+    <google-tracking></google-tracking>
+
+</body></html>

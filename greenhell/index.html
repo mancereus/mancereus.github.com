@@ -1602,7 +1602,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </style>
 </head>
 
-<body unresolved="" touch-action="auto" style="background-color: #4CBF80"><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
+<body unresolved="" touch-action="auto" style="background-color: #4CBF80"><div hidden="" by-vulcanize=""><dom-module id="google-tracking" assetpath="../components/tracking/">
+    <template>
+        <template is="dom-if" if="[[include]]">
+            </template>
+    </template>
+</dom-module>
+<dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
   <template>
     <style>
@@ -3387,5 +3393,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </div>
     <game-board id="board">
     </game-board>
+    <google-tracking></google-tracking>
 
 </body></html>

@@ -471,7 +471,24 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 	</style>
 </head>
 
-<body><div hidden="" by-vulcanize=""><dom-module id="zenmaster-game" assetpath="/">
+<body><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
+
+    <content></content>
+  </template>
+
+  </dom-module>
+<dom-module id="zenmaster-game" assetpath="/">
 
     <template>
         <style>
@@ -522,10 +539,27 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 margin: 0;
                 padding: 0;
             }
+            section {
+                display: flex;
+                flex-direction: column;
+                align-content: center;
+            }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
-        <input type="button" on-click="newGame" value="Neues Spiel"> <a href="tipps.html" target="_blank">Tipps Seite</a>
+        
+        <iron-pages selected="{{selected}}">
+            <section>
+                <h2>Starte eine neue Partie als Meister...</h2>
+                <input style="width: 100px;" type="button" on-tap="switch" value="Ich bin Meister"> 
+                <br>
+                <h2>Trete als Schüler einer Partie bei...</h2>
+                <a href="tipps.html" target="_blank"><input style="width: 100px;" type="button" value="Ich bin Schüler"></a>
+            </section>
+            <section>
         <div class="cards">
+            <input style="width: 100px;" type="button" on-tap="newGame" value="Neue Karten"> 
+                <br>
+            <h2>Finde ein Ding oder Lebewesen mit den folgenden Eigenschaften..</h2>   
             <template is="dom-repeat" items="{{data.cards}}">
                 <div class$="{{item.type}} card">
                     <span class="header">{{item.type}} / {{item.type2}}</span>
@@ -533,21 +567,34 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                     <span>{{item.name}}</span>
                 </div>
             </template>
-
-        </div>
-        <br>
-        <h3>Schreibe deine Lösung auf:</h3>
-        <input style="width: 250px;" class="try inp" value="{{data.solution::input}}">
-        <button on-tap="startGame">Fertig</button>
-        <firebase-collection id="col" limit-to-last="10" location="https://protogames.firebaseio.com/zenmaster/games" data="{{games}}"></firebase-collection>
-        <input type="button" on-tap="saveGame" value="Speichere Spiel">
-        <br>
-        <b>Lade Spiel:</b>
-        <select id="game" on-change="loadGame">
+    <h2>oder Lade ein altes Spiel..</h2>
+    <firebase-collection id="col" limit-to-last="20" location="https://protogames.firebaseio.com/zenmaster/games" data="{{games}}"></firebase-collection>
+    <select id="game" on-change="loadGame">
             <template is="dom-repeat" items="{{games}}">
                 <option value="{{item.solution}}">{{item.solution}}</option>
             </template>
         </select>
+    <br>
+    <h3>Schreibe deine Lösung auf:</h3>
+    <input style="width: 250px;" class="try inp" value="{{data.solution::input}}">
+    <button on-tap="startGame">Fertig</button>
+    </div></section>
+    <section>
+            <template is="dom-repeat" items="{{data.cards}}">
+                <div class$="{{item.type}} " style="width: 250px;font-size: 120%">
+                    <span>{{item.type}} / {{item.type2}}</span>
+                    <br>
+                    <span>{{item.name}}</span>
+                </div>
+            </template>
+
+        <zenmaster-tipps master=""></zenmaster-tipps>
+        <input style="width: 120px" type="button" on-tap="saveGame" value="Speichere Spiel">
+
+    </section>
+    </iron-pages>
+
+
     </template>
 
     </dom-module><dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
@@ -863,6 +910,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         transform: scale(0);
         transition: -webkit-transform ease 0.28s;
         transition: transform ease 0.28s;
+        will-change: transform;
       }
 
       :host([checked]) #offRadio {
@@ -962,15 +1010,17 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
+        <template is="dom-if" if="{{!master}}">
         <template is="dom-if" if="{{data.started}}">
             <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
+        </template>
         </template>
         <table>
             <tbody><tr>
                 <th></th>
                 <th width="180px">Versuch</th>
                 <th width="40px">Form oder Oberfläche</th>
-                <th width="40px">Inhalt oder Bewegung</th>
+                <th width="40px">Inhalt oder Besonderheit</th>
                 <th width="40px">Ort oder Zeit</th>
                 <th width="40px">Größe oder Gewicht</th>
             </tr>
@@ -1043,10 +1093,16 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     </template>
 
     </dom-module>
+<dom-module id="google-tracking" assetpath="../components/tracking/">
+    <template>
+        <template is="dom-if" if="[[include]]">
+            </template>
+    </template>
+</dom-module>
 </div>
 	<h1>ZenMeister</h1>
 	<zenmaster-game></zenmaster-game>
-	<zenmaster-tipps master=""></zenmaster-tipps>
+    <google-tracking></google-tracking>
 
 
 </body></html>

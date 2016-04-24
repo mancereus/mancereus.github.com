@@ -754,6 +754,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         transform: scale(0);
         transition: -webkit-transform ease 0.28s;
         transition: transform ease 0.28s;
+        will-change: transform;
       }
 
       :host([checked]) #offRadio {
@@ -853,15 +854,17 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
+        <template is="dom-if" if="{{!master}}">
         <template is="dom-if" if="{{data.started}}">
             <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
+        </template>
         </template>
         <table>
             <tbody><tr>
                 <th></th>
                 <th width="180px">Versuch</th>
                 <th width="40px">Form oder Oberfläche</th>
-                <th width="40px">Inhalt oder Bewegung</th>
+                <th width="40px">Inhalt oder Besonderheit</th>
                 <th width="40px">Ort oder Zeit</th>
                 <th width="40px">Größe oder Gewicht</th>
             </tr>

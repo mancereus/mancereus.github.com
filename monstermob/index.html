@@ -275,6 +275,12 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       align-items: flex-end;
     };
 
+    --layout-baseline: {
+      -ms-flex-align: baseline;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+    };
+
     /* alignment in main axis */
 
     --layout-start-justified: {
@@ -336,6 +342,49 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       -ms-align-self: stretch;
       -webkit-align-self: stretch;
       align-self: stretch;
+    };
+
+    --layout-self-baseline: {
+      -ms-align-self: baseline;
+      -webkit-align-self: baseline;
+      align-self: baseline;
+    };
+
+    /* multi-line alignment in main axis */
+
+    --layout-start-aligned: {
+      -ms-flex-line-pack: start;  /* IE10 */
+      -ms-align-content: flex-start;
+      -webkit-align-content: flex-start;
+      align-content: flex-start;
+    };
+
+    --layout-end-aligned: {
+      -ms-flex-line-pack: end;  /* IE10 */
+      -ms-align-content: flex-end;
+      -webkit-align-content: flex-end;
+      align-content: flex-end;
+    };
+
+    --layout-center-aligned: {
+      -ms-flex-line-pack: center;  /* IE10 */
+      -ms-align-content: center;
+      -webkit-align-content: center;
+      align-content: center;
+    };
+
+    --layout-between-aligned: {
+      -ms-flex-line-pack: justify;  /* IE10 */
+      -ms-align-content: space-between;
+      -webkit-align-content: space-between;
+      align-content: space-between;
+    };
+
+    --layout-around-aligned: {
+      -ms-flex-line-pack: distribute;  /* IE10 */
+      -ms-align-content: space-around;
+      -webkit-align-content: space-around;
+      align-content: space-around;
     };
 
     /*******************************
@@ -1923,6 +1972,20 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
     <div id="waves"></div>
   </template>
 </dom-module>
+<dom-module id="iron-a11y-announcer" assetpath="../../bower_components/iron-a11y-announcer/">
+  <style>
+    :host {
+      display: inline-block;
+      position: fixed;
+      clip: rect(0px,0px,0px,0px);
+    }
+  </style>
+
+  <template>
+    <div aria-live$="[[mode]]">[[_text]]</div>
+  </template>
+
+  </dom-module>
 <dom-module id="paper-input-char-counter" assetpath="../../bower_components/paper-input/">
   <template>
     <style>
@@ -2276,7 +2339,7 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
 
       #progressContainer,
       .indeterminate::after {
-        background-color: var(--paper-progress-container-color, --google-grey-300);
+        background: var(--paper-progress-container-color, --google-grey-300);
       }
 
       :host(.transiting) #primaryProgress,
@@ -2308,20 +2371,19 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       }
 
       #primaryProgress {
-        background-color: var(--paper-progress-active-color, --google-green-500);
+        background: var(--paper-progress-active-color, --google-green-500);
       }
 
       #secondaryProgress {
-        position: relative;
-        background-color: var(--paper-progress-secondary-color, --google-green-100);
+        background: var(--paper-progress-secondary-color, --google-green-100);
       }
 
       :host([disabled]) #primaryProgress {
-        background-color: var(--paper-progress-disabled-active-color, --google-grey-500);
+        background: var(--paper-progress-disabled-active-color, --google-grey-500);
       }
 
       :host([disabled]) #secondaryProgress {
-        background-color: var(--paper-progress-disabled-secondary-color, --google-grey-300);
+        background: var(--paper-progress-disabled-secondary-color, --google-grey-300);
       }
 
       :host(:not([disabled])) #primaryProgress.indeterminate {
@@ -2747,12 +2809,14 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       background-color: var(--iron-overlay-backdrop-background-color, #000);
       opacity: 0;
       transition: opacity 0.2s;
+      pointer-events: none;
 
       @apply(--iron-overlay-backdrop);
     }
 
     :host([opened]) {
       opacity: var(--iron-overlay-backdrop-opacity, 0.6);
+      pointer-events: auto;
 
       @apply(--iron-overlay-backdrop-opened);
     }
@@ -2771,7 +2835,6 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       :host {
         display: block;
         margin: 24px 40px;
-        -webkit-overflow-scrolling: touch;
 
         background: var(--paper-dialog-background-color, --primary-background-color);
         color: var(--paper-dialog-color, --primary-text-color);
@@ -3154,11 +3217,11 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
 <dom-module id="monstermob-card" assetpath="/">
 
     <template>
-        <div class$="card {{data.dark}}">
-            <div class="head"><span class="count">{{data.count}}x</span>
-                <div class="titel">{{data.type}}</div><span class="count">{{data.subtype}}</span></div>
-            <img src="img/{{data.type}}.png">
-            <hr><img class="icon" src="img/{{data.type}}icon.png">
+        <div class$="card [[data.dark]]">
+            <div class="head"><span class="count">[[data.count]]x</span>
+                <div class="titel">[[data.type]]</div><span class="count">[[data.subtype]]</span></div>
+            <img src="img/[[data.type]].png">
+            <hr><img class="icon" src="img/[[data.type]]icon.png">
         </div>
     </template>
 
@@ -3176,60 +3239,60 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
                 -ms-user-select: none;
                 user-select: none;
             }
-
+            
             paper-slider.red {
                 color: var(--paper-red-500);
                 --paper-slider-knob-color: var(--paper-red-500);
                 --paper-slider-active-color: var(--paper-red-500);
             }
-
+            
             paper-slider.yellow {
                 color: var(--google-yellow-500);
                 --paper-slider-knob-color: var(--google-yellow-500);
                 --paper-slider-active-color: var(--google-yellow-500);
             }
-
+            
             paper-button.blue {
                 background-color: var(--paper-blue-500) !important;
                 color: white !important;
                 padding: 4px;
             }
-
+            
             paper-button.green {
                 background-color: var(--paper-green-500) !important;
                 color: white !important;
                 padding: 4px;
             }
-
+            
             paper-button.orange {
                 background-color: var(--paper-orange-500) !important;
                 color: white !important;
                 padding: 4px;
             }
-
+            
             .knobs {
                 display: flex;
                 justify-content: space-around;
                 align-content: space-between;
             }
-
+            
             .tipp {
                 display: flex;
                 justify-content: space-around;
                 align-content: space-between;
             }
-
+            
             .true {
                 background-color: lightgreen;
             }
-
+            
             paper-dialog.red {
                 border: 2px solid;
                 border-color: var(--paper-red-500);
                 background-color: var(--paper-light-red-50);
                 color: var(--paper-red-500);
             }
-
+            
             paper-dialog.green {
                 border: 2px solid;
                 border-color: var(--paper-green-500);
@@ -3238,66 +3301,66 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
             }
         </style>
         <iron-localstorage auto="" id="local" name="config" value="{{config}}">
-        <paper-card container="{{container.name}}" on-drop-card="dropCard" class$="{{container.active}}">
-            <div>
-                <h4 style="margin: 2px 30px;"><paper-input style="width: 120px;" value="{{container.label}}"></paper-input></h4>
-            </div>
-            <div class="card-content">
-                <div class="knobs">
-                    <div>
-                        <iron-icon style="color: red" class="red" icon="favorite"></iron-icon>
-                    </div>
-                    <paper-slider class="red" min="0" max="5" snaps="" editable="" pin="" value="{{container.life}}"></paper-slider>
-                    <div>
-                        <iron-icon icon="info" style="color: orange"></iron-icon>
-                    </div>
-                    <paper-slider class="yellow" min="0" max="5" snaps="" editable="" pin="" value="{{container.gold}}"></paper-slider>
+            <paper-card container="[[container.name]]" on-drop-card="dropCard" class$="[[container.active]]">
+                <div>
+                    <h4 style="margin: 2px 30px;"><paper-input style="width: 120px;" value="[[container.label]]"></paper-input></h4>
                 </div>
-                <template is="dom-if" if="{{tipp}}">
-                    <div class="tipp">
-                        <p>Welche Karte wurde gelegt?</p>
-                        <div style="background-color: lightgray; border-radius: 12px;height: 35px; width:18px; padding: 20px;">?</div>
-                        <div style="display:flex;flex-direction: column; justify-content: space-around;align-content: space-between;">
-                            <template is="dom-repeat" items="{{data}}" filter="hasOwner" observe="owner">
-                                <paper-button class="orange" style="height: 20px; width:80px; padding:3px" on-tap="chooseTip">{{item.type}} {{item.subtype}}</paper-button>
-                            </template>
+                <div class="card-content">
+                    <div class="knobs">
+                        <div>
+                            <iron-icon style="color: red" class="red" icon="favorite"></iron-icon>
                         </div>
+                        <paper-slider class="red" min="0" max="5" snaps="" editable="" pin="" value="[[container.life]]"></paper-slider>
+                        <div>
+                            <iron-icon icon="info" style="color: orange"></iron-icon>
+                        </div>
+                        <paper-slider class="yellow" min="0" max="5" snaps="" editable="" pin="" value="[[container.gold]]"></paper-slider>
                     </div>
-                </template>
-                <template is="dom-if" if="{{!tipp}}">
-                    <template is="dom-repeat" items="{{data}}" filter="hasOwner" observe="owner">
-                        <monstermob-card data="{{item}}" draggable="true"></monstermob-card>
+                    <template is="dom-if" if="[[tipp]]">
+                        <div class="tipp">
+                            <p>Welche Karte wurde gelegt?</p>
+                            <div style="background-color: lightgray; border-radius: 12px;height: 35px; width:18px; padding: 20px;">?</div>
+                            <div style="display:flex;flex-direction: column; justify-content: space-around;align-content: space-between;">
+                                <template is="dom-repeat" items="[[data]]" filter="hasOwner" observe="owner">
+                                    <paper-button class="orange" style="height: 20px; width:80px; padding:3px" on-tap="chooseTip">[[item.type]] [[item.subtype]]</paper-button>
+                                </template>
+                            </div>
+                        </div>
                     </template>
-                </template>
-            </div>
-            <div class="card-actions">
-                Aktionen:
-                <template is="dom-if" if="{{!container.active}}">
-                    <paper-button class="green" on-tap="startTip">
-                        <iron-icon icon="menu"></iron-icon>
-                        Tippen
-                    </paper-button>
+                    <template is="dom-if" if="[[!tipp]]">
+                        <template is="dom-repeat" items="[[data]]" filter="hasOwner" observe="owner">
+                            <monstermob-card data="[[item]]" draggable="true"></monstermob-card>
+                        </template>
+                    </template>
+                </div>
+                <div class="card-actions">
+                    Aktionen:
+                    <template is="dom-if" if="[[!container.active]]">
+                        <paper-button class="green" on-tap="startTip">
+                            <iron-icon icon="menu"></iron-icon>
+                            Tippen
+                        </paper-button>
 
-                </template>
-                <template is="dom-if" if="{{container.active}}">
-                    <paper-button class="blue" on-tap="finishTurn">
-                        <iron-icon icon="home"></iron-icon>
-                        Zug beendet
-                    </paper-button>
+                    </template>
+                    <template is="dom-if" if="[[container.active]]">
+                        <paper-button class="blue" on-tap="finishTurn">
+                            <iron-icon icon="home"></iron-icon>
+                            Zug beendet
+                        </paper-button>
 
-                </template>
-            </div>
-        </paper-card>
-        <paper-dialog class="green" id="success">
-            <h2>{{testCard.type}} {{testCard.subtype}} ist richtig.</h2>
-            <p>Du hast die richtige Karte getippt. </p>
-            <monstermob-card data="{{tippCard}}"></monstermob-card>
-        </paper-dialog>
-        <paper-dialog class="red" id="failure">
-            <h2>{{testCard.type}} {{testCard.subtype}} ist falsch</h2>
-            <p>Du hast die falsche Karte getippt. </p>
-            <monstermob-card data="{{tippCard}}"></monstermob-card>
-        </paper-dialog>
+                    </template>
+                </div>
+            </paper-card>
+            <paper-dialog class="green" id="success">
+                <h2>[[testCard.type]] [[testCard.subtype]] ist richtig.</h2>
+                <p>Du hast die richtige Karte getippt. </p>
+                <monstermob-card data="[[tippCard]]"></monstermob-card>
+            </paper-dialog>
+            <paper-dialog class="red" id="failure">
+                <h2>[[testCard.type]] [[testCard.subtype]] ist falsch</h2>
+                <p>Du hast die falsche Karte getippt. </p>
+                <monstermob-card data="[[tippCard]]"></monstermob-card>
+            </paper-dialog>
     </iron-localstorage></template>
 
     </dom-module><dom-module id="monstermob-game" assetpath="/">
@@ -3326,12 +3389,12 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         <firebase-document location="https://protogames.firebaseio.com/monstermob/" data="{{game}}" log=""></firebase-document>
         <paper-button on-tap="newGame" raised="" class="warning">neues Spiel</paper-button>
         <div class="flex">
-            <template is="dom-repeat" items="{{game.players}}">
-                <template is="dom-if" if="{{item.name}}">
-                    <monstermob-container container="{{item}}" data="{{game.data}}">
+            <template is="dom-repeat" items="[[game.players]]">
+                <template is="dom-if" if="[[item.name]]">
+                    <monstermob-container container="[[item]]" data="[[game.data]]">
                     </monstermob-container>
                 </template>
-                <template is="dom-if" if="{{!item.name}}">
+                <template is="dom-if" if="[[!item.name]]">
                     <div style="border: 5px solid black;padding: 20px;background-color: white; text-align: center;">
                         <h1>Monster Mob</h1>
                         <img src="img/Biss.png">

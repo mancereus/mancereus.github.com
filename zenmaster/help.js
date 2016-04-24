@@ -2515,30 +2515,22 @@ addEventListener('DOMContentLoaded', resolve);
 }());
 window.Polymer = {
 Settings: function () {
-var user = window.Polymer || {};
+var settings = window.Polymer || {};
 var parts = location.search.slice(1).split('&');
 for (var i = 0, o; i < parts.length && (o = parts[i]); i++) {
 o = o.split('=');
-o[0] && (user[o[0]] = o[1] || true);
+o[0] && (settings[o[0]] = o[1] || true);
 }
-var wantShadow = user.dom === 'shadow';
-var hasShadow = Boolean(Element.prototype.createShadowRoot);
-var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
-var useShadow = wantShadow && hasShadow;
-var hasNativeImports = Boolean('import' in document.createElement('link'));
-var useNativeImports = hasNativeImports;
-var useNativeCustomElements = !window.CustomElements || window.CustomElements.useNative;
-var usePolyfillProto = !useNativeCustomElements && !Object.__proto__;
-return {
-wantShadow: wantShadow,
-hasShadow: hasShadow,
-nativeShadow: nativeShadow,
-useShadow: useShadow,
-useNativeShadow: useShadow && nativeShadow,
-useNativeImports: useNativeImports,
-useNativeCustomElements: useNativeCustomElements,
-usePolyfillProto: usePolyfillProto
-};
+settings.wantShadow = settings.dom === 'shadow';
+settings.hasShadow = Boolean(Element.prototype.createShadowRoot);
+settings.nativeShadow = settings.hasShadow && !window.ShadowDOMPolyfill;
+settings.useShadow = settings.wantShadow && settings.hasShadow;
+settings.hasNativeImports = Boolean('import' in document.createElement('link'));
+settings.useNativeImports = settings.hasNativeImports;
+settings.useNativeCustomElements = !window.CustomElements || window.CustomElements.useNative;
+settings.useNativeShadow = settings.useShadow && settings.nativeShadow;
+settings.usePolyfillProto = !settings.useNativeCustomElements && !Object.__proto__;
+return settings;
 }()
 };
 (function () {
@@ -2665,6 +2657,9 @@ Polymer.RenderStatus._catchFirstRender();
 }
 Polymer.ImportStatus = Polymer.RenderStatus;
 Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;
+(function () {
+'use strict';
+var settings = Polymer.Settings;
 Polymer.Base = {
 __isPolymerInstance__: true,
 _addFeature: function (feature) {
@@ -2674,13 +2669,30 @@ registerCallback: function () {
 this._desugarBehaviors();
 this._doBehavior('beforeRegister');
 this._registerFeatures();
-this._doBehavior('registered');
+if (!settings.lazyRegister) {
+this.ensureRegisterFinished();
+}
 },
 createdCallback: function () {
+if (!this.__hasRegisterFinished) {
+this._ensureRegisterFinished(this.__proto__);
+}
 Polymer.telemetry.instanceCount++;
 this.root = this;
 this._doBehavior('created');
 this._initFeatures();
+},
+ensureRegisterFinished: function () {
+this._ensureRegisterFinished(this);
+},
+_ensureRegisterFinished: function (proto) {
+if (proto.__hasRegisterFinished !== proto.is) {
+proto.__hasRegisterFinished = proto.is;
+if (proto._finishRegisterFeatures) {
+proto._finishRegisterFeatures();
+}
+proto._doBehavior('registered');
+}
 },
 attachedCallback: function () {
 var self = this;
@@ -2760,6 +2772,7 @@ Polymer.isInstance = function (obj) {
 return Boolean(obj && obj.__isPolymerInstance__);
 };
 Polymer.telemetry.instanceCount = 0;
+}());
 (function () {
 var modules = {};
 var lcModules = {};
@@ -3141,7 +3154,7 @@ return value != null ? value : undefined;
 }
 }
 });
-Polymer.version = '1.3.1';
+Polymer.version = '1.4.0';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -4494,7 +4507,11 @@ get localTarget() {
 return this.event.target;
 },
 get path() {
-return this.event.path;
+var path = this.event.path;
+if (!Array.isArray(path)) {
+path = Array.prototype.slice.call(path);
+}
+return path;
 }
 };
 } else {
@@ -6958,7 +6975,12 @@ if (prop.notify) {
 this._addPropertyEffect(p, 'notify', { event: Polymer.CaseMap.camelToDashCase(p) + '-changed' });
 }
 if (prop.reflectToAttribute) {
-this._addPropertyEffect(p, 'reflect', { attribute: Polymer.CaseMap.camelToDashCase(p) });
+var attr = Polymer.CaseMap.camelToDashCase(p);
+if (attr[0] === '-') {
+this._warn(this._logf('_addPropertyEffects', 'Property ' + p + ' cannot be reflected to attribute ' + attr + ' because "-" is not a valid starting attribute name. Use a lowercase first letter for the property instead.'));
+} else {
+this._addPropertyEffect(p, 'reflect', { attribute: attr });
+}
 }
 if (prop.readOnly) {
 Polymer.Bind.ensurePropertyEffects(this, p);
@@ -7041,6 +7063,9 @@ var part = note.parts[i];
 if (part.signature) {
 this._addAnnotatedComputationEffect(note, part, index);
 } else if (!part.literal) {
+if (note.kind === 'attribute' && note.name[0] === '-') {
+this._warn(this._logf('_addAnnotationEffect', 'Cannot set attribute ' + note.name + ' because "-" is not a valid attribute starting character'));
+} else {
 this._addPropertyEffect(part.model, 'annotation', {
 kind: note.kind,
 index: index,
@@ -7053,6 +7078,7 @@ event: part.event,
 customEvent: part.customEvent,
 negate: part.negate
 });
+}
 }
 }
 },
@@ -7824,19 +7850,29 @@ this.forEachRule(r, styleRuleCallback, keyframesRuleCallback);
 }
 }
 },
-applyCss: function (cssText, moniker, target, afterNode) {
+applyCss: function (cssText, moniker, target, contextNode) {
+var style = this.createScopeStyle(cssText, moniker);
+target = target || document.head;
+var after = contextNode && contextNode.nextSibling || target.firstChild;
+this.__lastHeadApplyNode = style;
+return target.insertBefore(style, after);
+},
+createScopeStyle: function (cssText, moniker) {
 var style = document.createElement('style');
 if (moniker) {
 style.setAttribute('scope', moniker);
 }
 style.textContent = cssText;
-target = target || document.head;
-if (!afterNode) {
-var n$ = target.querySelectorAll('style[scope]');
-afterNode = n$[n$.length - 1];
-}
-target.insertBefore(style, afterNode && afterNode.nextSibling || target.firstChild);
 return style;
+},
+__lastHeadApplyNode: null,
+applyStylePlaceHolder: function (moniker) {
+var placeHolder = document.createComment(' Shady DOM styles for ' + moniker + ' ');
+var after = this.__lastHeadApplyNode ? this.__lastHeadApplyNode.nextSibling : null;
+var scope = document.head;
+scope.insertBefore(placeHolder, after || scope.firstChild);
+this.__lastHeadApplyNode = placeHolder;
+return placeHolder;
 },
 cssFromModules: function (moduleIds, warnIfNotFound) {
 var modules = moduleIds.trim().split(' ');
@@ -8154,20 +8190,20 @@ styleTransformer.element(element, this.is, this._scopeCssViaAttr);
 prepElement.call(this, element);
 },
 _prepStyles: function () {
-if (this._encapsulateStyle === undefined) {
-this._encapsulateStyle = !nativeShadow && Boolean(this._template);
+if (!nativeShadow) {
+this._scopeStyle = styleUtil.applyStylePlaceHolder(this.is);
 }
+},
+_prepShimStyles: function () {
 if (this._template) {
+if (this._encapsulateStyle === undefined) {
+this._encapsulateStyle = !nativeShadow;
+}
 this._styles = this._collectStyles();
 var cssText = styleTransformer.elementStyles(this);
 this._prepStyleProperties();
-var needsStatic = this._styles.length && !this._needsStyleProperties();
-if (needsStatic || !nativeShadow) {
-cssText = needsStatic ? cssText : ' ';
-var style = styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null);
-if (!nativeShadow) {
-this._scopeStyle = style;
-}
+if (!this._needsStyleProperties() && this._styles.length) {
+styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null, this._scopeStyle);
 }
 } else {
 this._styles = [];
@@ -8810,8 +8846,11 @@ Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepConstructor();
-this._prepTemplate();
 this._prepStyles();
+},
+_finishRegisterFeatures: function () {
+this._prepTemplate();
+this._prepShimStyles();
 this._prepAnnotations();
 this._prepEffects();
 this._prepBehaviors();
@@ -10084,18 +10123,8 @@ this.fire('dom-change');
 }
 });
 var data = {
-    dict: [
-        {solution: "Kugelschreiber", form:"stabförmig", inhalt:"mehrere Teile", ort:"jetzt mehr als früher", extra:"leicht"},
-        {solution: "Sonne", form:"kugelförmig", inhalt:"heiss", ort:"schon beiden römern", extra:"grösser als ein rehienhaus"},
-        {solution: "Lagerfeuer", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Kugel Vanille-Eis", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Skateboard", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Stinktier", form:"mit Haaren", inhalt:"stinkt", ort:"in freier Wildbahn", extra:"Katze"},
-        {solution: "Puzzle", form:"mehrere Teile", inhalt:"papier", ort:"", extra:""},
-        {solution: "Kartenspiel", form:"Rechteckig", inhalt:"papier", ort:"Gaststätte", extra:"weniger als 100g"},
-        {solution: "Plastiktier", form:"4 Beine", inhalt:"hart", ort:"zoo", extra:"weniger als 1kg"},
-        ],
     form: {
+        letter: "A",
         type: "Form",
         type2: "Oberfläche",
         desc: "Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Fühlt es sich warm an? Hat es Haare? Steht es auf 4 Beinen? Besteht es aus mehreren Teilen?",
@@ -10106,20 +10135,24 @@ var data = {
             { name: "ist Kistenförmig oder rechteckig" },
             { name: "steht auf 4 Beinen" },
             { name: "besteht aus mehreren Teilen, die sich trennen lassen" },
-            { name: "Oberfläche ist warm oder heiss" },
-            { name: "Oberfläche teilweise mit Haaren oder Pelz" },
-            { name: "Oberfläche ist vorwiegend glatt" },
-            { name: "Oberfläche ist vorwiegend rauh" },
-            { name: "Oberfläche ist vorwiegend hart" },
-            { name: "Oberfläche ist vorwiegend elastisch" },
+        ],
+        cards2: [
+            { name: " ist warm oder heiss" },
+            { name: " ist teilweise mit Haaren oder Pelz" },
+            { name: " ist vorwiegend glatt" },
+            { name: " ist vorwiegend rauh" },
+            { name: " ist vorwiegend hart" },
+            { name: " ist vorwiegend elastisch" },
+
         ]
     },
     inhalt: {
+        letter: "B",
         type: "Inhalt",
-        type2: "Extra",
-        desc: "Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon? ",
+        type2: "Besonderheit",
+        desc: "Welche Besonderheiten oder Inhalte hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig oder schwimmt es? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon? Enthält es Papier oder sind Symbole darauf? Kann es leicht kaputt gehen?",
         cards: [
-            { name: "enthält Papier oder Karton" },
+            { name: "enthält Papier oder Karton"},
             { name: "hat Zähne oder spitze Teile" },
             { name: "mit Rad oder vollständig drehbarem Teil" },
             { name: "mit Gelenk oder beweglichem Teil" },
@@ -10127,17 +10160,20 @@ var data = {
             { name: "macht Geräusche, selbständig oder bei normalen Gebrauch" },
             { name: "glänzt, strahlt oder leuchtet" },
             { name: "tritt meist in größeren Mengen auf" },
+        ],
+        cards2: [
+            { name: "kostet mehr als 100 Euro" },
+            { name: "kann ohne Elektrizität kaum verwendet werden" },
             { name: "geht kaputt, wenn man sich darauf setzt" },
             { name: "riecht eher schlecht, stinkt" },
             { name: "schmeckt gut" },
-            { name: "kostet mehr als 100 Euro" },
-            { name: "kann ohne Elektrizität kaum verwendet werden" },
             { name: "bewegt sich selbständig" },
             { name: "bewegt sich selbständig, aber eher langsam" },
             { name: "schwimmt im Wasser oben" },
         ]
     },
     ort: {
+        letter: "C",
         type: "Ort",
         type2: "Zeit",
         desc: "Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause? Im Cafe?",
@@ -10145,36 +10181,48 @@ var data = {
             { name: "kann ich innerhalb von 5 Minuten hierherbringen" },
             { name: "ist nicht im Umkreis von 100 Metern zu finden" },
             { name: "gibt es eher im Wald als in der Stadt" },
+            { name: "wird eher im Winter als im Sommer verwendet" },
             { name: "gibt es eher in freier Wildbahn" },
             { name: "gibt es im Zoo" },
             { name: "gibt es im Büro" },
-            { name: "gibt es in der Gaststätte oder Cafe" },
-            { name: "gibt es zu Hause" },
+        ],
+        cards2: [
             { name: "gibt es Freibad" },
+            { name: "gibt es zu Hause" },
             { name: "gibt es häufiger in der Stadt als auf dem Land" },
-            { name: "wird eher im Winter als im Sommer verwendet" },
             { name: "wird eher im Sommer als im Winter verwendet" },
-            { name: "gab es schon bei den alten Griechen oder Römern" },
             { name: "es gibt jetzt mehr als vor 100 Jahren" },
+            { name: "gab es schon bei den alten Griechen oder Römern" },
+            { name: "gibt es in der Gaststätte oder Cafe" },
+
         ]
     },
     extra: {
+        letter: "D",
         type: "Größe",
         type2: "Gewicht",
-        desc: "Wie gross ist es? Klein, Mittel, groß oder sehr groß? Wie schwer ist es? Leicht, mittel oder schwer? Passt es in eine Kiste?",
+        desc: "Wie hoch oder lang ist es? Klein, Mittel, groß oder sehr groß? Wie schwer ist es? Leicht, mittel oder schwer? Passt es in eine grosse oder kleine Kiste?",
         cards: [
-            { name: "zwischen halb so groß und doppelt so groß wie eine Maus" },
-            { name: "zwischen halb so groß und doppelt so groß wie eine Katze" },
-            { name: "zwischen halb so groß und doppelt so groß wie ein Tisch" },
-            { name: "zwischen halb so groß und doppelt so groß wie ein Gartenhäuschen" },
-            { name: "zwischen halb so groß und doppelt so groß wie 2-stöckiges Reihenhaus" },
-            { name: "passt in eine quadratische Kiste mit 1 Meter Seitenlänge" },
-            { name: "passt in einen Schuhkarton" },
-            { name: "leichter als 100gr" },
-            { name: "ist zwischen 100gr und 1kg" },
-            { name: "ist zwischen 1kg und 10kg" },
-            { name: "ist zwischen 10kg und 100kg" },
+            { name: "weniger als 1cm hoch" },
+            { name: "zwischen 1cm und 10cm hoch" },
+            { name: "zwischen 10cm und 1m hoch" },
+            { name: "zwischen 1m und 10m hoch" },
+            { name: "mehr als 10m hoch" },
+            { name: "weniger als 1m lang <-->" },
+            { name: "zwischen 1m und 5m lang <-->" },
+            { name: "mehr als 5 m lang <-->" },
+        ],
+        cards2: [
             { name: "schwerer als 100kg" },
+            { name: "ist zwischen 10kg und 100kg schwer" },
+            { name: "ist zwischen 1kg und 10kg schwer" },
+            { name: "ist zwischen 100gr und 1kg schwer" },
+            { name: "leichter als 100gr" },
+            { name: "passt in einen Schuhkarton" },
+            { name: "passt in eine quadratische Kiste mit 1 Meter Seitenlänge" },
+            { name: "passt in einen Streichholzschachtel" },
+            
+
         ]
     }
 };

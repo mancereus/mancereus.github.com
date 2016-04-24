@@ -1535,30 +1535,22 @@ addEventListener('DOMContentLoaded', resolve);
 }());
 window.Polymer = {
 Settings: function () {
-var user = window.Polymer || {};
+var settings = window.Polymer || {};
 var parts = location.search.slice(1).split('&');
 for (var i = 0, o; i < parts.length && (o = parts[i]); i++) {
 o = o.split('=');
-o[0] && (user[o[0]] = o[1] || true);
+o[0] && (settings[o[0]] = o[1] || true);
 }
-var wantShadow = user.dom === 'shadow';
-var hasShadow = Boolean(Element.prototype.createShadowRoot);
-var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
-var useShadow = wantShadow && hasShadow;
-var hasNativeImports = Boolean('import' in document.createElement('link'));
-var useNativeImports = hasNativeImports;
-var useNativeCustomElements = !window.CustomElements || window.CustomElements.useNative;
-var usePolyfillProto = !useNativeCustomElements && !Object.__proto__;
-return {
-wantShadow: wantShadow,
-hasShadow: hasShadow,
-nativeShadow: nativeShadow,
-useShadow: useShadow,
-useNativeShadow: useShadow && nativeShadow,
-useNativeImports: useNativeImports,
-useNativeCustomElements: useNativeCustomElements,
-usePolyfillProto: usePolyfillProto
-};
+settings.wantShadow = settings.dom === 'shadow';
+settings.hasShadow = Boolean(Element.prototype.createShadowRoot);
+settings.nativeShadow = settings.hasShadow && !window.ShadowDOMPolyfill;
+settings.useShadow = settings.wantShadow && settings.hasShadow;
+settings.hasNativeImports = Boolean('import' in document.createElement('link'));
+settings.useNativeImports = settings.hasNativeImports;
+settings.useNativeCustomElements = !window.CustomElements || window.CustomElements.useNative;
+settings.useNativeShadow = settings.useShadow && settings.nativeShadow;
+settings.usePolyfillProto = !settings.useNativeCustomElements && !Object.__proto__;
+return settings;
 }()
 };
 (function () {
@@ -1685,6 +1677,9 @@ Polymer.RenderStatus._catchFirstRender();
 }
 Polymer.ImportStatus = Polymer.RenderStatus;
 Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;
+(function () {
+'use strict';
+var settings = Polymer.Settings;
 Polymer.Base = {
 __isPolymerInstance__: true,
 _addFeature: function (feature) {
@@ -1694,13 +1689,30 @@ registerCallback: function () {
 this._desugarBehaviors();
 this._doBehavior('beforeRegister');
 this._registerFeatures();
-this._doBehavior('registered');
+if (!settings.lazyRegister) {
+this.ensureRegisterFinished();
+}
 },
 createdCallback: function () {
+if (!this.__hasRegisterFinished) {
+this._ensureRegisterFinished(this.__proto__);
+}
 Polymer.telemetry.instanceCount++;
 this.root = this;
 this._doBehavior('created');
 this._initFeatures();
+},
+ensureRegisterFinished: function () {
+this._ensureRegisterFinished(this);
+},
+_ensureRegisterFinished: function (proto) {
+if (proto.__hasRegisterFinished !== proto.is) {
+proto.__hasRegisterFinished = proto.is;
+if (proto._finishRegisterFeatures) {
+proto._finishRegisterFeatures();
+}
+proto._doBehavior('registered');
+}
 },
 attachedCallback: function () {
 var self = this;
@@ -1780,6 +1792,7 @@ Polymer.isInstance = function (obj) {
 return Boolean(obj && obj.__isPolymerInstance__);
 };
 Polymer.telemetry.instanceCount = 0;
+}());
 (function () {
 var modules = {};
 var lcModules = {};
@@ -2161,7 +2174,7 @@ return value != null ? value : undefined;
 }
 }
 });
-Polymer.version = '1.3.1';
+Polymer.version = '1.4.0';
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -3514,7 +3527,11 @@ get localTarget() {
 return this.event.target;
 },
 get path() {
-return this.event.path;
+var path = this.event.path;
+if (!Array.isArray(path)) {
+path = Array.prototype.slice.call(path);
+}
+return path;
 }
 };
 } else {
@@ -5978,7 +5995,12 @@ if (prop.notify) {
 this._addPropertyEffect(p, 'notify', { event: Polymer.CaseMap.camelToDashCase(p) + '-changed' });
 }
 if (prop.reflectToAttribute) {
-this._addPropertyEffect(p, 'reflect', { attribute: Polymer.CaseMap.camelToDashCase(p) });
+var attr = Polymer.CaseMap.camelToDashCase(p);
+if (attr[0] === '-') {
+this._warn(this._logf('_addPropertyEffects', 'Property ' + p + ' cannot be reflected to attribute ' + attr + ' because "-" is not a valid starting attribute name. Use a lowercase first letter for the property instead.'));
+} else {
+this._addPropertyEffect(p, 'reflect', { attribute: attr });
+}
 }
 if (prop.readOnly) {
 Polymer.Bind.ensurePropertyEffects(this, p);
@@ -6061,6 +6083,9 @@ var part = note.parts[i];
 if (part.signature) {
 this._addAnnotatedComputationEffect(note, part, index);
 } else if (!part.literal) {
+if (note.kind === 'attribute' && note.name[0] === '-') {
+this._warn(this._logf('_addAnnotationEffect', 'Cannot set attribute ' + note.name + ' because "-" is not a valid attribute starting character'));
+} else {
 this._addPropertyEffect(part.model, 'annotation', {
 kind: note.kind,
 index: index,
@@ -6073,6 +6098,7 @@ event: part.event,
 customEvent: part.customEvent,
 negate: part.negate
 });
+}
 }
 }
 },
@@ -6844,19 +6870,29 @@ this.forEachRule(r, styleRuleCallback, keyframesRuleCallback);
 }
 }
 },
-applyCss: function (cssText, moniker, target, afterNode) {
+applyCss: function (cssText, moniker, target, contextNode) {
+var style = this.createScopeStyle(cssText, moniker);
+target = target || document.head;
+var after = contextNode && contextNode.nextSibling || target.firstChild;
+this.__lastHeadApplyNode = style;
+return target.insertBefore(style, after);
+},
+createScopeStyle: function (cssText, moniker) {
 var style = document.createElement('style');
 if (moniker) {
 style.setAttribute('scope', moniker);
 }
 style.textContent = cssText;
-target = target || document.head;
-if (!afterNode) {
-var n$ = target.querySelectorAll('style[scope]');
-afterNode = n$[n$.length - 1];
-}
-target.insertBefore(style, afterNode && afterNode.nextSibling || target.firstChild);
 return style;
+},
+__lastHeadApplyNode: null,
+applyStylePlaceHolder: function (moniker) {
+var placeHolder = document.createComment(' Shady DOM styles for ' + moniker + ' ');
+var after = this.__lastHeadApplyNode ? this.__lastHeadApplyNode.nextSibling : null;
+var scope = document.head;
+scope.insertBefore(placeHolder, after || scope.firstChild);
+this.__lastHeadApplyNode = placeHolder;
+return placeHolder;
 },
 cssFromModules: function (moduleIds, warnIfNotFound) {
 var modules = moduleIds.trim().split(' ');
@@ -7174,20 +7210,20 @@ styleTransformer.element(element, this.is, this._scopeCssViaAttr);
 prepElement.call(this, element);
 },
 _prepStyles: function () {
-if (this._encapsulateStyle === undefined) {
-this._encapsulateStyle = !nativeShadow && Boolean(this._template);
+if (!nativeShadow) {
+this._scopeStyle = styleUtil.applyStylePlaceHolder(this.is);
 }
+},
+_prepShimStyles: function () {
 if (this._template) {
+if (this._encapsulateStyle === undefined) {
+this._encapsulateStyle = !nativeShadow;
+}
 this._styles = this._collectStyles();
 var cssText = styleTransformer.elementStyles(this);
 this._prepStyleProperties();
-var needsStatic = this._styles.length && !this._needsStyleProperties();
-if (needsStatic || !nativeShadow) {
-cssText = needsStatic ? cssText : ' ';
-var style = styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null);
-if (!nativeShadow) {
-this._scopeStyle = style;
-}
+if (!this._needsStyleProperties() && this._styles.length) {
+styleUtil.applyCss(cssText, this.is, nativeShadow ? this._template.content : null, this._scopeStyle);
 }
 } else {
 this._styles = [];
@@ -7830,8 +7866,11 @@ Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepConstructor();
-this._prepTemplate();
 this._prepStyles();
+},
+_finishRegisterFeatures: function () {
+this._prepTemplate();
+this._prepShimStyles();
 this._prepAnnotations();
 this._prepEffects();
 this._prepBehaviors();
@@ -9731,18 +9770,22 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       },
 
       /**
-       * Set to true to prevent the user from entering invalid input. The new input characters are
-       * matched with `allowedPattern` if it is set, otherwise it will use the `type` attribute (only
-       * supported for `type=number`).
+       * Set to true to prevent the user from entering invalid input. If `allowedPattern` is set,
+       * any character typed by the user will be matched against that pattern, and rejected if it's not a match.
+       * Pasted input will have each character checked individually; if any character
+       * doesn't match `allowedPattern`, the entire pasted string will be rejected.
+       * If `allowedPattern` is not set, it will use the `type` attribute (only supported for `type=number`).
        */
       preventInvalidInput: {
         type: Boolean
       },
 
       /**
-       * Regular expression expressing a set of characters to enforce the validity of input characters.
-       * The recommended value should follow this format: `[a-ZA-Z0-9.+-!;:]` that list the characters 
-       * allowed as input.
+       * Regular expression that list the characters allowed as input.
+       * This pattern represents the allowed characters for the field; as the user inputs text,
+       * each individual character will be checked against the pattern (rather than checking
+       * the entire value as a whole). The recommended format should be a list of allowed characters;
+       * for example, `[a-zA-Z0-9.+-!;:]`
        */
       allowedPattern: {
         type: String,
@@ -9764,6 +9807,46 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     listeners: {
       'input': '_onInput',
       'keypress': '_onKeypress'
+    },
+
+    registered: function() {
+      // Feature detect whether we need to patch dispatchEvent (i.e. on FF and IE).
+      if (!this._canDispatchEventOnDisabled()) {
+        this._origDispatchEvent = this.dispatchEvent;
+        this.dispatchEvent = this._dispatchEventFirefoxIE;
+      }
+    },
+
+    created: function() {
+      Polymer.IronA11yAnnouncer.requestAvailability();
+    },
+
+    _canDispatchEventOnDisabled: function() {
+      var input = document.createElement('input');
+      var canDispatch = false;
+      input.disabled = true;
+
+      input.addEventListener('feature-check-dispatch-event', function() {
+        canDispatch = true;
+      });
+
+      try {
+        input.dispatchEvent(new Event('feature-check-dispatch-event'));
+      } catch(e) {}
+
+      return canDispatch;
+    },
+
+    _dispatchEventFirefoxIE: function() {
+      // Due to Firefox bug, events fired on disabled form controls can throw
+      // errors; furthermore, neither IE nor Firefox will actually dispatch
+      // events from disabled form controls; as such, we toggle disable around
+      // the dispatch to allow notifying properties to notify
+      // See issue #47 for details
+      var disabled = this.disabled;
+      this.disabled = false;
+      this._origDispatchEvent.apply(this, arguments);
+      this.disabled = disabled;
     },
 
     get _patternRegExp() {
@@ -9806,6 +9889,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       if (this.preventInvalidInput && !this._patternAlreadyChecked) {
         var valid = this._checkPatternValidity();
         if (!valid) {
+          this._announceInvalidCharacter('Invalid string of characters not entered.');
           this.value = this._previousValidInput;
         }
       }
@@ -9866,6 +9950,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       var thisChar = String.fromCharCode(event.charCode);
       if (this._isPrintable(event) && !regexp.test(thisChar)) {
         event.preventDefault();
+        this._announceInvalidCharacter('Invalid character ' + thisChar + ' not entered.');
       }
     },
 
@@ -9888,23 +9973,29 @@ is separate from validation, and `allowed-pattern` does not affect how the input
      * @return {boolean} True if the value is valid.
      */
     validate: function() {
-      // Empty, non-required input is valid.
-      if (!this.required && this.value == '') {
-        this.invalid = false;
-        return true;
+      // First, check what the browser thinks. Some inputs (like type=number)
+      // behave weirdly and will set the value to "" if something invalid is
+      // entered, but will set the validity correctly.
+      var valid =  this.checkValidity();
+
+      // Only do extra checking if the browser thought this was valid.
+      if (valid) {
+        // Empty, required input is invalid
+        if (this.required && this.value === '') {
+          valid = false;
+        } else if (this.hasValidator()) {
+          valid = Polymer.IronValidatableBehavior.validate.call(this, this.value);
+        }
       }
 
-      var valid;
-      if (this.hasValidator()) {
-        valid = Polymer.IronValidatableBehavior.validate.call(this, this.value);
-      } else {
-        valid = this.checkValidity();
-        this.invalid = !valid;
-      }
+      this.invalid = !valid;
       this.fire('iron-input-validate');
       return valid;
-    }
+    },
 
+    _announceInvalidCharacter: function(message) {
+      this.fire('iron-announce', { text: message });
+    }
   });
 
   /*
@@ -9991,6 +10082,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     var SPACE_KEY = /^space(bar)?/;
 
     /**
+     * Matches ESC key.
+     *
+     * Value from: http://w3c.github.io/uievents-key/#key-Escape
+     */
+    var ESC_KEY = /^escape$/;
+
+    /**
      * Transforms the key.
      * @param {string} key The KeyBoardEvent.key
      * @param {Boolean} [noSpecialChars] Limits the transformation to
@@ -10002,6 +10100,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         var lKey = key.toLowerCase();
         if (lKey === ' ' || SPACE_KEY.test(lKey)) {
           validKey = 'space';
+        } else if (ESC_KEY.test(lKey)) {
+          validKey = 'esc';
         } else if (lKey.length == 1) {
           if (!noSpecialChars || KEY_CHAR.test(lKey)) {
             validKey = lKey;
@@ -10045,10 +10145,10 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           validKey = 'f' + (keyCode - 112);
         } else if (keyCode >= 48 && keyCode <= 57) {
           // top 0-9 keys
-          validKey = String(48 - keyCode);
+          validKey = String(keyCode - 48);
         } else if (keyCode >= 96 && keyCode <= 105) {
           // num pad 0-9
-          validKey = String(96 - keyCode);
+          validKey = String(keyCode - 96);
         } else {
           validKey = KEY_CODE[keyCode];
         }
@@ -10213,6 +10313,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         this._resetKeyEventListeners();
       },
 
+      /**
+       * Returns true if a keyboard event matches `eventString`.
+       *
+       * @param {KeyboardEvent} event
+       * @param {string} eventString
+       * @return {boolean}
+       */
       keyboardEventMatchesKeys: function(event, eventString) {
         var keyCombos = parseEventString(eventString);
         for (var i = 0; i < keyCombos.length; ++i) {
@@ -10794,8 +10901,14 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     properties: {
 
       /**
-       * If you want to use the attribute value of an element for `selected` instead of the index,
-       * set this to the name of the attribute.
+       * If you want to use an attribute value or property of an element for
+       * `selected` instead of the index, set this to the name of the attribute
+       * or property. Hyphenated values are converted to camel case when used to
+       * look up the property of a selectable element. Camel cased values are
+       * *not* converted to hyphenated values for attribute lookup. It's
+       * recommended that you provide the hyphenated form of the name so that
+       * selection works in both cases. (Use `attr-or-property-name` instead of
+       * `attrOrPropertyName`.)
        */
       attrForSelected: {
         type: String,
@@ -10856,6 +10969,15 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       },
 
       /**
+       * Default fallback if the selection based on selected with `attrForSelected`
+       * is not found.
+       */
+      fallbackSelection: {
+        type: String,
+        value: null
+      },
+
+      /**
        * The list of items from which a selection can be made.
        */
       items: {
@@ -10885,7 +11007,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
     observers: [
       '_updateAttrForSelected(attrForSelected)',
-      '_updateSelected(selected)'
+      '_updateSelected(selected)',
+      '_checkFallback(fallbackSelection)'
     ],
 
     created: function() {
@@ -10971,6 +11094,12 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       return this.selected != null;
     },
 
+    _checkFallback: function() {
+      if (this._shouldUpdateSelection) {
+        this._updateSelected();
+      }
+    },
+
     _addListener: function(eventName) {
       this.listen(this, eventName, '_activateHandler');
     },
@@ -10992,7 +11121,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
     _updateAttrForSelected: function() {
       if (this._shouldUpdateSelection) {
-        this.selected = this._indexToValue(this.indexOf(this.selectedItem));        
+        this.selected = this._indexToValue(this.indexOf(this.selectedItem));
       }
     },
 
@@ -11002,6 +11131,11 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
     _selectSelected: function(selected) {
       this._selection.select(this._valueToItem(this.selected));
+      // Check for items, since this array is populated only when attached
+      // Since Number(0) is falsy, explicitly check for undefined
+      if (this.fallbackSelection && this.items.length && (this._selection.get() === undefined)) {
+        this.selected = this.fallbackSelection;
+      }
     },
 
     _filterItem: function(node) {
@@ -11036,7 +11170,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     _valueForItem: function(item) {
-      var propValue = item[this.attrForSelected];
+      var propValue = item[Polymer.CaseMap.dashToCamelCase(this.attrForSelected)];
       return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
     },
 
@@ -11129,7 +11263,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     },
 
     observers: [
-      '_updateSelected(selectedValues)'
+      '_updateSelected(selectedValues.splices)'
     ],
 
     /**
@@ -11165,7 +11299,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         Polymer.IronSelectableBehavior._updateAttrForSelected.apply(this);
       } else if (this._shouldUpdateSelection) {
         this.selectedValues = this.selectedItems.map(function(selectedItem) {
-          return this._indexToValue(this.indexOf(selectedItem));        
+          return this._indexToValue(this.indexOf(selectedItem));
         }, this).filter(function(unfilteredValue) {
           return unfilteredValue != null;
         }, this);
@@ -11188,6 +11322,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         // select only those not selected yet
         for (var i = 0; i < selectedItems.length; i++) {
           this._selection.setItemSelected(selectedItems[i], true);
+        }
+        // Check for items, since this array is populated only when attached
+        if (this.fallbackSelection && this.items.length && !this._selection.get().length) {
+          var fallback = this._valueToItem(this.fallbackSelection);
+          if (fallback) {
+            this.selectedValues = [this.fallbackSelection];
+          }
         }
       } else {
         this._selection.clear();
@@ -11212,7 +11353,6 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       } else {
         this.splice('selectedValues',i,1);
       }
-      this._selection.setItemSelected(this._valueToItem(value), unselected);
     },
 
     _valuesToItems: function(values) {
@@ -11290,6 +11430,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
      * @param {string|number} value the value to select.
      */
     select: function(value) {
+      // Cancel automatically focusing a default item if the menu received focus
+      // through a user action selecting a particular item.
       if (this._defaultFocusAsync) {
         this.cancelAsync(this._defaultFocusAsync);
         this._defaultFocusAsync = null;
@@ -11460,8 +11602,6 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         return;
       }
 
-      this.blur();
-
       // clear the cached focus item
       this._defaultFocusAsync = this.async(function() {
         // focus the selected item when the menu receives focus, or the first item
@@ -11472,11 +11612,10 @@ is separate from validation, and `allowed-pattern` does not affect how the input
 
         if (selectedItem) {
           this._setFocusedItem(selectedItem);
-        } else {
+        } else if (this.items[0]) {
           this._setFocusedItem(this.items[0]);
         }
-      // async 1ms to wait for `select` to get called from `_itemActivate`
-      }, 1);
+      });
     },
 
     /**
@@ -12748,6 +12887,67 @@ Polymer({
       }
 
     });
+(function() {
+      'use strict';
+
+      Polymer.IronA11yAnnouncer = Polymer({
+        is: 'iron-a11y-announcer',
+
+        properties: {
+
+          /**
+           * The value of mode is used to set the `aria-live` attribute
+           * for the element that will be announced. Valid values are: `off`,
+           * `polite` and `assertive`.
+           */
+          mode: {
+            type: String,
+            value: 'polite'
+          },
+
+          _text: {
+            type: String,
+            value: ''
+          }
+        },
+
+        created: function() {
+          if (!Polymer.IronA11yAnnouncer.instance) {
+            Polymer.IronA11yAnnouncer.instance = this;
+          }
+
+          document.body.addEventListener('iron-announce', this._onIronAnnounce.bind(this));
+        },
+
+        /**
+         * Cause a text string to be announced by screen readers.
+         *
+         * @param {string} text The text that should be announced.
+         */
+        announce: function(text) {
+          this._text = '';
+          this.async(function() {
+            this._text = text;
+          }, 100);
+        },
+
+        _onIronAnnounce: function(event) {
+          if (event.detail && event.detail.text) {
+            this.announce(event.detail.text);
+          }
+        }
+      });
+
+      Polymer.IronA11yAnnouncer.instance = null;
+
+      Polymer.IronA11yAnnouncer.requestAvailability = function() {
+        if (!Polymer.IronA11yAnnouncer.instance) {
+          Polymer.IronA11yAnnouncer.instance = document.createElement('iron-a11y-announcer');
+        }
+
+        document.body.appendChild(Polymer.IronA11yAnnouncer.instance);
+      };
+    })();
 Polymer({
       is: 'paper-item',
 

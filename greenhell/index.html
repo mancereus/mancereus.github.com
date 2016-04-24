@@ -262,6 +262,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       align-items: flex-end;
     };
 
+    --layout-baseline: {
+      -ms-flex-align: baseline;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+    };
+
     /* alignment in main axis */
 
     --layout-start-justified: {
@@ -323,6 +329,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       -ms-align-self: stretch;
       -webkit-align-self: stretch;
       align-self: stretch;
+    };
+
+    --layout-self-baseline: {
+      -ms-align-self: baseline;
+      -webkit-align-self: baseline;
+      align-self: baseline;
+    };
+
+    /* multi-line alignment in main axis */
+
+    --layout-start-aligned: {
+      -ms-flex-line-pack: start;  /* IE10 */
+      -ms-align-content: flex-start;
+      -webkit-align-content: flex-start;
+      align-content: flex-start;
+    };
+
+    --layout-end-aligned: {
+      -ms-flex-line-pack: end;  /* IE10 */
+      -ms-align-content: flex-end;
+      -webkit-align-content: flex-end;
+      align-content: flex-end;
+    };
+
+    --layout-center-aligned: {
+      -ms-flex-line-pack: center;  /* IE10 */
+      -ms-align-content: center;
+      -webkit-align-content: center;
+      align-content: center;
+    };
+
+    --layout-between-aligned: {
+      -ms-flex-line-pack: justify;  /* IE10 */
+      -ms-align-content: space-between;
+      -webkit-align-content: space-between;
+      align-content: space-between;
+    };
+
+    --layout-around-aligned: {
+      -ms-flex-line-pack: distribute;  /* IE10 */
+      -ms-align-content: space-around;
+      -webkit-align-content: space-around;
+      align-content: space-around;
     };
 
     /*******************************
@@ -1553,7 +1602,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </style>
 </head>
 
-<body unresolved="" touch-action="auto" style="background-color: #4CBF80"><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
+<body unresolved="" touch-action="auto" style="background-color: #4CBF80"><div hidden="" by-vulcanize=""><dom-module id="google-tracking" assetpath="../components/tracking/">
+    <template>
+        <template is="dom-if" if="[[include]]">
+            </template>
+    </template>
+</dom-module>
+<dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
   <template>
     <style>
@@ -1876,12 +1931,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   <template>
     <style>
       :host {
-        --paper-header-panel-shadow: {
-          height: 6px;
-          bottom: -6px;
-          box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
-        };
-
         @apply(--layout-vertical);
 
         position: relative;
@@ -1971,19 +2020,18 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #dropShadow {
+        transition: opacity 0.5s;
+        height: 6px;
+        box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.4);
+
         @apply(--paper-header-panel-shadow);
 
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 6px;
-        pointer-events: none;
-
-        -webkit-transition: opacity 0.5s;
-        transition: opacity 0.5s;
-
         opacity: 0;
+        pointer-events: none;
       }
 
       #dropShadow.has-shadow {
@@ -2508,12 +2556,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         cursor: pointer;
         z-index: 0;
         line-height: 1;
-        
+
         width: 40px;
         height: 40px;
 
         /* Because of polymer/2558, this style has lower specificity than * */
         box-sizing: border-box !important;
+
         @apply(--paper-icon-button);
       }
 
@@ -2526,10 +2575,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         color: var(--paper-icon-button-disabled-text, --disabled-text-color);
         pointer-events: none;
         cursor: auto;
+
         @apply(--paper-icon-button-disabled);
       }
-      
-      :host(:hover) { 
+
+      :host(:hover) {
         @apply(--paper-icon-button-hover);
       }
 
@@ -2538,6 +2588,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         --iron-icon-height: 100%;
       }
     </style>
+
     <iron-icon id="icon" src="[[src]]" icon="[[icon]]" alt$="[[alt]]"></iron-icon>
   </template>
 
@@ -2863,6 +2914,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       .toggle-button {
         position: absolute;
         top: -3px;
+        left: 0;
         height: 20px;
         width: 20px;
         border-radius: 50%;
@@ -2912,6 +2964,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         position: absolute;
         top: -14px;
         left: -14px;
+        right: auto;
+        bottom: auto;
         width: 48px;
         height: 48px;
         opacity: 0.5;
@@ -2966,12 +3020,14 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       background-color: var(--iron-overlay-backdrop-background-color, #000);
       opacity: 0;
       transition: opacity 0.2s;
+      pointer-events: none;
 
       @apply(--iron-overlay-backdrop);
     }
 
     :host([opened]) {
       opacity: var(--iron-overlay-backdrop-opacity, 0.6);
+      pointer-events: auto;
 
       @apply(--iron-overlay-backdrop-opened);
     }
@@ -2990,7 +3046,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       :host {
         display: block;
         margin: 24px 40px;
-        -webkit-overflow-scrolling: touch;
 
         background: var(--paper-dialog-background-color, --primary-background-color);
         color: var(--paper-dialog-color, --primary-text-color);
@@ -3247,7 +3302,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                             <td>
                                 <h2>Konfiguration</h2></td>
                             <td>
-                                <select id="akt" value="{{config.akt::input}}">
+                                <select id="akt" value="{{config.akt::change}}">
                                     <option value="1">Akt 1</option>
                                     <option value="2">Akt 2</option>
                                 </select>
@@ -3261,7 +3316,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                             <td>
                                 <h2>Akt 1</h2></td>
                             <td>
-                                <select id="sterne" value="{{config.stars::input}}">
+                                <select id="sterne" value="{{config.stars::change}}">
                                     <option value="1">ein Stern</option>
                                     <option value="2">zwei Sterne</option>
                                     <option value="3">drei Sterne</option>
@@ -3317,7 +3372,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                         </div>
 
                     </template>
-                    <paper-dialog id="dialog" modal="">
+
+                </div>
+                <div>
+                    <h1>Vorrat</h1>
+                </div>
+            </div>
+                    <paper-dialog id="dialog">
                         <h2>Geheimnis Nr. {{level}} <game-help text="{{secret}}"></game-help></h2>
                         <h3>Nur lesen, wenn du die Schatzkammer mit {{level}} Stern(en) geöffnet hast!</h3>
                         <p>{{secret}}</p>
@@ -3325,12 +3386,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                             <paper-button dialog-confirm="" autofocus="">OK</paper-button>
                         </div>
                     </paper-dialog>
-
-                </div>
-                <div>
-                    <h1>Vorrat</h1>
-                </div>
-            </div>
         </template>
         </dom-module>
 
@@ -3338,5 +3393,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </div>
     <game-board id="board">
     </game-board>
+    <google-tracking></google-tracking>
 
 </body></html>

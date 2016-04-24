@@ -86,43 +86,43 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     </template>
 </dom-module>
 <dom-module id="crime-scene-card" assetpath="/">
-	<style>
-		:host {
-		}
-		img {
-			height:160px;
-			width:160px;
-		}
-	</style>
-	<template>
-	    <board-game-card open="{{open}}">
-			<div style="background-color: green"><img src="{{frontUrl}}"></div>
-			<div style="background-color: red"><img src="{{backUrl}}"></div>
-		</board-game-card>
-	</template>
-</dom-module>
-	<dom-module id="crime-scene-print" assetpath="/">
-	<style>
-		:host {}
+    <style>
+        :host {}
 
-		.item {
-			width: 30px;
-			height: 30px;
-		}
-	</style>
-	<template>
-		<div style="width: 780px; ">
-			<template is="dom-repeat" items="{{cards}}">
-				<crime-scene-card front="{{item.front}}" back="{{item.back}}"></crime-scene-card>
-			</template>
-		</div>
-		<div style="width: 780px; page-break-after: always; border: 1px solid black">break</div>
-		<div style="width: 780px;">
-			<template is="dom-repeat" items="{{cards}}">
-				<crime-scene-card front="{{item.front}}" back="{{item.back}}" open="open"></crime-scene-card>
-			</template>
-		</div>
-	</template>
+        img {
+            height: 160px;
+            width: 160px;
+        }
+    </style>
+    <template>
+        <board-game-card open="{{open}}">
+            <div style="background-color: green"><img src="{{frontUrl}}"></div>
+            <div style="background-color: red"><img src="{{backUrl}}"></div>
+        </board-game-card>
+    </template>
+</dom-module>
+<dom-module id="crime-scene-print" assetpath="/">
+    <style>
+        :host {}
+
+        .item {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+    <template>
+        <div style="width: 780px; ">
+            <template is="dom-repeat" items="{{cards}}">
+                <crime-scene-card front="{{item.front}}" back="{{item.back}}"></crime-scene-card>
+            </template>
+        </div>
+        <div style="width: 780px; page-break-after: always; border: 1px solid black">break</div>
+        <div style="width: 780px;">
+            <template is="dom-repeat" items="{{cards}}">
+                <crime-scene-card front="{{item.front}}" back="{{item.back}}" open="open"></crime-scene-card>
+            </template>
+        </div>
+    </template>
 </dom-module>
 </div>
   <crime-scene-print></crime-scene-print>

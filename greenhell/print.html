@@ -1591,24 +1591,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </dom-module>
 <dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
-
-  <style>
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center-center);
-      position: relative;
-
-      vertical-align: middle;
-
-      fill: var(--iron-icon-fill-color, currentcolor);
-      stroke: var(--iron-icon-stroke-color, none);
-
-      width: var(--iron-icon-width, 24px);
-      height: var(--iron-icon-height, 24px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
+        position: relative;
+
+        vertical-align: middle;
+
+        fill: var(--iron-icon-fill-color, currentcolor);
+        stroke: var(--iron-icon-stroke-color, none);
+
+        width: var(--iron-icon-width, 24px);
+        height: var(--iron-icon-height, 24px);
+        @apply(--iron-icon);
+      }
+    </style>
   </template>
 
   </dom-module>
@@ -1916,8 +1915,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </defs></svg>
 </iron-iconset-svg>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
-
-  
 
   <template>
     <style>

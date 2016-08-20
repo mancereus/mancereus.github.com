@@ -1607,7 +1607,19 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             height: 100%;
             margin-top: 10mm;
         }
-
+        .quiz {
+            background-color: lightgray
+        }
+        .q {
+            font-size: 12pt;
+            height: 20px;
+        }
+        .answer {
+            border: 2px solid #29B6F6;
+            font-size: 12pt;
+            width: 120px;
+            margin: 2px 0 ;
+        }
         .red {
             background-color: #EF5350;
         }
@@ -1649,6 +1661,28 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </dom-module>
 </div>
     <template id="tmpl" is="dom-bind">
+         <div class="game">
+             <h1 style="text-align:center;">QUIZ: Teste dein Wissen...</h1>
+            <template is="dom-repeat" items="{{quiz}}">
+                <div class="card quiz" style="width:280px;height: 160px;">
+                    <p class="q">{{item.q}}</p>
+                    <div style="display: flex; flex-wrap: wrap;justify-content: space-around; flex-direction: row">
+                    <div class="answer">A. {{item.a}}</div>
+                    <div class="answer">B. {{item.b}}</div>
+                    <div class="answer">C. {{item.c}}</div>
+                    <div class="answer">D. {{item.d}}</div>
+                    <div class="answer" style="border: none; margin-top: 12px; white-space: nowrap">Lösung: _______________</div>
+                    </div>
+                </div>
+            </template>
+                <div class="card" style="width:280px;height: 160px;">
+                    <p class="q">Lösung</p>
+                    <div style="font-size: 9pt; display: flex; flex-wrap: wrap;justify-content: space-around; flex-direction: row; transform: rotate(180deg);">
+                    <div class="solution">Die Lösung enthält alle Buchstaben A,B,C,D nur in anderer Reihenfolge. Bei wie vielen Fragen sind Sie sicher die richtige Antowrt zu kennen? Senden Sie die richtige Lösung an eine Adresse ihrer Wahl.</div>
+                    </div>
+                </div>
+        </div>
+        <div style="page-break-before: always; width:800px;">break</div>
         <div class="game">
             <template is="dom-repeat" items="{{cards}}">
                 <div class$="card {{item.color}}">
@@ -1664,6 +1698,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 </div>
             </template>
         </div>
+       
     </template>
 
     </body></html>

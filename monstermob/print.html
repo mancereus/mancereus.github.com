@@ -15,77 +15,97 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-	<meta charset="utf-8">
+    <meta charset="utf-8">
     <title>MonsterMob</title>
-	<style>
-		.card {
-			width: 190px;
-			height: 270px;
-			border: 1px solid black;
-			display: inline-block;
-			text-align: center;
-			vertical-align: middle;
-            margin: 1px;
-		}
-
-		.page-break {
-			page-break-after: always;
-			width: 500px;
-		}
-
-		img {
-			width: 100px;
-			height: 150px;
-			margin: 10px 0;
-		}
-
-		hr {
-			margin: 0;
-		}
-
-		.dark {
-			background-color: #aaaaaa;
-		}
-
-		.head {
-			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-			font-size: 18pt;
-			font-weight: bold;
-			margin: 2px 0 2px 0;
-			width: 98%;
+    <style>
+        .card {
+            width: 250px;
+            height: 370px;
+            background-image: url("img/borders.png");
+            background-size: 100% 100%;
+			margin: 0 -2px;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .page-break {
+            page-break-after: always;
+            width: 500px;
+        }
+        
+        img {
+            width: 200px;
+            height: 250px;
+            margin: 10px 0;
+        }
+        
+        hr {
+            margin: 0;
+        }
+        
+        .dark {
+            background-image: url("img/bordersdark.png");
+        }
+         .break {
+            width: 710px;
+            page-break-before: always;
+        }
+        .head {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 24pt;
+            font-weight: bold;
+            margin: 9px 0 2px 0;
+            width: 98%;
             display: flex;
             justify-content: space-around
-		}
-		.titel {
-			display: inline-block;
-			width: 60%;
-			text-align: center;
-			}
-		.count {
-			text-align: left;
-			padding: 2px 5px;
-			border: 1px solid black;
-			border-top: none;
-		}
-
-		.foot {
-			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-			font-size: 24pt;
-			margin: 5px 0 5px 0;
-		}
-
-		.small {
-			margin-top: 10px;
-			width: 40px;
-			height: 50px;
-		}
-
-		.icon {
-			margin-top: 5px;
-			width: 113px;
-			height: 44px;
-		}
-	</style>
+        }
+        
+        .titel {
+            display: inline-block;
+            width: 70%;
+            text-align: center;
+        }
+        
+        .count {
+            text-align: left;
+            padding: 2px 5px;
+            border: 1px solid black;
+            border-top: none;
+        }
+        
+        .foot {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 24pt;
+            margin: 5px 0 5px 0;
+        }
+        
+        .small {
+            margin-top: 10px;
+            width: 40px;
+            height: 50px;
+        }
+        
+        .icon {
+            margin-top: 5px;
+            width: 113px;
+            height: 44px;
+        }
+        .Schwert {
+            border: 8px solid blue;
+        }
+        .Schatz {
+            border: 8px solid yellow;
+        }
+        .field {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            width: 100px;
+            height: 90px;
+            border-radius: 33%;
+            border: 3px solid red;
+            padding: 20px 10px 0 10px;
+        }
+    </style>
 </head>
 
 <body><div hidden="" by-vulcanize=""><dom-module id="page-break-div" assetpath="../components/page-break-div/">
@@ -106,19 +126,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
 </dom-module>
 </div>
-  <template id="tmpl" is="dom-bind">
-    <div style="width:1050px">
+    <template id="tmpl" is="dom-bind">
+    <div style="width:800px">
         <template is="dom-repeat" items="[[cards]]">
 
             <div class$="card [[item.dark]]">
-                <div class="head"><span class="count">[[item.count]]x</span>
+                <div class="head">
                     <div class="titel">[[item.type]]</div><span class="count">[[item.subtype]]</span></div>
                 <img src="img/[[item.type]].png">
-                <hr><img class="icon" src="img/[[item.type]]icon.png">
+                
             </div>
-            <page-break-div nmbr="[[index]]" max="18"></page-break-div>
+            <page-break-div nmbr="[[index]]" max="9"></page-break-div>
         </template>
+    <template is="dom-repeat" items="[[chars]]">
+			<div class="card">
+				<div>
+					<div class="head">[[item.name]]</div>
+				</div>
+				<img src="img/[[item.name]].png">
+			</div>
+		</template>
+    <div class="card">
+        <div class="head" style="margin-bottom: 0;">
+            Spieltableau
+        </div>
+        <img style="height: 300px; width: 220px;" src="img/Tableau.png">
     </div>
-</template>
+    <div class="card">
+        <div class="head">
+            Aktiver Spieler
+        </div>
+        <br>
+        <img src="img/fackel.png">
+    </div> <div class="card">        
+    </div>
+    <div class="break">
+        page-break
+    </div>
 
-</body></html>
+    <template is="dom-repeat" items="[[items]]">
+			<div class="card">
+				<div>
+					<div class="head">[[item.name]]</div>
+				</div>
+				<img style="border-radius: 20%; width:150px;height:200px;margin-top: 70px;" class$="[[item.type]]" src="img/[[item.type]].png">
+			</div>
+            <page-break-div nmbr="[[index]]" max="9"></page-break-div>
+		</template>
+    </div>
+    </template>
+
+    </body></html>

@@ -46,7 +46,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
     <style>
         body {}
-
+        p {
+            heigth: 12px;
+            margin: 0 2px;
+        }
         .try {
             font-size: 150%;
             font-weight: bold;
@@ -59,48 +62,42 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
          .Inhalt {
             border: 6px solid lightblue;
             border-radius: 4px;
-            padding: 0;
+            padding: 20px;
             margin: 0;
-            width: 94%;
-            height: 102px;
+            height: 400px;
         }
 
         .Form {
             border: 6px solid lightcoral;
             border-radius: 4px;
-            padding: 0;
+            padding: 20px;
             margin: 0;
-            width: 94%;
-            height: 102px;
+            height: 400px;
         }
 
         .Ort {
             border: 6px solid lightgreen;
             border-radius: 4px;
-            padding: 0;
+            padding: 20px;
             margin: 0;
-            width: 94%;
-            height: 102px;
+            height: 400px;
         }
 
         .Größe {
             border: 6px solid yellow;
             border-radius: 4px;
-            padding: 0;
             margin: 0;
-            width: 94%;
-            height: 102px;
+            padding: 20px;
+            height: 400px;
         }
 
 
         .card {
             margin: 2px;
-            padding: 20px;
-            width: 300px;
-            height: 280px;
-            display: flex;
-            justify-content: space-around;
-            flex-direction: column;
+            width: 320px;
+            height: 455px;
+            border: 1px solid black;
+            float:left;
         }
 
         .pagebreak {
@@ -139,23 +136,53 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 <body>
     test
     <template id="tmpl" is="dom-bind">
-        <div style="display:flex;flex-wrap: wrap;">
-            <div class="card Form">
+        <div style="display: float-right;width: 1050px">
+            <div class="card">
+            <div class="Form">
                 <h2>A) {{data.form.type}} oder {{data.form.type2}}</h2>
-                <p>{{data.form.desc}} </p>
+                <template is="dom-repeat" items="{{data.form.cards}}">
+                    <div>{{item.name}}</div>
+                    <hr>
+                </template>
+            </div>                
             </div>
-            <div class="card Inhalt">
+            <div class="card">
+            <div class="Inhalt">
                 <h2>B) {{data.inhalt.type}} oder {{data.inhalt.type2}}</h2>
-                <p>{{data.inhalt.desc}} </p>
+                <template is="dom-repeat" items="{{data.inhalt.cards}}">
+                    <div>{{item.name}}</div>
+                    <hr>
+                </template>
+            </div>                
             </div>
-            <div class="card Ort">
+            <div class="card">
+            <div class="Ort">
                 <h2>C) {{data.ort.type}} oder {{data.ort.type2}}</h2>
-                <p>{{data.ort.desc}} </p>
+                <template is="dom-repeat" items="{{data.ort.cards}}">
+                    <div>{{item.name}}</div>
+                    <hr>
+                </template>
             </div>
-            <div class="card Größe">
+            </div>
+            <div class="card">
+            <div class="Größe">
                 <h2>D) {{data.extra.type}} oder {{data.extra.type2}}</h2>
-                <p>{{data.extra.desc}} </p>
+                <template is="dom-repeat" items="{{data.extra.cards}}">
+                    <div>{{item.name}}</div>
+                    <hr>
+                </template>
             </div>
-        </div>
+            </div>
+            <div style="width: 540px;height: 240px;padding: 200px 50px;float:left;border: 3px solid black; text-align: center;">
+                <h1>Club der Telepathen</h1>
+                <img src="title.jpg" style="width: 100px;height: 100px;">
+                <p>ein Kommunikationsratespiel <br>für 2 oder mehr Spieler ab 8 Jahren.</p>
+                <p>Matthias Schmitt <br>
+                Ottostr. 75 / 50823 Köln <br>
+                email: mschmitt@db12.de </p>
+            </div>
+            
+            </div>
+        
     </template>
     </body></html>

@@ -1071,6 +1071,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   <template>
     <style>
       :host {
+        --calculated-paper-toolbar-height: var(--paper-toolbar-height, 64px);
+        --calculated-paper-toolbar-sm-height: var(--paper-toolbar-sm-height, 56px);
+
         /* technical */
         display: block;
         position: relative;
@@ -1078,7 +1081,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         -moz-box-sizing: border-box;
 
         /* size */
-        height: var(--paper-toolbar-height, 64px);
+        height: var(--calculated-paper-toolbar-height);
 
         background: var(--paper-toolbar-background, --primary-color);
         color: var(--paper-toolbar-color, --dark-theme-text-color);
@@ -1092,18 +1095,18 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host(.medium-tall) {
-        height: calc(var(--paper-toolbar-height, 64px) * 2);
+        height: calc(var(--calculated-paper-toolbar-height) * 2);
         @apply(--paper-toolbar-medium);
       }
 
       :host(.tall) {
-        height: calc(var(--paper-toolbar-height, 64px) * 3);
+        height: calc(var(--calculated-paper-toolbar-height) * 3);
         @apply(--paper-toolbar-tall);
       }
 
       .toolbar-tools {
         position: relative;
-        height: var(--paper-toolbar-height, 64px);
+        height: var(--calculated-paper-toolbar-height);
         padding: 0 16px;
         pointer-events: none;
         @apply(--layout-horizontal);
@@ -1117,19 +1120,19 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       @media (max-width: 600px) {
         :host {
-          height: var(--paper-toolbar-sm-height, 56px);
+          height: var(--calculated-paper-toolbar-sm-height);
         }
 
         :host(.medium-tall) {
-          height: calc(var(--paper-toolbar-sm-height, 56px) * 2);
+          height: calc(var(--calculated-paper-toolbar-sm-height) * 2);
         }
 
         :host(.tall) {
-          height: calc(var(--paper-toolbar-sm-height, 56px) * 3);
+          height: calc(var(--calculated-paper-toolbar-sm-height) * 3);
         }
 
         .toolbar-tools {
-          height: var(--paper-toolbar-sm-height, 56px);
+          height: var(--calculated-paper-toolbar-sm-height);
         }
       }
 
@@ -1182,27 +1185,26 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         pointer-events: none;
 
         @apply(--layout-flex);
-        @apply(--paper-toolbar-title);
       }
 
-      /**
-       * TODO: Refactor these selectors
-       * Work in progress.
-       */
-      .toolbar-tools > ::content paper-icon-button[icon=menu] {
-        margin-right: 24px;
-      }
-
-      .toolbar-tools > ::content > .title,
-      .toolbar-tools > ::content[select=".middle"] > .title,
-      .toolbar-tools > ::content[select=".bottom"] > .title {
+      .toolbar-tools > ::content > .title {
         margin-left: 56px;
       }
 
-      .toolbar-tools > ::content > paper-icon-button + .title,
-      .toolbar-tools > ::content[select=".middle"] paper-icon-button + .title,
-      .toolbar-tools > ::content[select=".bottom"] paper-icon-button + .title {
+      .toolbar-tools > ::content > paper-icon-button + .title {
         margin-left: 0;
+      }
+
+      /**
+       * The --paper-toolbar-title mixin is applied here instead of above to
+       * fix the issue with margin-left being ignored due to css ordering.
+       */
+      .toolbar-tools > ::content .title {
+        @apply(--paper-toolbar-title);
+      }
+
+      .toolbar-tools > ::content paper-icon-button[icon=menu] {
+        margin-right: 24px;
       }
 
       .toolbar-tools > ::content > .fit {
@@ -1254,24 +1256,23 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
   </dom-module>
 <dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
-
-  <style>
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center-center);
-      position: relative;
-
-      vertical-align: middle;
-
-      fill: var(--iron-icon-fill-color, currentcolor);
-      stroke: var(--iron-icon-stroke-color, none);
-
-      width: var(--iron-icon-width, 24px);
-      height: var(--iron-icon-height, 24px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
+        position: relative;
+
+        vertical-align: middle;
+
+        fill: var(--iron-icon-fill-color, currentcolor);
+        stroke: var(--iron-icon-stroke-color, none);
+
+        width: var(--iron-icon-width, 24px);
+        height: var(--iron-icon-height, 24px);
+        @apply(--iron-icon);
+      }
+    </style>
   </template>
 
   </dom-module>
@@ -1579,15 +1580,14 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </defs></svg>
 </iron-iconset-svg>
 <dom-module id="iron-a11y-announcer" assetpath="../../bower_components/iron-a11y-announcer/">
-  <style>
-    :host {
-      display: inline-block;
-      position: fixed;
-      clip: rect(0px,0px,0px,0px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: fixed;
+        clip: rect(0px,0px,0px,0px);
+      }
+    </style>
     <div aria-live$="[[mode]]">[[_text]]</div>
   </template>
 
@@ -1723,8 +1723,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
   </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
-
-  
 
   <template>
     <style>

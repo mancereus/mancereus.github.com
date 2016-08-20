@@ -1,12 +1,4 @@
-<!DOCTYPE html><html><head><script src="index.js" defer=""></script><!--
-@license
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
---><!--
+<!DOCTYPE html><html><head><script src="print.js" defer=""></script><!--
 @license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
@@ -14,8 +6,17 @@ The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-	<meta charset="utf-8">
+    <meta charset="utf-8">
+    <title>Tiger Eye</title>
     <style is="custom-style">
 /*
  * PolymerThemes v1.0.3
@@ -103,7 +104,9 @@ section.hero paper-menu, section[hero] paper-menu { --paper-menu-background-colo
 
 paper-tabs { background-color: #3d6868; color: #ffffff; }
 
-</style><style>
+</style>
+
+<style>
   /* IE 10 support for HTML5 hidden attr */
   [hidden] {
     display: none !important;
@@ -1727,8 +1730,7 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         margin-top: 20px;
     }
 </style>
-<title>Tiger Eye</title>
-    <style>
+<style>
         body {
             background-color: lightgray;
         }
@@ -3166,8 +3168,60 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         <game-piece color="orange" top="-290" left="20"></game-piece>
     </template>
 
-    </dom-module></div>
-    <tigereye-game></tigereye-game>
+    </dom-module><dom-module id="print-cards" assetpath="/">
+        <style>
+            :host {
+                display: block;
+            }
+            
+            game-print-card {
+                margin: 0 -1px;
+            }
+            
+            #gameTable {
+                width: 210mm;
+            }
+            tigereye-card {
+                display: inline-block;
+                
+            }
+        </style>
+        <template>
+
+            <div id="gameTable">
+                <template is="dom-repeat" items="{{game.cards}}" index-as="cardIndex">
+                    <tigereye-card data="{{item}}"></tigereye-card>
+                </template>
+                <template is="dom-repeat" items="{{game.back}}" index-as="cardIndex">
+                    <tigereye-card data="{{item}}"></tigereye-card>
+                </template>
+            </div>
+        </template>
+
+    </dom-module><dom-module id="page-break-div" assetpath="../components/page-break-div/">
+    <style>
+        :host {
+            background-color: cadetblue;
+        }
+
+        .break {
+            width: 710px;
+            page-break-before: always;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{pageBreak}}">
+            <div class="break">page break</div>
+        </template>
+    </template>
+</dom-module>
+</div>
+    
+    <print-cards></print-cards>
+        <tigereye-pointcard color="orange"></tigereye-pointcard>
+        <tigereye-pointcard color="blue"></tigereye-pointcard>
+        <tigereye-pointcard color="green"></tigereye-pointcard>
+        <tigereye-pointcard color="red"></tigereye-pointcard>
 
 
 

@@ -1863,6 +1863,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
       :host {
+        --calculated-paper-toolbar-height: var(--paper-toolbar-height, 64px);
+        --calculated-paper-toolbar-sm-height: var(--paper-toolbar-sm-height, 56px);
+
         /* technical */
         display: block;
         position: relative;
@@ -1870,7 +1873,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         -moz-box-sizing: border-box;
 
         /* size */
-        height: var(--paper-toolbar-height, 64px);
+        height: var(--calculated-paper-toolbar-height);
 
         background: var(--paper-toolbar-background, --primary-color);
         color: var(--paper-toolbar-color, --dark-theme-text-color);
@@ -1884,18 +1887,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       :host(.medium-tall) {
-        height: calc(var(--paper-toolbar-height, 64px) * 2);
+        height: calc(var(--calculated-paper-toolbar-height) * 2);
         @apply(--paper-toolbar-medium);
       }
 
       :host(.tall) {
-        height: calc(var(--paper-toolbar-height, 64px) * 3);
+        height: calc(var(--calculated-paper-toolbar-height) * 3);
         @apply(--paper-toolbar-tall);
       }
 
       .toolbar-tools {
         position: relative;
-        height: var(--paper-toolbar-height, 64px);
+        height: var(--calculated-paper-toolbar-height);
         padding: 0 16px;
         pointer-events: none;
         @apply(--layout-horizontal);
@@ -1909,19 +1912,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       @media (max-width: 600px) {
         :host {
-          height: var(--paper-toolbar-sm-height, 56px);
+          height: var(--calculated-paper-toolbar-sm-height);
         }
 
         :host(.medium-tall) {
-          height: calc(var(--paper-toolbar-sm-height, 56px) * 2);
+          height: calc(var(--calculated-paper-toolbar-sm-height) * 2);
         }
 
         :host(.tall) {
-          height: calc(var(--paper-toolbar-sm-height, 56px) * 3);
+          height: calc(var(--calculated-paper-toolbar-sm-height) * 3);
         }
 
         .toolbar-tools {
-          height: var(--paper-toolbar-sm-height, 56px);
+          height: var(--calculated-paper-toolbar-sm-height);
         }
       }
 
@@ -1974,27 +1977,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pointer-events: none;
 
         @apply(--layout-flex);
-        @apply(--paper-toolbar-title);
       }
 
-      /**
-       * TODO: Refactor these selectors
-       * Work in progress.
-       */
-      .toolbar-tools > ::content paper-icon-button[icon=menu] {
-        margin-right: 24px;
-      }
-
-      .toolbar-tools > ::content > .title,
-      .toolbar-tools > ::content[select=".middle"] > .title,
-      .toolbar-tools > ::content[select=".bottom"] > .title {
+      .toolbar-tools > ::content > .title {
         margin-left: 56px;
       }
 
-      .toolbar-tools > ::content > paper-icon-button + .title,
-      .toolbar-tools > ::content[select=".middle"] paper-icon-button + .title,
-      .toolbar-tools > ::content[select=".bottom"] paper-icon-button + .title {
+      .toolbar-tools > ::content > paper-icon-button + .title {
         margin-left: 0;
+      }
+
+      /**
+       * The --paper-toolbar-title mixin is applied here instead of above to
+       * fix the issue with margin-left being ignored due to css ordering.
+       */
+      .toolbar-tools > ::content .title {
+        @apply(--paper-toolbar-title);
+      }
+
+      .toolbar-tools > ::content paper-icon-button[icon=menu] {
+        margin-right: 24px;
       }
 
       .toolbar-tools > ::content > .fit {
@@ -2121,30 +2123,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </dom-module>
 <dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
-
-  <style>
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center-center);
-      position: relative;
-
-      vertical-align: middle;
-
-      fill: var(--iron-icon-fill-color, currentcolor);
-      stroke: var(--iron-icon-stroke-color, none);
-
-      width: var(--iron-icon-width, 24px);
-      height: var(--iron-icon-height, 24px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
+        position: relative;
+
+        vertical-align: middle;
+
+        fill: var(--iron-icon-fill-color, currentcolor);
+        stroke: var(--iron-icon-stroke-color, none);
+
+        width: var(--iron-icon-width, 24px);
+        height: var(--iron-icon-height, 24px);
+        @apply(--iron-icon);
+      }
+    </style>
   </template>
 
   </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
-
-  
 
   <template>
     <style>
@@ -2226,7 +2225,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         position: relative;
         padding: 8px;
         outline: none;
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
@@ -2237,6 +2235,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         width: 40px;
         height: 40px;
+
+        /* NOTE: Both values are needed, since some phones require the value to be `transparent`. */
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-tap-highlight-color: transparent;
 
         /* Because of polymer/2558, this style has lower specificity than * */
         box-sizing: border-box !important;
@@ -2390,8 +2392,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         white-space: nowrap;
       }
 
-      #tabsContent.horizontal {
+      #tabsContent:not(.scrollable),
+      #tabsContent.scrollable.fit-container {
         @apply(--layout-horizontal);
+      }
+
+      #tabsContent.scrollable.fit-container {
+        min-width: 100%;
+      }
+
+      #tabsContent.scrollable.fit-container > ::content > * {
+        /* IE - prevent tabs from compressing when they should scroll. */
+        -ms-flex: 1 0 auto;
+        -webkit-flex: 1 0 auto;
+        flex: 1 0 auto;
       }
 
       .hidden {
@@ -2450,7 +2464,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-icon-button icon="paper-tabs:chevron-left" class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onLeftScrollButtonDown" tabindex="-1"></paper-icon-button>
 
     <div id="tabsContainer" on-track="_scroll" on-down="_down">
-      <div id="tabsContent" class$="[[_computeTabsContentClass(scrollable)]]">
+      <div id="tabsContent" class$="[[_computeTabsContentClass(scrollable, fitContainer)]]">
         <div id="selectionBar" class$="[[_computeSelectionBarClass(noBar, alignBottom)]]" on-transitionend="_onBarTransitionEnd"></div>
         <content select="*"></content>
       </div>
@@ -2933,6 +2947,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .header iron-image {
+        display: block;
         width: 100%;
         --iron-image-width: 100%;
         pointer-events: none;
@@ -2973,7 +2988,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="header">
-      <iron-image hidden$="[[!image]]" src="[[image]]" preload$="[[preloadImage]]" fade$="[[fadeImage]]"></iron-image>
+      <iron-image hidden$="[[!image]]" src="[[image]]" alt="[[alt]]" placeholder="[[placeholderImage]]" preload="[[preloadImage]]" fade="[[fadeImage]]"></iron-image>
       <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]">[[heading]]</div>
     </div>
 

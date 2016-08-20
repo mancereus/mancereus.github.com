@@ -1711,6 +1711,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       .header iron-image {
+        display: block;
         width: 100%;
         --iron-image-width: 100%;
         pointer-events: none;
@@ -1751,7 +1752,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     </style>
 
     <div class="header">
-      <iron-image hidden$="[[!image]]" src="[[image]]" preload$="[[preloadImage]]" fade$="[[fadeImage]]"></iron-image>
+      <iron-image hidden$="[[!image]]" src="[[image]]" alt="[[alt]]" placeholder="[[placeholderImage]]" preload="[[preloadImage]]" fade="[[fadeImage]]"></iron-image>
       <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]">[[heading]]</div>
     </div>
 

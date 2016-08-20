@@ -408,6 +408,359 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
 <style>
+  /* IE 10 support for HTML5 hidden attr */
+  [hidden] {
+    display: none !important;
+  }
+</style>
+
+<style is="custom-style">
+  :root {
+
+    --layout: {
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+    };
+
+    --layout-inline: {
+      display: -ms-inline-flexbox;
+      display: -webkit-inline-flex;
+      display: inline-flex;
+    };
+
+    --layout-horizontal: {
+      @apply(--layout);
+
+      -ms-flex-direction: row;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+    };
+
+    --layout-horizontal-reverse: {
+      @apply(--layout);
+
+      -ms-flex-direction: row-reverse;
+      -webkit-flex-direction: row-reverse;
+      flex-direction: row-reverse;
+    };
+
+    --layout-vertical: {
+      @apply(--layout);
+
+      -ms-flex-direction: column;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    };
+
+    --layout-vertical-reverse: {
+      @apply(--layout);
+
+      -ms-flex-direction: column-reverse;
+      -webkit-flex-direction: column-reverse;
+      flex-direction: column-reverse;
+    };
+
+    --layout-wrap: {
+      -ms-flex-wrap: wrap;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+    };
+
+    --layout-wrap-reverse: {
+      -ms-flex-wrap: wrap-reverse;
+      -webkit-flex-wrap: wrap-reverse;
+      flex-wrap: wrap-reverse;
+    };
+
+    --layout-flex-auto: {
+      -ms-flex: 1 1 auto;
+      -webkit-flex: 1 1 auto;
+      flex: 1 1 auto;
+    };
+
+    --layout-flex-none: {
+      -ms-flex: none;
+      -webkit-flex: none;
+      flex: none;
+    };
+
+    --layout-flex: {
+      -ms-flex: 1 1 0.000000001px;
+      -webkit-flex: 1;
+      flex: 1;
+      -webkit-flex-basis: 0.000000001px;
+      flex-basis: 0.000000001px;
+    };
+
+    --layout-flex-2: {
+      -ms-flex: 2;
+      -webkit-flex: 2;
+      flex: 2;
+    };
+
+    --layout-flex-3: {
+      -ms-flex: 3;
+      -webkit-flex: 3;
+      flex: 3;
+    };
+
+    --layout-flex-4: {
+      -ms-flex: 4;
+      -webkit-flex: 4;
+      flex: 4;
+    };
+
+    --layout-flex-5: {
+      -ms-flex: 5;
+      -webkit-flex: 5;
+      flex: 5;
+    };
+
+    --layout-flex-6: {
+      -ms-flex: 6;
+      -webkit-flex: 6;
+      flex: 6;
+    };
+
+    --layout-flex-7: {
+      -ms-flex: 7;
+      -webkit-flex: 7;
+      flex: 7;
+    };
+
+    --layout-flex-8: {
+      -ms-flex: 8;
+      -webkit-flex: 8;
+      flex: 8;
+    };
+
+    --layout-flex-9: {
+      -ms-flex: 9;
+      -webkit-flex: 9;
+      flex: 9;
+    };
+
+    --layout-flex-10: {
+      -ms-flex: 10;
+      -webkit-flex: 10;
+      flex: 10;
+    };
+
+    --layout-flex-11: {
+      -ms-flex: 11;
+      -webkit-flex: 11;
+      flex: 11;
+    };
+
+    --layout-flex-12: {
+      -ms-flex: 12;
+      -webkit-flex: 12;
+      flex: 12;
+    };
+
+    /* alignment in cross axis */
+
+    --layout-start: {
+      -ms-flex-align: start;
+      -webkit-align-items: flex-start;
+      align-items: flex-start;
+    };
+
+    --layout-center: {
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+    };
+
+    --layout-end: {
+      -ms-flex-align: end;
+      -webkit-align-items: flex-end;
+      align-items: flex-end;
+    };
+
+    --layout-baseline: {
+      -ms-flex-align: baseline;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+    };
+
+    /* alignment in main axis */
+
+    --layout-start-justified: {
+      -ms-flex-pack: start;
+      -webkit-justify-content: flex-start;
+      justify-content: flex-start;
+    };
+
+    --layout-center-justified: {
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+    };
+
+    --layout-end-justified: {
+      -ms-flex-pack: end;
+      -webkit-justify-content: flex-end;
+      justify-content: flex-end;
+    };
+
+    --layout-around-justified: {
+      -ms-flex-pack: distribute;
+      -webkit-justify-content: space-around;
+      justify-content: space-around;
+    };
+
+    --layout-justified: {
+      -ms-flex-pack: justify;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+    };
+
+    --layout-center-center: {
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
+    };
+
+    /* self alignment */
+
+    --layout-self-start: {
+      -ms-align-self: flex-start;
+      -webkit-align-self: flex-start;
+      align-self: flex-start;
+    };
+
+    --layout-self-center: {
+      -ms-align-self: center;
+      -webkit-align-self: center;
+      align-self: center;
+    };
+
+    --layout-self-end: {
+      -ms-align-self: flex-end;
+      -webkit-align-self: flex-end;
+      align-self: flex-end;
+    };
+
+    --layout-self-stretch: {
+      -ms-align-self: stretch;
+      -webkit-align-self: stretch;
+      align-self: stretch;
+    };
+
+    --layout-self-baseline: {
+      -ms-align-self: baseline;
+      -webkit-align-self: baseline;
+      align-self: baseline;
+    };
+
+    /* multi-line alignment in main axis */
+
+    --layout-start-aligned: {
+      -ms-flex-line-pack: start;  /* IE10 */
+      -ms-align-content: flex-start;
+      -webkit-align-content: flex-start;
+      align-content: flex-start;
+    };
+
+    --layout-end-aligned: {
+      -ms-flex-line-pack: end;  /* IE10 */
+      -ms-align-content: flex-end;
+      -webkit-align-content: flex-end;
+      align-content: flex-end;
+    };
+
+    --layout-center-aligned: {
+      -ms-flex-line-pack: center;  /* IE10 */
+      -ms-align-content: center;
+      -webkit-align-content: center;
+      align-content: center;
+    };
+
+    --layout-between-aligned: {
+      -ms-flex-line-pack: justify;  /* IE10 */
+      -ms-align-content: space-between;
+      -webkit-align-content: space-between;
+      align-content: space-between;
+    };
+
+    --layout-around-aligned: {
+      -ms-flex-line-pack: distribute;  /* IE10 */
+      -ms-align-content: space-around;
+      -webkit-align-content: space-around;
+      align-content: space-around;
+    };
+
+    /*******************************
+              Other Layout
+    *******************************/
+
+    --layout-block: {
+      display: block;
+    };
+
+    --layout-invisible: {
+      visibility: hidden !important;
+    };
+
+    --layout-relative: {
+      position: relative;
+    };
+
+    --layout-fit: {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+    --layout-scroll: {
+      -webkit-overflow-scrolling: touch;
+      overflow: auto;
+    };
+
+    --layout-fullbleed: {
+      margin: 0;
+      height: 100vh;
+    };
+
+    /* fixed position */
+
+    --layout-fixed-top: {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+    };
+
+    --layout-fixed-right: {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    };
+
+    --layout-fixed-bottom: {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+    --layout-fixed-left: {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+  }
+
+</style>
+
+
+<style>
 body {margin: 0; padding: 1px}
 body,h5,h6,p{font-size:13px;line-height:20px}
 a,body,paper-toolbar{color:#424242}
@@ -442,8 +795,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </head>
 
 <body><div hidden="" by-vulcanize=""><dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
-
-  
 
   <template>
     <style>
@@ -525,8 +876,15 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         white-space: nowrap;
         cursor: pointer;
         --calculated-paper-checkbox-size: var(--paper-checkbox-size, 18px);
+        /* -1px is a sentinel for the default and is replaced in `attached`. */
+        --calculated-paper-checkbox-ink-size: var(--paper-checkbox-ink-size, -1px);
         @apply(--paper-font-common-base);
         line-height: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :host([hidden]) {
+        display: none !important;
       }
 
       :host(:focus) {
@@ -543,7 +901,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         width: var(--calculated-paper-checkbox-size);
         height: var(--calculated-paper-checkbox-size);
         min-width: var(--calculated-paper-checkbox-size);
-        vertical-align: middle;
+        margin: var(--paper-checkbox-margin, initial);
+        vertical-align: var(--paper-checkbox-vertical-align, middle);
         background-color: var(--paper-checkbox-unchecked-background-color, transparent);
       }
 
@@ -552,22 +911,22 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
         /* Center the ripple in the checkbox by negative offsetting it by
          * (inkWidth - rippleWidth) / 2 */
-        top: calc(0px - (2.66 * var(--calculated-paper-checkbox-size) - var(--calculated-paper-checkbox-size)) / 2);
-        left: calc(0px - (2.66 * var(--calculated-paper-checkbox-size) - var(--calculated-paper-checkbox-size)) / 2);
-        width: calc(2.66 * var(--calculated-paper-checkbox-size));
-        height: calc(2.66 * var(--calculated-paper-checkbox-size));
-        color: var(--paper-checkbox-unchecked-ink-color, --primary-text-color);
+        top: calc(0px - (var(--calculated-paper-checkbox-ink-size) - var(--calculated-paper-checkbox-size)) / 2);
+        left: calc(0px - (var(--calculated-paper-checkbox-ink-size) - var(--calculated-paper-checkbox-size)) / 2);
+        width: var(--calculated-paper-checkbox-ink-size);
+        height: var(--calculated-paper-checkbox-ink-size);
+        color: var(--paper-checkbox-unchecked-ink-color, var(--primary-text-color));
         opacity: 0.6;
         pointer-events: none;
       }
 
       :host-context([dir="rtl"]) #ink {
-        right: calc(0px - (2.66 * var(--calculated-paper-checkbox-size) - var(--calculated-paper-checkbox-size)) / 2);
+        right: calc(0px - (var(--calculated-paper-checkbox-ink-size) - var(--calculated-paper-checkbox-size)) / 2);
         left: auto;
       }
 
       #ink[checked] {
-        color: var(--paper-checkbox-checked-ink-color, --primary-color);
+        color: var(--paper-checkbox-checked-ink-color, var(--primary-color));
       }
 
       #checkbox {
@@ -575,7 +934,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         box-sizing: border-box;
         height: 100%;
         border: solid 2px;
-        border-color: var(--paper-checkbox-unchecked-color, --primary-text-color);
+        border-color: var(--paper-checkbox-unchecked-color, var(--primary-text-color));
         border-radius: 2px;
         pointer-events: none;
         -webkit-transition: background-color 140ms, border-color 140ms;
@@ -607,8 +966,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #checkbox.checked {
-        background-color: var(--paper-checkbox-checked-color, --primary-color);
-        border-color: var(--paper-checkbox-checked-color, --primary-color);
+        background-color: var(--paper-checkbox-checked-color, var(--primary-color));
+        border-color: var(--paper-checkbox-checked-color, var(--primary-color));
       }
 
       #checkmark {
@@ -639,7 +998,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         padding-left: var(--paper-checkbox-label-spacing, 8px);
         white-space: normal;
         line-height: normal;
-        color: var(--paper-checkbox-label-color, --primary-text-color);
+        color: var(--paper-checkbox-label-color, var(--primary-text-color));
+        @apply(--paper-checkbox-label);
+      }
+
+      :host([checked]) #checkboxLabel {
+        color: var(--paper-checkbox-label-checked-color, var(--paper-checkbox-label-color, var(--primary-text-color)));
+        @apply(--paper-checkbox-label-checked);
       }
 
       :host-context([dir="rtl"]) #checkboxLabel {
@@ -655,11 +1020,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       :host([disabled]) #checkbox {
         opacity: 0.5;
-        border-color: var(--paper-checkbox-unchecked-color, --primary-text-color);
+        border-color: var(--paper-checkbox-unchecked-color, var(--primary-text-color));
       }
 
       :host([disabled][checked]) #checkbox {
-        background-color: var(--paper-checkbox-unchecked-color, --primary-text-color);
+        background-color: var(--paper-checkbox-unchecked-color, var(--primary-text-color));
         opacity: 0.5;
       }
 
@@ -669,7 +1034,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       /* invalid state */
       #checkbox.invalid:not(.checked) {
-        border-color: var(--paper-checkbox-error-color, --error-color);
+        border-color: var(--paper-checkbox-error-color, var(--error-color));
       }
     </style>
 
@@ -688,9 +1053,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     <style>
       :host {
         display: inline-block;
+        line-height: 0;
         white-space: nowrap;
         cursor: pointer;
         @apply(--paper-font-common-base);
+        --calculated-paper-radio-button-size: var(--paper-radio-button-size, 16px);
       }
 
       :host(:focus) {
@@ -698,57 +1065,49 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #radioContainer {
-        display: inline-block;
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
         position: relative;
-        width: 16px;
-        height: 16px;
+        width: var(--calculated-paper-radio-button-size);
+        height: var(--calculated-paper-radio-button-size);
         vertical-align: middle;
       }
 
       #ink {
         position: absolute;
-        top: -16px;
-        left: -16px;
-        width: 48px;
-        height: 48px;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        width: calc(3 * var(--calculated-paper-radio-button-size));
+        height: calc(3 * var(--calculated-paper-radio-button-size));
         color: var(--paper-radio-button-unchecked-ink-color, --primary-text-color);
         opacity: 0.6;
         pointer-events: none;
-      }
-
-      :host-context([dir="rtl"]) #ink {
-        right: -15px;
-        left: auto;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
       }
 
       #ink[checked] {
         color: var(--paper-radio-button-checked-ink-color, --primary-color);
       }
 
-      #offRadio {
+      #offRadio, #onRadio {
         position: absolute;
-        box-sizing: content-box;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        width: 12px;
-        height: 12px;
+        box-sizing: border-box;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
-        border: solid 2px;
+      }
+
+      #offRadio {
+        border: 2px solid var(--paper-radio-button-unchecked-color, --primary-text-color);
         background-color: var(--paper-radio-button-unchecked-background-color, transparent);
-        border-color: var(--paper-radio-button-unchecked-color, --primary-text-color);
         transition: border-color 0.28s;
       }
 
       #onRadio {
-        position: absolute;
-        box-sizing: content-box;
-        top: 4px;
-        left: 4px;
-        right: 4px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
         background-color: var(--paper-radio-button-checked-color, --primary-color);
         -webkit-transform: scale(0);
         transform: scale(0);
@@ -762,11 +1121,12 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host([checked]) #onRadio {
-        -webkit-transform: scale(1);
-        transform: scale(1);
+        -webkit-transform: scale(0.5);
+        transform: scale(0.5);
       }
 
       #radioLabel {
+        line-height: normal;
         position: relative;
         display: inline-block;
         vertical-align: middle;
@@ -776,7 +1136,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host-context([dir="rtl"]) #radioLabel {
-        margin-left: 0px;
+        margin-left: 0;
         margin-right: var(--paper-radio-button-label-spacing, 10px);
       }
 
@@ -819,7 +1179,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host ::content > * {
-        padding: 12px;
+        padding: var(--paper-radio-group-item-padding, 12px);
       }
     </style>
 
@@ -854,15 +1214,17 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
+        <template is="dom-if" if="{{!master}}">
         <template is="dom-if" if="{{data.started}}">
             <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
+        </template>
         </template>
         <table>
             <tbody><tr>
                 <th></th>
                 <th width="180px">Versuch</th>
                 <th width="40px">Form oder Oberfläche</th>
-                <th width="40px">Inhalt oder Bewegung</th>
+                <th width="40px">Inhalt oder Besonderheit</th>
                 <th width="40px">Ort oder Zeit</th>
                 <th width="40px">Größe oder Gewicht</th>
             </tr>

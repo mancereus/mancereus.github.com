@@ -1627,8 +1627,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
 
-  
-
   <template>
     <style>
       :host {
@@ -1744,24 +1742,23 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   </template>
 </dom-module>
 <dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
-
-  <style>
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center-center);
-      position: relative;
-
-      vertical-align: middle;
-
-      fill: var(--iron-icon-fill-color, currentcolor);
-      stroke: var(--iron-icon-stroke-color, none);
-
-      width: var(--iron-icon-width, 24px);
-      height: var(--iron-icon-height, 24px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
+        position: relative;
+
+        vertical-align: middle;
+
+        fill: var(--iron-icon-fill-color, currentcolor);
+        stroke: var(--iron-icon-stroke-color, none);
+
+        width: var(--iron-icon-width, 24px);
+        height: var(--iron-icon-height, 24px);
+        @apply(--iron-icon);
+      }
+    </style>
   </template>
 
   </dom-module>
@@ -2054,6 +2051,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
   <template>
     <style>
       :host {
+        --calculated-paper-toolbar-height: var(--paper-toolbar-height, 64px);
+        --calculated-paper-toolbar-sm-height: var(--paper-toolbar-sm-height, 56px);
+
         /* technical */
         display: block;
         position: relative;
@@ -2061,7 +2061,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         -moz-box-sizing: border-box;
 
         /* size */
-        height: var(--paper-toolbar-height, 64px);
+        height: var(--calculated-paper-toolbar-height);
 
         background: var(--paper-toolbar-background, --primary-color);
         color: var(--paper-toolbar-color, --dark-theme-text-color);
@@ -2075,18 +2075,18 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host(.medium-tall) {
-        height: calc(var(--paper-toolbar-height, 64px) * 2);
+        height: calc(var(--calculated-paper-toolbar-height) * 2);
         @apply(--paper-toolbar-medium);
       }
 
       :host(.tall) {
-        height: calc(var(--paper-toolbar-height, 64px) * 3);
+        height: calc(var(--calculated-paper-toolbar-height) * 3);
         @apply(--paper-toolbar-tall);
       }
 
       .toolbar-tools {
         position: relative;
-        height: var(--paper-toolbar-height, 64px);
+        height: var(--calculated-paper-toolbar-height);
         padding: 0 16px;
         pointer-events: none;
         @apply(--layout-horizontal);
@@ -2100,19 +2100,19 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       @media (max-width: 600px) {
         :host {
-          height: var(--paper-toolbar-sm-height, 56px);
+          height: var(--calculated-paper-toolbar-sm-height);
         }
 
         :host(.medium-tall) {
-          height: calc(var(--paper-toolbar-sm-height, 56px) * 2);
+          height: calc(var(--calculated-paper-toolbar-sm-height) * 2);
         }
 
         :host(.tall) {
-          height: calc(var(--paper-toolbar-sm-height, 56px) * 3);
+          height: calc(var(--calculated-paper-toolbar-sm-height) * 3);
         }
 
         .toolbar-tools {
-          height: var(--paper-toolbar-sm-height, 56px);
+          height: var(--calculated-paper-toolbar-sm-height);
         }
       }
 
@@ -2165,27 +2165,26 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         pointer-events: none;
 
         @apply(--layout-flex);
-        @apply(--paper-toolbar-title);
       }
 
-      /**
-       * TODO: Refactor these selectors
-       * Work in progress.
-       */
-      .toolbar-tools > ::content paper-icon-button[icon=menu] {
-        margin-right: 24px;
-      }
-
-      .toolbar-tools > ::content > .title,
-      .toolbar-tools > ::content[select=".middle"] > .title,
-      .toolbar-tools > ::content[select=".bottom"] > .title {
+      .toolbar-tools > ::content > .title {
         margin-left: 56px;
       }
 
-      .toolbar-tools > ::content > paper-icon-button + .title,
-      .toolbar-tools > ::content[select=".middle"] paper-icon-button + .title,
-      .toolbar-tools > ::content[select=".bottom"] paper-icon-button + .title {
+      .toolbar-tools > ::content > paper-icon-button + .title {
         margin-left: 0;
+      }
+
+      /**
+       * The --paper-toolbar-title mixin is applied here instead of above to
+       * fix the issue with margin-left being ignored due to css ordering.
+       */
+      .toolbar-tools > ::content .title {
+        @apply(--paper-toolbar-title);
+      }
+
+      .toolbar-tools > ::content paper-icon-button[icon=menu] {
+        margin-right: 24px;
       }
 
       .toolbar-tools > ::content > .fit {
@@ -2548,7 +2547,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         position: relative;
         padding: 8px;
         outline: none;
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
@@ -2559,6 +2557,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
         width: 40px;
         height: 40px;
+
+        /* NOTE: Both values are needed, since some phones require the value to be `transparent`. */
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-tap-highlight-color: transparent;
 
         /* Because of polymer/2558, this style has lower specificity than * */
         box-sizing: border-box !important;
@@ -2721,8 +2723,15 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         white-space: nowrap;
         cursor: pointer;
         --calculated-paper-checkbox-size: var(--paper-checkbox-size, 18px);
+        /* -1px is a sentinel for the default and is replaced in `attached`. */
+        --calculated-paper-checkbox-ink-size: var(--paper-checkbox-ink-size, -1px);
         @apply(--paper-font-common-base);
         line-height: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :host([hidden]) {
+        display: none !important;
       }
 
       :host(:focus) {
@@ -2749,22 +2758,22 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
         /* Center the ripple in the checkbox by negative offsetting it by
          * (inkWidth - rippleWidth) / 2 */
-        top: calc(0px - (2.66 * var(--calculated-paper-checkbox-size) - var(--calculated-paper-checkbox-size)) / 2);
-        left: calc(0px - (2.66 * var(--calculated-paper-checkbox-size) - var(--calculated-paper-checkbox-size)) / 2);
-        width: calc(2.66 * var(--calculated-paper-checkbox-size));
-        height: calc(2.66 * var(--calculated-paper-checkbox-size));
-        color: var(--paper-checkbox-unchecked-ink-color, --primary-text-color);
+        top: calc(0px - (var(--calculated-paper-checkbox-ink-size) - var(--calculated-paper-checkbox-size)) / 2);
+        left: calc(0px - (var(--calculated-paper-checkbox-ink-size) - var(--calculated-paper-checkbox-size)) / 2);
+        width: var(--calculated-paper-checkbox-ink-size);
+        height: var(--calculated-paper-checkbox-ink-size);
+        color: var(--paper-checkbox-unchecked-ink-color, var(--primary-text-color));
         opacity: 0.6;
         pointer-events: none;
       }
 
       :host-context([dir="rtl"]) #ink {
-        right: calc(0px - (2.66 * var(--calculated-paper-checkbox-size) - var(--calculated-paper-checkbox-size)) / 2);
+        right: calc(0px - (var(--calculated-paper-checkbox-ink-size) - var(--calculated-paper-checkbox-size)) / 2);
         left: auto;
       }
 
       #ink[checked] {
-        color: var(--paper-checkbox-checked-ink-color, --primary-color);
+        color: var(--paper-checkbox-checked-ink-color, var(--primary-color));
       }
 
       #checkbox {
@@ -2772,7 +2781,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         box-sizing: border-box;
         height: 100%;
         border: solid 2px;
-        border-color: var(--paper-checkbox-unchecked-color, --primary-text-color);
+        border-color: var(--paper-checkbox-unchecked-color, var(--primary-text-color));
         border-radius: 2px;
         pointer-events: none;
         -webkit-transition: background-color 140ms, border-color 140ms;
@@ -2804,8 +2813,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #checkbox.checked {
-        background-color: var(--paper-checkbox-checked-color, --primary-color);
-        border-color: var(--paper-checkbox-checked-color, --primary-color);
+        background-color: var(--paper-checkbox-checked-color, var(--primary-color));
+        border-color: var(--paper-checkbox-checked-color, var(--primary-color));
       }
 
       #checkmark {
@@ -2836,11 +2845,13 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         padding-left: var(--paper-checkbox-label-spacing, 8px);
         white-space: normal;
         line-height: normal;
-        color: var(--paper-checkbox-label-color, --primary-text-color);
+        color: var(--paper-checkbox-label-color, var(--primary-text-color));
+        @apply(--paper-checkbox-label);
       }
 
       :host([checked]) #checkboxLabel {
-        color: var(--paper-checkbox-label-checked-color, --paper-checkbox-label-color);
+        color: var(--paper-checkbox-label-checked-color, var(--paper-checkbox-label-color, var(--primary-text-color)));
+        @apply(--paper-checkbox-label-checked);
       }
 
       :host-context([dir="rtl"]) #checkboxLabel {
@@ -2856,11 +2867,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       :host([disabled]) #checkbox {
         opacity: 0.5;
-        border-color: var(--paper-checkbox-unchecked-color, --primary-text-color);
+        border-color: var(--paper-checkbox-unchecked-color, var(--primary-text-color));
       }
 
       :host([disabled][checked]) #checkbox {
-        background-color: var(--paper-checkbox-unchecked-color, --primary-text-color);
+        background-color: var(--paper-checkbox-unchecked-color, var(--primary-text-color));
         opacity: 0.5;
       }
 
@@ -2870,7 +2881,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       /* invalid state */
       #checkbox.invalid:not(.checked) {
-        border-color: var(--paper-checkbox-error-color, --error-color);
+        border-color: var(--paper-checkbox-error-color, var(--error-color));
       }
     </style>
 
@@ -3000,6 +3011,19 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         pointer-events: none;
         color: var(--paper-toggle-button-label-color, --primary-text-color);
       }
+
+      /* invalid state */
+      :host([invalid]) .toggle-bar {
+        background-color: var(--paper-toggle-button-invalid-bar-color, --error-color);
+      }
+
+      :host([invalid]) .toggle-button {
+        background-color: var(--paper-toggle-button-invalid-button-color, --error-color);
+      }
+
+      :host([invalid]) .toggle-ink {
+        color: var(--paper-toggle-button-invalid-ink-color, --error-color);
+      }
     </style>
 
     <div class="toggle-container">
@@ -3103,7 +3127,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
 <dom-module id="paper-button" assetpath="../../bower_components/paper-button/">
   <template strip-whitespace="">
-    <style include="paper-material">
+    <style include="paper-material-shared-styles">
       :host {
         @apply(--layout-inline);
         @apply(--layout-center-center);
@@ -3130,6 +3154,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         @apply(--paper-button);
       }
 
+      :host([hidden]) {
+        display: none !important;
+      }
+
       :host([raised].keyboard-focus) {
         font-weight: bold;
         @apply(--paper-button-raised-keyboard-focus);
@@ -3147,6 +3175,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         pointer-events: none;
 
         @apply(--paper-button-disabled);
+      }
+
+      :host([animated]) {
+        @apply(--shadow-transition);
       }
 
       paper-ripple {

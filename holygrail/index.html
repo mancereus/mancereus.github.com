@@ -1782,6 +1782,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .header iron-image {
+        display: block;
         width: 100%;
         --iron-image-width: 100%;
         pointer-events: none;
@@ -1822,7 +1823,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="header">
-      <iron-image hidden$="[[!image]]" src="[[image]]" preload$="[[preloadImage]]" fade$="[[fadeImage]]"></iron-image>
+      <iron-image hidden$="[[!image]]" src="[[image]]" alt="[[alt]]" placeholder="[[placeholderImage]]" preload="[[preloadImage]]" fade="[[fadeImage]]"></iron-image>
       <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]">[[heading]]</div>
     </div>
 
@@ -1831,8 +1832,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </dom-module>
 <dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
-
-  
 
   <template>
     <style>
@@ -1907,15 +1906,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 </dom-module>
 <dom-module id="iron-a11y-announcer" assetpath="../../bower_components/iron-a11y-announcer/">
-  <style>
-    :host {
-      display: inline-block;
-      position: fixed;
-      clip: rect(0px,0px,0px,0px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: fixed;
+        clip: rect(0px,0px,0px,0px);
+      }
+    </style>
     <div aria-live$="[[mode]]">[[_text]]</div>
   </template>
 
@@ -1929,6 +1927,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         @apply(--paper-font-caption);
         @apply(--paper-input-char-counter);
+      }
+
+      :host([hidden]) {
+        display: none !important;
       }
 
       :host-context([dir="rtl"]) {
@@ -1950,7 +1952,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--paper-input-container);
       }
 
-      :host[inline] {
+      :host([inline]) {
         display: inline-block;
       }
 
@@ -1959,6 +1961,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         opacity: 0.33;
 
         @apply(--paper-input-container-disabled);
+      }
+
+      :host([hidden]) {
+        display: none !important;
       }
 
       .floated-label-placeholder {
@@ -2150,7 +2156,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <template is="dom-if" if="[[!noLabelFloat]]">
-      <div class="floated-label-placeholder">&nbsp;</div>
+      <div class="floated-label-placeholder" aria-hidden="true">&nbsp;</div>
     </template>
 
     <div class$="[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]">
@@ -2206,6 +2212,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
 
+      :host([focused]) {
+        outline: none;
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+
       input::-webkit-input-placeholder {
         color: var(--paper-input-container-color, --secondary-text-color);
       }
@@ -2221,20 +2235,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       input:-ms-input-placeholder {
         color: var(--paper-input-container-color, --secondary-text-color);
       }
+
+      label {
+        pointer-events: none;
+      }
     </style>
 
     <paper-input-container no-label-float="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate$="[[autoValidate]]" disabled$="[[disabled]]" invalid="[[invalid]]">
 
       <content select="[prefix]"></content>
 
-      <label hidden$="[[!label]]">[[label]]</label>
+      <label hidden$="[[!label]]" aria-hidden="true" for="input">[[label]]</label>
 
       <input is="iron-input" id="input" aria-labelledby$="[[_ariaLabelledBy]]" aria-describedby$="[[_ariaDescribedBy]]" disabled$="[[disabled]]" title$="[[title]]" bind-value="{{value}}" invalid="{{invalid}}" prevent-invalid-input="[[preventInvalidInput]]" allowed-pattern="[[allowedPattern]]" validator="[[validator]]" type$="[[type]]" pattern$="[[pattern]]" required$="[[required]]" autocomplete$="[[autocomplete]]" autofocus$="[[autofocus]]" inputmode$="[[inputmode]]" minlength$="[[minlength]]" maxlength$="[[maxlength]]" min$="[[min]]" max$="[[max]]" step$="[[step]]" name$="[[name]]" placeholder$="[[placeholder]]" readonly$="[[readonly]]" list$="[[list]]" size$="[[size]]" autocapitalize$="[[autocapitalize]]" autocorrect$="[[autocorrect]]" on-change="_onChange" tabindex$="[[tabindex]]" autosave$="[[autosave]]" results$="[[results]]" accept$="[[accept]]" multiple$="[[multiple]]">
 
       <content select="[suffix]"></content>
 
       <template is="dom-if" if="[[errorMessage]]">
-        <paper-input-error>[[errorMessage]]</paper-input-error>
+        <paper-input-error aria-live="assertive">[[errorMessage]]</paper-input-error>
       </template>
 
       <template is="dom-if" if="[[charCounter]]">
@@ -2255,7 +2273,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         overflow: hidden;
       }
 
+      :host([hidden]) {
+        display: none !important;
+      }
+
       #progressContainer {
+        @apply(--paper-progress-container);
         position: relative;
       }
 
@@ -2323,8 +2346,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host(:not([disabled])) #primaryProgress.indeterminate {
         -webkit-transform-origin: right center;
         transform-origin: right center;
-        -webkit-animation: indeterminate-bar 2s linear infinite;
-        animation: indeterminate-bar 2s linear infinite;
+        -webkit-animation: indeterminate-bar var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;
+        animation: indeterminate-bar var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;
       }
 
       :host(:not([disabled])) #primaryProgress.indeterminate::after {
@@ -2332,8 +2355,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         -webkit-transform-origin: center center;
         transform-origin: center center;
 
-        -webkit-animation: indeterminate-splitter 2s linear infinite;
-        animation: indeterminate-splitter 2s linear infinite;
+        -webkit-animation: indeterminate-splitter var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;
+        animation: indeterminate-splitter var(--paper-progress-indeterminate-cycle-duration, 2s) linear infinite;
       }
 
       @-webkit-keyframes indeterminate-bar {
@@ -2672,7 +2695,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </dom-module>
 <dom-module id="paper-button" assetpath="../../bower_components/paper-button/">
   <template strip-whitespace="">
-    <style include="paper-material">
+    <style include="paper-material-shared-styles">
       :host {
         @apply(--layout-inline);
         @apply(--layout-center-center);
@@ -2699,6 +2722,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--paper-button);
       }
 
+      :host([hidden]) {
+        display: none !important;
+      }
+
       :host([raised].keyboard-focus) {
         font-weight: bold;
         @apply(--paper-button-raised-keyboard-focus);
@@ -2716,6 +2743,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pointer-events: none;
 
         @apply(--paper-button-disabled);
+      }
+
+      :host([animated]) {
+        @apply(--shadow-transition);
       }
 
       paper-ripple {
@@ -2900,24 +2931,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
     </template>
     </dom-module><dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
-
-  <style>
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center-center);
-      position: relative;
-
-      vertical-align: middle;
-
-      fill: var(--iron-icon-fill-color, currentcolor);
-      stroke: var(--iron-icon-stroke-color, none);
-
-      width: var(--iron-icon-width, 24px);
-      height: var(--iron-icon-height, 24px);
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
+        position: relative;
+
+        vertical-align: middle;
+
+        fill: var(--iron-icon-fill-color, currentcolor);
+        stroke: var(--iron-icon-stroke-color, none);
+
+        width: var(--iron-icon-width, 24px);
+        height: var(--iron-icon-height, 24px);
+        @apply(--iron-icon);
+      }
+    </style>
   </template>
 
   </dom-module>

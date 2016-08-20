@@ -45,35 +45,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </style>
 
     <style>
-       
-    </style>
-</head>
-
-<body><div hidden="" by-vulcanize=""><dom-module id="page-break-div" assetpath="../components/page-break-div/">
-    <style>
-        :host {
-            background-color: cadetblue;
-        }
-
-        .break {
-            width: 710px;
-            page-break-before: always;
-        }
-    </style>
-    <template>
-        <template is="dom-if" if="{{pageBreak}}">
-            <div class="break">page break</div>
-        </template>
-    </template>
-</dom-module>
-</div>
-   <print-cards></print-cards>
-    
-    
-    <dom-module id="print-cards">
-        <template>
-            <style>
-                .try {
+        .try {
             font-size: 150%;
             font-weight: bold;
         }
@@ -82,10 +54,45 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             width: 120px;
         }
 
-      
+        .Inhalt {
+            border: 6px solid lightblue;
+            border-radius: 4px;
+            padding: 0;
+            margin: 0;
+            width: 94%;
+            height: 102px;
+        }
+
+        .Form {
+            border: 6px solid lightcoral;
+            border-radius: 4px;
+            padding: 0;
+            margin: 0;
+            width: 94%;
+            height: 102px;
+        }
+
+        .Ort {
+            border: 6px solid lightgreen;
+            border-radius: 4px;
+            padding: 0;
+            margin: 0;
+            width: 94%;
+            height: 102px;
+        }
+
+        .Größe {
+            border: 6px solid yellow;
+            border-radius: 4px;
+            padding: 0;
+            margin: 0;
+            width: 94%;
+            height: 102px;
+        }
+
         .card {
-            width: 320px;
-            height: 455px;
+            width: 213px;
+            height: 112px;
             float: left;
             border: 1px solid black;
             text-align: center;
@@ -114,78 +121,50 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             background-color: lightgray;
         }
 
-            </style>
-               <div style="width:1050px">
+        .header {
+            text-align: center;
+            width: 240px;
+            font-size: 80%;
+            margin: 0;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body><div hidden="" by-vulcanize=""><dom-module id="page-break-div" assetpath="../components/page-break-div/">
+    <style>
+        :host {
+            background-color: cadetblue;
+        }
+
+        .break {
+            width: 710px;
+            page-break-before: always;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{pageBreak}}">
+            <div class="break">page break</div>
+        </template>
+    </template>
+</dom-module>
+</div>
+    <template id="tmpl" is="dom-bind">
+        <div style="width:1050px">
             <template is="dom-repeat" items="{{cards}}">
-                    
+
                 <div class="card">
-                    <card-half type="{{item.type}}" letter="{{item.letter}}" text="{{item.name}}"></card-half>
-                        <hr>
-                    <card-half type="{{item.type}}" letter="{{item.letter}}" text="{{item.name2}}" rotate="rotate"></card-half>
+                    <div class$="{{item.type}}">
+                        <div style="margin: 5px;">
+                            <span class="header">{{item.type}} / {{item.type2}}</span><span class="header"></span>
+                            <br>
+                            <span>{{item.name}}</span>
+                        </div>
+                    </div>
                 </div>
-                <page-break-div nmbr="{{index}}" max="9"></page-break-div>
+                <page-break-div nmbr="{{index}}" max="20"></page-break-div>
             </template>
         </div>
-        </template>
-        </dom-module>
-    
-    <dom-module id="card-half">
-        <template>
-            <style>
-                :host {
-                    display: block;
-                }
-                .rotate {
-                    transform: rotate(180deg);
-                }
-                  .innerCard {
-                    border-radius: 4px;
-                    padding: 0;
-                    margin: 0;
-                    width: 96%;
-                    height: 200px;
-                }
+    </template>
 
-                .Inhalt, .Besonderheit {
-                    border: 6px solid lightblue;
-                }
-
-                .Form, .Oberfläche{
-                    border: 6px solid lightcoral;
-                }
-
-                .Ort, .Zeit{
-                    border: 6px solid lightgreen;
-                }
-
-                .Größe, .Gewicht {
-                    border: 6px solid yellow;
-                }
-                .header {
-                    text-align: center;
-                    width: 100%;
-                    font-size: 160%;
-                    margin: 20px 2px 20px 2px;
-                    padding: 5px;
-                }
-
-                .text {
-                    text-align: center;
-                    width: 80%;
-                    font-size: 120%;
-                    margin: 20px;
-                }
-
-            </style>
-            <div class$="{{type}} innerCard {{rotate}}">
-                    <div class="header">{{letter}}.   {{type}}</div>
-                    <br>
-                    <div class="text">{{text}}</div>
-            </div>
-               
-        </template>
-        </dom-module>
-    
-
-
-</body></html>
+    </body></html>

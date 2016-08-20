@@ -1650,8 +1650,8 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
 <title>MonsterMob</title>
 <style>
 	.card {
-			width: 190px;
-			height: 190px;
+			width: 188px;
+			height: 188px;
 			border: 1px solid black;
 			display: inline-block;
 			text-align: center;
@@ -1721,6 +1721,10 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
 <style>
     .card {
         position: relative;
+        user-select: none;
+    }
+    .titel {
+        margin-top: 20px;
     }
 </style>
 <title>Tiger Eye</title>
@@ -2546,7 +2550,7 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         padding: 15px 0;
         width: 100%;
         background-color: var(--paper-slider-bar-color, transparent);
-        --paper-progress-container-color: var(--paper-grey-400);
+        --paper-progress-container-color: var(--paper-slider-container-color, --paper-grey-400);
         --paper-progress-height: var(--paper-slider-height, 2px);
       }
 
@@ -2715,7 +2719,6 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
     </style>
 
     <div id="sliderContainer" class$="[[_getClassNames(disabled, pin, snaps, immediateValue, min, expand, dragging, transiting, editable)]]">
-
       <div class="bar-container">
         <paper-progress disabled$="[[disabled]]" id="sliderBar" aria-hidden="true" min="[[min]]" max="[[max]]" step="[[step]]" value="[[immediateValue]]" secondary-progress="[[secondaryProgress]]" on-down="_bardown" on-up="_resetKnob" on-track="_onTrack">
         </paper-progress>
@@ -2743,16 +2746,17 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
   </dom-module>
 <dom-module id="paper-button" assetpath="../../bower_components/paper-button/">
   <template strip-whitespace="">
-
     <style include="paper-material">
       :host {
-        display: inline-block;
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
         position: relative;
         box-sizing: border-box;
         min-width: 5.14em;
         margin: 0 0.29em;
         background: transparent;
-        text-align: center;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-tap-highlight-color: transparent;
         font: inherit;
         text-transform: uppercase;
         outline-width: 0;
@@ -2765,6 +2769,7 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         z-index: 0;
         padding: 0.7em 0.57em;
 
+        @apply(--paper-font-common-base);
         @apply(--paper-button);
       }
 
@@ -2790,15 +2795,12 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       paper-ripple {
         color: var(--paper-button-ink-color);
       }
-
-      :host > ::content * {
-        text-transform: inherit;
-      }
     </style>
+
     <content></content>
   </template>
-</dom-module>
 
+  </dom-module>
 <dom-module id="iron-localstorage" assetpath="../../bower_components/iron-localstorage/"></dom-module>
 <dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
 
@@ -2821,21 +2823,31 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
 
     <template>
         <iron-pages selected="{{selected}}">
-            <div class="card"><img style="margin:0;width: 100%; height: 100%" src="img/back.png">
-            </div>
             <div class="card">
-                <div class="head">
-                    <div class="titel">{{data.type}}</div>
+                <div id="front" class="head">
+                    <div class="titel">{{data.btype}}</div>
                 </div>
-                <img style="margin:0;width: 100px; height: 100px" src="img/{{data.type}}.png">
-                <template is="dom-if" if="{{data.ver}}">
-                    <img src="img/vertic.jpg" style="position:absolute; top:-10px;right: 0px;width:15px;height: 190px;" alt="">
+                <img style="margin:0;width: 100px; height: 100px" src="img/{{data.btype}}.png">
+                <template is="dom-if" if="{{data.bver}}">
+                    <img src="img/vertic.png" style="position:absolute; top:-10px;right: 0px;width:20px;height: 190px;" alt="">
                 </template>
-                <template is="dom-if" if="{{data.hor}}">
-                    <img src="img/horiz.jpg" style="position:absolute; left: 0;bottom: -10px;height:15px; width: 190px;" alt="">
+    <template is="dom-if" if="{{data.bhor}}">
+                    <img src="img/horiz.png" style="position:absolute; left: 0;top: -10px;height:20px; width: 190px;" alt="">
                 </template>
-            </div>
-        </iron-pages>
+    </div>
+    <div id="back" class="card">
+        <div class="head">
+            <div class="titel">{{data.type}}</div>
+        </div>
+        <img style="margin:0;width: 100px; height: 100px" src="img/{{data.type}}.png">
+        <template is="dom-if" if="{{data.ver}}">
+                    <img src="img/vertic.png" style="position:absolute; top:-10px;right: 0px;width:20px;height: 190px;" alt="">
+                </template>
+        <template is="dom-if" if="{{data.hor}}">
+                    <img src="img/horiz.png" style="position:absolute; left: 0;top: -10px;height:20px; width: 190px;" alt="">
+                </template>
+    </div>
+    </iron-pages>
 
 
     </template>
@@ -2932,6 +2944,157 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
             <div class="hexBottom"></div>
         </div>
     </template>
+    </dom-module><dom-module id="game-meeple" assetpath="/">
+    <style>
+        :host {
+            height: 32px;
+            width: 32px;
+            color: #fff;
+            overflow: hidden;
+            cursor: move;
+        }
+
+        .sized {
+            position: relative;
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            border: 3px solid blue;
+            background-color:red;
+        }
+        .red {
+        }
+    </style>
+    <template>
+        <div draggable="true" class="sized">
+        </div>
+    </template>
+    </dom-module><dom-module id="iron-icon" assetpath="../../bower_components/iron-icon/">
+
+  <style>
+    :host {
+      @apply(--layout-inline);
+      @apply(--layout-center-center);
+      position: relative;
+
+      vertical-align: middle;
+
+      fill: var(--iron-icon-fill-color, currentcolor);
+      stroke: var(--iron-icon-stroke-color, none);
+
+      width: var(--iron-icon-width, 24px);
+      height: var(--iron-icon-height, 24px);
+    }
+  </style>
+
+  <template>
+  </template>
+
+  </dom-module>
+<dom-module id="game-piece" assetpath="/">
+    <style>
+        :host {
+            z-index: 99;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        div {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            overflow: hidden;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+            cursor: move;
+            border: 2px solid green;
+            background-color: white;
+            z-index: 99;
+        }
+
+        :host.bigsymbol {
+            height: 56px;
+        }
+
+        div.bigsymbol img {
+            background-color: yellow;
+            height: 56px;
+        }
+
+        div.symbol img {
+            height: 56px;
+        }
+    </style>
+    <template>
+        <div id="piece" draggable="true" on-tap="clicker" class$="fab green symbol {{imgclass}}">
+            
+        </div>
+    </template>
+    </dom-module><dom-module id="tigereye-pointcard" assetpath="/">
+    <style>
+        :host {
+            display: inline-block;
+        }
+
+        #piece {
+            width: 120px;
+            height: 120px;
+            color: #fff;
+            display: flex;
+            flex-wrap: wrap;
+             justify-content: space-around;
+        }
+        .side {
+            font-size: 150%;
+        }
+        .north {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+            vertical-align: bottom;
+        }
+        .south {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+            transform: rotate(180deg);
+        }
+        .east {
+            transform: rotate(270deg);
+            
+        }
+        .west {
+            transform: rotate(90deg);
+            
+        }
+        :host.bigsymbol {
+            height: 56px;
+        }
+
+        div.bigsymbol img {
+            background-color: yellow;
+            height: 56px;
+        }
+
+        div.symbol img {
+            height: 56px;
+        }
+    </style>
+    <template>
+        <div id="piece" on-tap="clicker" class$="fab green symbol {{imgclass}}">
+            <div class="side north">3</div>
+            <div class="side middle east">2</div>
+            <div class="side middle west">0</div>
+            <div class="side south">1</div>
+        </div>
+    </template>
     </dom-module><dom-module id="tigereye-game" assetpath="/">
 
     <template>
@@ -2948,19 +3111,29 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
             }
 
             div.flex {
-                width: 1100px;
+                /*width: 1200px;*/
+                width: 1000px;
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: space-around;
                 align-content: space-between;
             }
         </style>
+        <tigereye-pointcard color="orange"></tigereye-pointcard>
+        <tigereye-pointcard color="blue"></tigereye-pointcard>
+        <tigereye-pointcard color="green"></tigereye-pointcard>
+        <tigereye-pointcard color="red"></tigereye-pointcard>
         <div class="flex">
+        <br>
             <template is="dom-repeat" items="{{game.cards}}">
                 <tigereye-card data="{{item}}"></tigereye-card>
             </template>
         </div>
-        <game-hexagon imgsrc="Tiger" top="-800" left="200"></game-hexagon>
+        <game-hexagon imgsrc="Tiger" top="-500" left="500"></game-hexagon>
+        <game-piece color="red" top="-200" left="60"></game-piece>
+        <game-piece color="green" top="-230" left="20"></game-piece>
+        <game-piece color="blue" top="-260" left="60"></game-piece>
+        <game-piece color="orange" top="-290" left="20"></game-piece>
     </template>
 
     </dom-module></div>

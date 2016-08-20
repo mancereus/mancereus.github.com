@@ -1,0 +1,139 @@
+<!DOCTYPE html><html><head><script src="print.js" defer=""></script><!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+    <meta charset="utf-8">
+    <title>Conquer</title>
+    <style>
+        .card {
+            width: 190px;
+            height: 270px;
+            border: 1px solid black;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 1px;
+        }
+        
+        .Standard {
+            background-color: lightgray;
+        }
+        
+        .Forschung {
+            background-color: gray;
+        }
+        
+        .page-break {
+            page-break-after: always;
+            width: 500px;
+        }
+        
+        img {
+            width: 100px;
+            height: 150px;
+            margin: 10px 0;
+        }
+        
+        hr {
+            margin: 0;
+        }
+        
+        .dark {
+            background-color: #aaaaaa;
+        }
+        
+        p {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+        
+        .head {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 2px 0 2px 0;
+            width: 98%;
+            display: flex;
+            justify-content: space-around
+        }
+        
+        .titel {
+            display: inline-block;
+            width: 60%;
+            text-align: center;
+        }
+        
+        .count {
+            text-align: left;
+            padding: 2px 5px;
+            border: 1px solid black;
+            border-top: none;
+        }
+        
+        .foot {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 24pt;
+            margin: 5px 0 5px 0;
+        }
+        
+        .small {
+            margin-top: 10px;
+            width: 40px;
+            height: 50px;
+        }
+        
+        .icon {
+            margin-top: 5px;
+            width: 113px;
+            height: 44px;
+        }
+    </style>
+</head>
+
+<body><div hidden="" by-vulcanize=""><dom-module id="page-break-div" assetpath="../components/page-break-div/">
+    <style>
+        :host {
+            background-color: cadetblue;
+        }
+
+        .break {
+            width: 710px;
+            page-break-before: always;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{pageBreak}}">
+            <div class="break">page break</div>
+        </template>
+    </template>
+</dom-module>
+</div>
+    <template id="tmpl" is="dom-bind">
+    <div style="width:950px">
+        <template is="dom-repeat" items="[[cards]]">
+
+            <div class$="card [[item.type]]">
+                <div class="head"><span class="count">[[item.strength]]</span>
+                    <div class="titel">[[item.name]]</div></div>
+                	<img class="icon" src="img/[[item.type]].png">
+					<p style="height: 120px;">[[item.desc]]</p>
+					<p style="font-size: 70%">[[item.type]]</p>
+            </div>
+            <page-break-div nmbr="[[index]]" max="18"></page-break-div>
+        </template>
+    </div>
+    </template>
+
+    </body></html>

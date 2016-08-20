@@ -1595,37 +1595,46 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 <dom-module id="paper-item-shared-styles" assetpath="../../bower_components/paper-item/">
   <template>
     <style>
-      :host {
+      :host, .paper-item {
         display: block;
         position: relative;
         min-height: var(--paper-item-min-height, 48px);
         padding: 0px 16px;
       }
 
-      :host([hidden]) {
+      .paper-item {
+        @apply(--paper-font-subhead);
+        border:none;
+        outline: none;
+        background: white;
+        width: 100%;
+        text-align: left;
+      }
+
+      :host([hidden]), .paper-item[hidden] {
         display: none !important;
       }
 
-      :host(.iron-selected) {
+      :host(.iron-selected), .paper-item.iron-selected {
         font-weight: var(--paper-item-selected-weight, bold);
 
         @apply(--paper-item-selected);
       }
 
-      :host([disabled]) {
+      :host([disabled]), .paper-item[disabled] {
         color: var(--paper-item-disabled-color, --disabled-text-color);
 
         @apply(--paper-item-disabled);
       }
 
-      :host(:focus) {
+      :host(:focus), .paper-item:focus {
         position: relative;
         outline: 0;
 
         @apply(--paper-item-focused);
       }
 
-      :host(:focus):before {
+      :host(:focus):before, .paper-item:focus:before {
         @apply(--layout-fit);
 
         background: currentColor;

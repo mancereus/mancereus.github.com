@@ -7,7 +7,7 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.21
+// @version 0.7.22
 (function() {
   window.WebComponents = window.WebComponents || {
     flags: {}
@@ -914,14 +914,29 @@ if (typeof WeakMap === "undefined") {
 
 (function() {
   var needsTemplate = typeof HTMLTemplateElement === "undefined";
+  if (/Trident/.test(navigator.userAgent)) {
+    (function() {
+      var importNode = document.importNode;
+      document.importNode = function() {
+        var n = importNode.apply(document, arguments);
+        if (n.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+          var f = document.createDocumentFragment();
+          f.appendChild(n);
+          return f;
+        } else {
+          return n;
+        }
+      };
+    })();
+  }
   var needsCloning = function() {
     if (!needsTemplate) {
-      var frag = document.createDocumentFragment();
       var t = document.createElement("template");
-      frag.appendChild(t);
-      t.content.appendChild(document.createElement("div"));
-      var clone = frag.cloneNode(true);
-      return clone.firstChild.content.childNodes.length === 0;
+      var t2 = document.createElement("template");
+      t2.content.appendChild(document.createElement("div"));
+      t.content.appendChild(t2);
+      var clone = t.cloneNode(true);
+      return clone.content.childNodes.length === 0 || clone.content.firstChild.content.childNodes.length === 0;
     }
   }();
   var TEMPLATE_TAG = "template";
@@ -943,6 +958,9 @@ if (typeof WeakMap === "undefined") {
       while (child = template.firstChild) {
         template.content.appendChild(child);
       }
+      template.cloneNode = function(deep) {
+        return TemplateImpl.cloneNode(this, deep);
+      };
       if (canDecorate) {
         try {
           Object.defineProperty(template, "innerHTML", {
@@ -965,9 +983,6 @@ if (typeof WeakMap === "undefined") {
             },
             configurable: true
           });
-          template.cloneNode = function(deep) {
-            return TemplateImpl.cloneNode(this, deep);
-          };
         } catch (err) {
           canDecorate = false;
         }
@@ -987,7 +1002,7 @@ if (typeof WeakMap === "undefined") {
     document.createElement = function() {
       "use strict";
       var el = createElement.apply(document, arguments);
-      if (el.localName == "template") {
+      if (el.localName === "template") {
         TemplateImpl.decorate(el);
       }
       return el;
@@ -1015,7 +1030,7 @@ if (typeof WeakMap === "undefined") {
   if (needsTemplate || needsCloning) {
     var nativeCloneNode = Node.prototype.cloneNode;
     TemplateImpl.cloneNode = function(template, deep) {
-      var clone = nativeCloneNode.call(template);
+      var clone = nativeCloneNode.call(template, false);
       if (this.decorate) {
         this.decorate(clone);
       }
@@ -1026,6 +1041,7 @@ if (typeof WeakMap === "undefined") {
       return clone;
     };
     TemplateImpl.fixClonedDom = function(clone, source) {
+      if (!source.querySelectorAll) return;
       var s$ = source.querySelectorAll(TEMPLATE_TAG);
       var t$ = clone.querySelectorAll(TEMPLATE_TAG);
       for (var i = 0, l = t$.length, t, s; i < l; i++) {
@@ -1063,7 +1079,7 @@ if (typeof WeakMap === "undefined") {
     }
   }
   if (needsTemplate) {
-    HTMLTemplateElement = TemplateImpl;
+    window.HTMLTemplateElement = TemplateImpl;
   }
 })();
 
@@ -2231,6 +2247,9 @@ window.CustomElements.addModule(function(scope) {
       definition.prototype = Object.create(HTMLElement.prototype);
     }
     definition.__name = name.toLowerCase();
+    if (definition.extends) {
+      definition.extends = definition.extends.toLowerCase();
+    }
     definition.lifecycle = definition.lifecycle || {};
     definition.ancestry = ancestry(definition.extends);
     resolveTagName(definition);
@@ -2403,21 +2422,6 @@ window.CustomElements.addModule(function(scope) {
   }
   wrapDomMethodToForceUpgrade(Node.prototype, "cloneNode");
   wrapDomMethodToForceUpgrade(document, "importNode");
-  if (isIE) {
-    (function() {
-      var importNode = document.importNode;
-      document.importNode = function() {
-        var n = importNode.apply(document, arguments);
-        if (n.nodeType == n.DOCUMENT_FRAGMENT_NODE) {
-          var f = document.createDocumentFragment();
-          f.appendChild(n);
-          return f;
-        } else {
-          return n;
-        }
-      };
-    })();
-  }
   document.registerElement = register;
   document.createElement = createElement;
   document.createElementNS = createElementNS;
@@ -2512,8 +2516,7 @@ resolve();
 addEventListener('DOMContentLoaded', resolve);
 }
 }
-}());
-window.Polymer = {
+}());window.Polymer = {
 Settings: function () {
 var settings = window.Polymer || {};
 var parts = location.search.slice(1).split('&');
@@ -2532,8 +2535,7 @@ settings.useNativeShadow = settings.useShadow && settings.nativeShadow;
 settings.usePolyfillProto = !settings.useNativeCustomElements && !Object.__proto__;
 return settings;
 }()
-};
-(function () {
+};(function () {
 var userPolymer = window.Polymer;
 window.Polymer = function (prototype) {
 if (typeof prototype === 'function') {
@@ -2580,15 +2582,13 @@ Polymer.log && this._regLog(prototype);
 dumpRegistrations: function () {
 this.registrations.forEach(this._regLog);
 }
-};
-Object.defineProperty(window, 'currentImport', {
+};Object.defineProperty(window, 'currentImport', {
 enumerable: true,
 configurable: true,
 get: function () {
 return (document._currentScript || document.currentScript).ownerDocument;
 }
-});
-Polymer.RenderStatus = {
+});Polymer.RenderStatus = {
 _ready: false,
 _callbacks: [],
 whenReady: function (cb) {
@@ -2656,8 +2656,7 @@ Polymer.RenderStatus._catchFirstRender();
 Polymer.RenderStatus._catchFirstRender();
 }
 Polymer.ImportStatus = Polymer.RenderStatus;
-Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;
-(function () {
+Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;(function () {
 'use strict';
 var settings = Polymer.Settings;
 Polymer.Base = {
@@ -2692,6 +2691,9 @@ if (proto._finishRegisterFeatures) {
 proto._finishRegisterFeatures();
 }
 proto._doBehavior('registered');
+if (settings.usePolyfillProto && proto !== this) {
+proto.extend(this, proto);
+}
 }
 },
 attachedCallback: function () {
@@ -2702,8 +2704,11 @@ self._doBehavior('attached');
 });
 },
 detachedCallback: function () {
-this.isAttached = false;
-this._doBehavior('detached');
+var self = this;
+Polymer.RenderStatus.whenReady(function () {
+self.isAttached = false;
+self._doBehavior('detached');
+});
 },
 attributeChangedCallback: function (name, oldValue, newValue) {
 this._attributeChangedImpl(name);
@@ -2737,15 +2742,36 @@ if (pd) {
 Object.defineProperty(target, name, pd);
 }
 },
-_log: console.log.apply.bind(console.log, console),
-_warn: console.warn.apply.bind(console.warn, console),
-_error: console.error.apply.bind(console.error, console),
+_logger: function (level, args) {
+if (args.length === 1 && Array.isArray(args[0])) {
+args = args[0];
+}
+switch (level) {
+case 'log':
+case 'warn':
+case 'error':
+console[level].apply(console, args);
+break;
+}
+},
+_log: function () {
+var args = Array.prototype.slice.call(arguments, 0);
+this._logger('log', args);
+},
+_warn: function () {
+var args = Array.prototype.slice.call(arguments, 0);
+this._logger('warn', args);
+},
+_error: function () {
+var args = Array.prototype.slice.call(arguments, 0);
+this._logger('error', args);
+},
 _logf: function () {
-return this._logPrefix.concat([this.is]).concat(Array.prototype.slice.call(arguments, 0));
+return this._logPrefix.concat(this.is).concat(Array.prototype.slice.call(arguments, 0));
 }
 };
 Polymer.Base._logPrefix = function () {
-var color = window.chrome || /firefox/i.test(navigator.userAgent);
+var color = window.chrome && !/edge/i.test(navigator.userAgent) || /firefox/i.test(navigator.userAgent);
 return color ? [
 '%c[%s::%s]:',
 'font-weight: bold; background-color:#EEEE00;'
@@ -2772,8 +2798,7 @@ Polymer.isInstance = function (obj) {
 return Boolean(obj && obj.__isPolymerInstance__);
 };
 Polymer.telemetry.instanceCount = 0;
-}());
-(function () {
+}());(function () {
 var modules = {};
 var lcModules = {};
 var findModule = function (id) {
@@ -2826,8 +2851,7 @@ CustomElements.upgrade(m);
 }
 }
 }
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 _prepIs: function () {
 if (!this.is) {
 var module = (document._currentScript || document.currentScript).parentNode;
@@ -2840,8 +2864,7 @@ if (this.is) {
 this.is = this.is.toLowerCase();
 }
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 behaviors: [],
 _desugarBehaviors: function () {
 if (this.behaviors.length) {
@@ -2922,8 +2945,7 @@ attached: true,
 detached: true,
 attributeChanged: true,
 ready: true
-};
-Polymer.Base._addFeature({
+};Polymer.Base._addFeature({
 _getExtendedPrototype: function (tag) {
 return this._getExtendedNativePrototype(tag);
 },
@@ -2940,8 +2962,7 @@ return p;
 getNativePrototype: function (tag) {
 return Object.getPrototypeOf(document.createElement(tag));
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 _prepConstructor: function () {
 this._factoryArgs = this.extends ? [
 this.extends,
@@ -2967,8 +2988,7 @@ this.factoryImpl.apply(elt, args);
 }
 return elt;
 }
-});
-Polymer.nob = Object.create(null);
+});Polymer.nob = Object.create(null);
 Polymer.Base._addFeature({
 properties: {},
 getPropertyInfo: function (property) {
@@ -3027,8 +3047,7 @@ t.readOnly = s.readOnly;
 }
 }
 }
-});
-Polymer.CaseMap = {
+});Polymer.CaseMap = {
 _caseMap: {},
 _rx: {
 dashToCamel: /-[a-z]/g,
@@ -3042,8 +3061,7 @@ return m[1].toUpperCase();
 camelToDashCase: function (camel) {
 return this._caseMap[camel] || (this._caseMap[camel] = camel.replace(this._rx.camelToDash, '-$1').toLowerCase());
 }
-};
-Polymer.Base._addFeature({
+};Polymer.Base._addFeature({
 _addHostAttributes: function (attributes) {
 if (!this._aggregatedAttributes) {
 this._aggregatedAttributes = {};
@@ -3153,9 +3171,7 @@ default:
 return value != null ? value : undefined;
 }
 }
-});
-Polymer.version = '1.4.0';
-Polymer.Base._addFeature({
+});Polymer.version = "1.5.0";Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepBehaviors();
@@ -3193,8 +3209,7 @@ instanceTemplate: function (template) {
 var dom = document.importNode(template._content || template.content, true);
 return dom;
 }
-});
-(function () {
+});(function () {
 var baseAttachedCallback = Polymer.Base.attachedCallback;
 Polymer.Base._addFeature({
 _hostStack: [],
@@ -3270,8 +3285,7 @@ this._attachedPending = true;
 }
 }
 });
-}());
-Polymer.ArraySplice = function () {
+}());Polymer.ArraySplice = function () {
 function newSplice(index, removed, addedCount) {
 return {
 index: index,
@@ -3440,8 +3454,7 @@ return currentValue === previousValue;
 }
 };
 return new ArraySplice();
-}();
-Polymer.domInnerHTML = function () {
+}();Polymer.domInnerHTML = function () {
 var escapeAttrRegExp = /[&\u00A0"]/g;
 var escapeDataRegExp = /[&\u00A0<>]/g;
 function escapeReplace(c) {
@@ -3537,8 +3550,7 @@ s += getOuterHTML(child, node, composed);
 return s;
 }
 return { getInnerHTML: getInnerHTML };
-}();
-(function () {
+}();(function () {
 'use strict';
 var nativeInsertBefore = Element.prototype.insertBefore;
 var nativeAppendChild = Element.prototype.appendChild;
@@ -3734,8 +3746,7 @@ removeChild: function (parentNode, node) {
 return nativeRemoveChild.call(parentNode, node);
 }
 };
-}());
-Polymer.DomApi = function () {
+}());Polymer.DomApi = function () {
 'use strict';
 var Settings = Polymer.Settings;
 var TreeApi = Polymer.TreeApi;
@@ -3852,8 +3863,7 @@ return DomApi.factory(obj, patch);
 var p = Element.prototype;
 DomApi.matchesSelector = p.matches || p.matchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector || p.webkitMatchesSelector;
 return DomApi;
-}();
-(function () {
+}();(function () {
 'use strict';
 var Settings = Polymer.Settings;
 var DomApi = Polymer.DomApi;
@@ -4322,8 +4332,7 @@ configurable: true
 DomApi.hasInsertionPoint = function (root) {
 return Boolean(root && root._insertionPoints.length);
 };
-}());
-(function () {
+}());(function () {
 'use strict';
 var Settings = Polymer.Settings;
 var TreeApi = Polymer.TreeApi;
@@ -4441,8 +4450,7 @@ forwardProperties([
 'nextElementSibling',
 'previousElementSibling'
 ]);
-}());
-Polymer.Base.extend(Polymer.dom, {
+}());Polymer.Base.extend(Polymer.dom, {
 _flushGuard: 0,
 _FLUSH_MAX: 100,
 _needsTakeRecords: !Polymer.Settings.useNativeCustomElements,
@@ -4490,8 +4498,7 @@ this._finishDebouncer = Polymer.Debounce(this._finishDebouncer, this._finishFlus
 _finishFlush: function () {
 Polymer.dom._debouncers = [];
 }
-});
-Polymer.EventApi = function () {
+});Polymer.EventApi = function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var Settings = Polymer.Settings;
@@ -4559,8 +4566,7 @@ event.__eventApi = new DomApi.Event(event);
 return event.__eventApi;
 };
 return { factory: factory };
-}();
-(function () {
+}();(function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var useShadow = Polymer.Settings.useShadow;
@@ -4599,8 +4605,7 @@ contains: function () {
 return this.node.classList.contains.apply(this.node.classList, arguments);
 }
 };
-}());
-(function () {
+}());(function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var Settings = Polymer.Settings;
@@ -4800,8 +4805,7 @@ h._alwaysNotify = h._isContentListener;
 }
 });
 }
-}());
-(function () {
+}());(function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var Settings = Polymer.Settings;
@@ -4852,8 +4856,7 @@ this._observer = null;
 }
 });
 }
-}());
-(function () {
+}());(function () {
 var DomApi = Polymer.DomApi;
 var TreeApi = Polymer.TreeApi;
 Polymer.Base._addFeature({
@@ -5160,8 +5163,7 @@ CustomElements.upgrade(children[i]);
 }
 }
 }
-}());
-if (Polymer.Settings.useShadow) {
+}());if (Polymer.Settings.useShadow) {
 Polymer.Base._addFeature({
 _poolContent: function () {
 },
@@ -5179,8 +5181,7 @@ this.shadowRoot.appendChild(this.root);
 this.root = this.shadowRoot;
 }
 });
-}
-Polymer.Async = {
+}Polymer.Async = {
 _currVal: 0,
 _lastVal: 0,
 _callbacks: [],
@@ -5230,8 +5231,7 @@ this._lastVal += len;
 };
 new window.MutationObserver(function () {
 Polymer.Async._atEndOfMicrotask();
-}).observe(Polymer.Async._twiddle, { characterData: true });
-Polymer.Debounce = function () {
+}).observe(Polymer.Async._twiddle, { characterData: true });Polymer.Debounce = function () {
 var Async = Polymer.Async;
 var Debouncer = function (context) {
 this.context = context;
@@ -5253,12 +5253,14 @@ stop: function () {
 if (this.finish) {
 this.finish();
 this.finish = null;
+this.callback = null;
 }
 },
 complete: function () {
 if (this.finish) {
+var callback = this.callback;
 this.stop();
-this.callback.call(this.context);
+callback.call(this.context);
 }
 }
 };
@@ -5272,8 +5274,7 @@ debouncer.go(callback, wait);
 return debouncer;
 }
 return debounce;
-}();
-Polymer.Base._addFeature({
+}();Polymer.Base._addFeature({
 _setupDebouncers: function () {
 this._debouncers = {};
 },
@@ -5296,8 +5297,7 @@ if (debouncer) {
 debouncer.stop();
 }
 }
-});
-Polymer.DomModule = document.createElement('dom-module');
+});Polymer.DomModule = document.createElement('dom-module');
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -5543,8 +5543,7 @@ return n;
 return root;
 }
 }
-};
-(function () {
+};(function () {
 function resolveCss(cssText, ownerDocument) {
 return cssText.replace(CSS_URL_RX, function (m, pre, url, post) {
 return pre + '\'' + resolve(url.replace(/["']/g, ''), ownerDocument) + '\'' + post;
@@ -5602,8 +5601,7 @@ resolveCss: resolveCss,
 resolveAttrs: resolveAttrs,
 resolveUrl: resolveUrl
 };
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 _prepAnnotations: function () {
 if (!this._template) {
 this._notes = [];
@@ -5643,10 +5641,12 @@ this._processAnnotations(note.templateContent._notes);
 var pp = note.templateContent._parentProps = this._discoverTemplateParentProps(note.templateContent._notes);
 var bindings = [];
 for (var prop in pp) {
+var name = '_parent_' + prop;
 bindings.push({
 index: note.index,
 kind: 'property',
-name: '_parent_' + prop,
+name: name,
+propertyName: name,
 parts: [{
 mode: '{',
 model: prop,
@@ -5670,6 +5670,9 @@ var model = args[kk].model;
 if (model) {
 pp[model] = true;
 }
+}
+if (p.signature.dynamicFn) {
+pp[p.signature.method] = true;
 }
 } else {
 if (p.model) {
@@ -5761,8 +5764,7 @@ this.listen(node, e.name, e.value);
 }
 }
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 listeners: {},
 _listenListeners: function (listeners) {
 var node, name, eventName;
@@ -5843,8 +5845,7 @@ node.addEventListener(eventName, handler);
 _unlisten: function (node, eventName, handler) {
 node.removeEventListener(eventName, handler);
 }
-});
-(function () {
+});(function () {
 'use strict';
 var wrap = Polymer.DomApi.wrap;
 var HAS_NATIVE_TA = typeof document.head.style.touchAction === 'string';
@@ -6025,9 +6026,9 @@ if (type === 'touchstart' || type === 'touchmove') {
 Gestures.handleTouchAction(ev);
 }
 }
-if (type === 'touchend' && !ev.__polymerSimulatedTouch) {
+if (type === 'touchend') {
 POINTERSTATE.mouse.target = Polymer.dom(ev).rootTarget;
-ignoreMouse(true);
+ignoreMouse();
 }
 }
 }
@@ -6174,6 +6175,11 @@ prevent: function (evName) {
 var recognizer = this.findRecognizerByEvent(evName);
 if (recognizer.info) {
 recognizer.info.prevent = true;
+}
+},
+resetMouseCanceller: function () {
+if (POINTERSTATE.mouse.mouseIgnoreJob) {
+POINTERSTATE.mouse.mouseIgnoreJob.complete();
 }
 }
 };
@@ -6487,8 +6493,7 @@ Gestures.setTouchAction(node, DIRECTION_MAP[direction] || 'auto');
 }
 });
 Polymer.Gestures = Gestures;
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 $$: function (slctr) {
 return Polymer.dom(this.root).querySelector(slctr);
 },
@@ -6664,9 +6669,7 @@ return this !== node && this.contains(node) && Polymer.dom(this).getOwnerRoot() 
 isLocalDescendant: function (node) {
 return this.root === Polymer.dom(node).getOwnerRoot();
 }
-});
-Polymer.Bind = {
-_dataEventCache: {},
+});Polymer.Bind = {
 prepareModel: function (model) {
 Polymer.Base.mixin(model, this._modelApi);
 },
@@ -6839,8 +6842,7 @@ element.addEventListener(event, function (e) {
 return context._notifyListener(changedFn, e);
 });
 }
-};
-Polymer.Base.extend(Polymer.Bind, {
+};Polymer.Base.extend(Polymer.Bind, {
 _shouldAddListener: function (effect) {
 return effect.name && effect.kind != 'attribute' && effect.kind != 'text' && !effect.isCompound && effect.parts[0].mode === '{';
 },
@@ -6849,10 +6851,7 @@ if (source != effect.value) {
 value = this._get(effect.value);
 this.__data__[effect.value] = value;
 }
-var calc = effect.negate ? !value : value;
-if (!effect.customEvent || this._nodes[effect.index][effect.name] !== calc) {
-return this._applyEffectValue(effect, calc);
-}
+this._applyEffectValue(effect, value);
 },
 _reflectEffect: function (source, value, effect) {
 this.reflectPropertyToAttribute(source, effect.attribute, value);
@@ -6905,9 +6904,6 @@ if (fn) {
 var args = Polymer.Bind._marshalArgs(this.__data__, effect, source, value);
 if (args) {
 var computedvalue = fn.apply(computedHost, args);
-if (effect.negate) {
-computedvalue = !computedvalue;
-}
 this._applyEffectValue(effect, computedvalue);
 }
 } else if (effect.dynamicFn) {
@@ -6925,17 +6921,19 @@ var name = arg.name;
 var v;
 if (arg.literal) {
 v = arg.value;
-} else if (arg.structured) {
-v = Polymer.Base._get(name, model);
+} else if (path === name) {
+v = value;
 } else {
 v = model[name];
+if (v === undefined && arg.structured) {
+v = Polymer.Base._get(name, model);
+}
 }
 if (bailoutEarly && v === undefined) {
 return;
 }
 if (arg.wildcard) {
-var baseChanged = name.indexOf(path + '.') === 0;
-var matches = effect.trigger.name.indexOf(name) === 0 && !baseChanged;
+var matches = path.indexOf(name + '.') === 0;
 values[i] = {
 path: matches ? path : name,
 value: matches ? value : v,
@@ -6947,8 +6945,7 @@ values[i] = v;
 }
 return values;
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 _addPropertyEffect: function (property, kind, effect) {
 var prop = Polymer.Bind.addPropertyEffect(this, property, kind, effect);
 prop.pathFn = this['_' + prop.kind + 'PathEffect'];
@@ -7183,33 +7180,45 @@ Polymer.Bind.setupBindListeners(this);
 _applyEffectValue: function (info, value) {
 var node = this._nodes[info.index];
 var property = info.name;
+value = this._computeFinalAnnotationValue(node, property, value, info);
+if (info.customEvent && node[property] === value) {
+return;
+}
+if (info.kind == 'attribute') {
+this.serializeValueToAttribute(value, property, node);
+} else {
+var pinfo = node._propertyInfo && node._propertyInfo[property];
+if (pinfo && pinfo.readOnly) {
+return;
+}
+this.__setProperty(property, value, false, node);
+}
+},
+_computeFinalAnnotationValue: function (node, property, value, info) {
+if (info.negate) {
+value = !value;
+}
 if (info.isCompound) {
 var storage = node.__compoundStorage__[property];
 storage[info.compoundIndex] = value;
 value = storage.join('');
 }
-if (info.kind == 'attribute') {
-this.serializeValueToAttribute(value, property, node);
-} else {
+if (info.kind !== 'attribute') {
 if (property === 'className') {
 value = this._scopeElementClass(node, value);
 }
 if (property === 'textContent' || node.localName == 'input' && property == 'value') {
 value = value == undefined ? '' : value;
 }
-var pinfo;
-if (!node._propertyInfo || !(pinfo = node._propertyInfo[property]) || !pinfo.readOnly) {
-this.__setProperty(property, value, false, node);
 }
-}
+return value;
 },
 _executeStaticEffects: function () {
 if (this._propertyEffects && this._propertyEffects.__static__) {
 this._effectEffects('__static__', null, this._propertyEffects.__static__);
 }
 }
-});
-(function () {
+});(function () {
 var usePolyfillProto = Polymer.Settings.usePolyfillProto;
 Polymer.Base._addFeature({
 _setupConfigure: function (initialConfig) {
@@ -7276,13 +7285,14 @@ for (var p in config) {
 var fx = fx$[p];
 if (fx) {
 for (var i = 0, l = fx.length, x; i < l && (x = fx[i]); i++) {
-if (x.kind === 'annotation' && !x.isCompound) {
+if (x.kind === 'annotation') {
 var node = this._nodes[x.effect.index];
 var name = x.effect.propertyName;
 var isAttr = x.effect.kind == 'attribute';
 var hasEffect = node._propertyEffects && node._propertyEffects[name];
 if (node._configValue && (hasEffect || !isAttr)) {
 var value = p === x.effect.value ? config[p] : this._get(x.effect.value, config);
+value = this._computeFinalAnnotationValue(node, name, value, x.effect);
 if (isAttr) {
 value = node.deserialize(this.serialize(value), node._propertyInfo[name].type);
 }
@@ -7336,13 +7346,15 @@ h[0].call(this, h[1], h[2], h[3]);
 this._handlers = [];
 }
 });
-}());
-(function () {
+}());(function () {
 'use strict';
 Polymer.Base._addFeature({
 notifyPath: function (path, value, fromAbove) {
 var info = {};
-this._get(path, this, info);
+var v = this._get(path, this, info);
+if (arguments.length === 1) {
+value = v;
+}
 if (info.path) {
 this._notifyPath(info.path, value, fromAbove);
 }
@@ -7540,17 +7552,13 @@ var change = {
 keySplices: Polymer.Collection.applySplices(array, splices),
 indexSplices: splices
 };
-if (!array.hasOwnProperty('splices')) {
-Object.defineProperty(array, 'splices', {
-configurable: true,
-writable: true
-});
-}
-array.splices = change;
-this._notifyPath(path + '.splices', change);
+var splicesPath = path + '.splices';
+this._notifyPath(splicesPath, change);
 this._notifyPath(path + '.length', array.length);
-change.keySplices = null;
-change.indexSplices = null;
+this.__data__[splicesPath] = {
+keySplices: null,
+indexSplices: null
+};
 },
 _notifySplice: function (array, path, index, added, removed) {
 this._notifySplices(array, path, [{
@@ -7645,8 +7653,7 @@ _getPathParts: Polymer.Base._getPathParts
 });
 }
 });
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 resolveUrl: function (url) {
 var module = Polymer.DomModule.import(this.is);
 var root = '';
@@ -7656,8 +7663,7 @@ root = Polymer.ResolveUrl.resolveUrl(assetPath, module.ownerDocument.baseURI);
 }
 return Polymer.ResolveUrl.resolveUrl(url, root);
 }
-});
-Polymer.CssParse = function () {
+});Polymer.CssParse = function () {
 return {
 parse: function (text) {
 text = this._clean(text);
@@ -7801,8 +7807,7 @@ VAR_START: '--',
 MEDIA_START: '@media',
 AT_START: '@'
 };
-}();
-Polymer.StyleUtil = function () {
+}();Polymer.StyleUtil = function () {
 return {
 MODULE_STYLES_SELECTOR: 'style, link[rel=import][type~=css], template',
 INCLUDE_ATTR: 'include',
@@ -7852,6 +7857,9 @@ this.forEachRule(r, styleRuleCallback, keyframesRuleCallback);
 },
 applyCss: function (cssText, moniker, target, contextNode) {
 var style = this.createScopeStyle(cssText, moniker);
+return this.applyStyle(style, target, contextNode);
+},
+applyStyle: function (style, target, contextNode) {
 target = target || document.head;
 var after = contextNode && contextNode.nextSibling || target.firstChild;
 this.__lastHeadApplyNode = style;
@@ -7920,8 +7928,7 @@ resolveCss: Polymer.ResolveUrl.resolveCss,
 parser: Polymer.CssParse,
 ruleTypes: Polymer.CssParse.types
 };
-}();
-Polymer.StyleTransformer = function () {
+}();Polymer.StyleTransformer = function () {
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var styleUtil = Polymer.StyleUtil;
 var api = {
@@ -8104,8 +8111,7 @@ var PSEUDO_PREFIX = ':';
 var CLASS = 'class';
 var CONTENT_START = new RegExp('^(' + CONTENT + ')');
 return api;
-}();
-Polymer.StyleExtends = function () {
+}();Polymer.StyleExtends = function () {
 var styleUtil = Polymer.StyleUtil;
 return {
 hasExtends: function (cssText) {
@@ -8175,8 +8181,7 @@ EXTEND: /@extends\(([^)]*)\)\s*?;/gim,
 STRIP: /%[^,]*$/
 }
 };
-}();
-(function () {
+}();(function () {
 var prepElement = Polymer.Base._prepElement;
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var styleUtil = Polymer.StyleUtil;
@@ -8281,8 +8286,7 @@ return mo;
 }
 }
 });
-}());
-Polymer.StyleProperties = function () {
+}());Polymer.StyleProperties = function () {
 'use strict';
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var matchesSelector = Polymer.DomApi.matchesSelector;
@@ -8544,12 +8548,20 @@ if (s._useCount <= 0 && s.parentNode) {
 s.parentNode.removeChild(s);
 }
 }
-if (nativeShadow || (!style || !style.parentNode)) {
-if (nativeShadow && element._customStyle) {
+if (nativeShadow) {
+if (element._customStyle) {
 element._customStyle.textContent = cssText;
 style = element._customStyle;
 } else if (cssText) {
-style = styleUtil.applyCss(cssText, selector, nativeShadow ? element.root : null, element._scopeStyle);
+style = styleUtil.applyCss(cssText, selector, element.root);
+}
+} else {
+if (!style) {
+if (cssText) {
+style = styleUtil.applyCss(cssText, selector, null, element._scopeStyle);
+}
+} else if (!style.parentNode) {
+styleUtil.applyStyle(style, null, element._scopeStyle);
 }
 }
 if (style) {
@@ -8590,8 +8602,7 @@ var o = parseInt(n / 32);
 var v = 1 << n % 32;
 bits[o] = (bits[o] || 0) | v;
 }
-}();
-(function () {
+}();(function () {
 Polymer.StyleCache = function () {
 this.cache = {};
 };
@@ -8637,8 +8648,7 @@ _objectsStrictlyEqual: function (target, source) {
 return this._objectsEqual(target, source) && this._objectsEqual(source, target);
 }
 };
-}());
-Polymer.StyleDefaults = function () {
+}());Polymer.StyleDefaults = function () {
 var styleProperties = Polymer.StyleProperties;
 var StyleCache = Polymer.StyleCache;
 var api = {
@@ -8679,8 +8689,7 @@ s._apply();
 }
 };
 return api;
-}();
-(function () {
+}();(function () {
 'use strict';
 var serializeValueToAttribute = Polymer.Base.serializeValueToAttribute;
 var propertyUtils = Polymer.StyleProperties;
@@ -8841,8 +8850,7 @@ var styleCache = new Polymer.StyleCache();
 Polymer.customStyleCache = styleCache;
 var SCOPE_NAME = styleTransformer.SCOPE_NAME;
 var XSCOPE_NAME = propertyUtils.XSCOPE_NAME;
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepConstructor();
@@ -8888,8 +8896,7 @@ if (b.listeners) {
 this._listenListeners(b.listeners);
 }
 }
-});
-(function () {
+});(function () {
 var propertyUtils = Polymer.StyleProperties;
 var styleUtil = Polymer.StyleUtil;
 var cssParse = Polymer.CssParse;
@@ -8962,8 +8969,7 @@ rule.cssText = propertyUtils.valueForProperties(css, props);
 });
 }
 });
-}());
-Polymer.Templatizer = {
+}());Polymer.Templatizer = {
 properties: { __hideTemplateChildren__: { observer: '_showHideChildren' } },
 _instanceProps: Polymer.nob,
 _parentPropPrefix: '_parent_',
@@ -9153,7 +9159,7 @@ var dot = path.indexOf('.');
 var root = dot < 0 ? path : path.slice(0, dot);
 dataHost._forwardInstancePath.call(dataHost, this, path, value);
 if (root in dataHost._parentProps) {
-dataHost._templatized.notifyPath(dataHost._parentPropPrefix + path, value);
+dataHost._templatized._notifyPath(dataHost._parentPropPrefix + path, value);
 }
 },
 _pathEffectorImpl: function (path, value, fromAbove) {
@@ -9206,6 +9212,7 @@ var host = this._rootDataHost;
 if (host) {
 return host._scopeElementClass(node, value);
 }
+return value;
 },
 stamp: function (model) {
 model = model || {};
@@ -9233,8 +9240,7 @@ el = el.parentNode;
 }
 }
 }
-};
-Polymer({
+};Polymer({
 is: 'dom-template',
 extends: 'template',
 _template: null,
@@ -9242,8 +9248,7 @@ behaviors: [Polymer.Templatizer],
 ready: function () {
 this.templatize(this);
 }
-});
-Polymer._collections = new WeakMap();
+});Polymer._collections = new WeakMap();
 Polymer.Collection = function (userArray) {
 Polymer._collections.set(userArray, this);
 this.userArray = userArray;
@@ -9378,8 +9383,7 @@ return Polymer._collections.get(userArray) || new Polymer.Collection(userArray);
 Polymer.Collection.applySplices = function (userArray, splices) {
 var coll = Polymer._collections.get(userArray);
 return coll ? coll._applySplices(splices) : null;
-};
-Polymer({
+};Polymer({
 is: 'dom-repeat',
 extends: 'template',
 _template: null,
@@ -9845,8 +9849,7 @@ indexForElement: function (el) {
 var instance = this.modelForElement(el);
 return instance && instance[this.indexAs];
 }
-});
-Polymer({
+});Polymer({
 is: 'array-selector',
 _template: null,
 properties: {
@@ -9937,8 +9940,7 @@ this.linkPaths('selectedItem', 'items.' + key);
 }
 }
 }
-});
-Polymer({
+});Polymer({
 is: 'dom-if',
 extends: 'template',
 _template: null,
@@ -10038,8 +10040,7 @@ if (this._instance) {
 this._instance._notifyPath(path, value, true);
 }
 }
-});
-Polymer({
+});Polymer({
 is: 'dom-bind',
 extends: 'template',
 _template: null,
@@ -11655,37 +11656,36 @@ var data1 = {
         { name: "Weg", Aktion: "", flavour: "Jack: 'Wer hat wohl meinen Bezintank manipuliert?'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: true },
-        { name: "Weg", Aktion: "", flavour: "Jane: Prof. Hampton ist ein berühmter Archeoöloge.", hor: true },
+        { name: "Weg", Aktion: "", flavour: "Jane: Prof. Hampton ist ein berühmter Archeologe.", hor: true },
         { name: "Weg", Aktion: "", flavour: "Jane: 'Ist das der richtige Weg?'", hor: true, ver: true },
+        { name: "Tempel", Aktion: "Ihr findet eine alte Tempelruine mit unbekannten Schriftzeichen.", hor: false, ver: true },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, ver: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
         { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
-        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
-        { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: true, imgclass: "symbol" },
+        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
+        { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: true, imgclass: "symbol" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
         { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen. Die Fackel darf man behalten.", ver: true, info: "info" },
-        { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
-        { name: "Hängebrücke", info: "problem", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+        { name: "Hängebrücke", info: "problem", Aktion: "Über eine tiefe Schlucht spannt sich eine Hängebrücke. Du kannst den Ort nur geradeaus überqueren. Wenn du deinen Zug hier beendest, kannst du auch abbiegen." },
+        { name: "Hängebrücke", info: "problem", Aktion: "Über eine tiefe Schlucht spannt sich eine Hängebrücke. Du kannst den Ort nur geradeaus überqueren. Wenn du deinen Zug hier beendest, kannst du auch abbiegen." },
         { name: "Boot", Aktion: "Mit dem Boot kannst du dem See überqueren oder auf dem Fluß fahren.", hor: true, imgclass: "symbol" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
         { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: true, imgclass: "symbol" },
         { name: "Pistole", Aktion: "Die Pistole ist alt und hat nur noch eine Kugel.", hor: true, imgclass: "symbol" },
-        { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu.", ver: true, imgclass: "symbol" },
-        { name: "Inschrift", Aktion: "Die Inschrift ist versteckt hinter Dschungelpflanzen. Lege eine Machete und das Tagebuch hier ab, dann könnt ihr den Weg zum 'Tal der Kannibalen' erkennen.", hor: true },
+         { name: "See", Aktion: "Nur mit dem Boot kannst du den See betreten oder überqueren.", info: "problem" },
         { name: "See", Aktion: "Nur mit dem Boot kannst du den See betreten oder überqueren.", info: "problem" },
         { name: "Tagebuch", Aktion: "Ihr findet das Tagebuch von Professor Hampton. Er sucht das geheime 'Tal der Kannibalen'. Finde den Tempel oder die versteckte Inschrift, um den Weg dorhin zu entschlüsseln.", imgclass: "symbol" },
-
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange. ", hor: true, imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: true, imgclass: "symbol" },
         { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", hor: true, imgclass: "symbol" },
-        { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", ver: true, imgclass: "symbol" },
-        { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange.", ver: true, imgclass: "symbol" },
+        { name: "Schrumpfkopf", order: "star", Aktion: "Ihr findet einen alte verfallenen Brunnen. Wenn ihr in diesen mit einer Fackel hinabsteigt, findet ihr darin einen Schrumpfkopf der Kannibalen. Die Fackel müsst ihr dann abgeben.", imgclass: "symbol"},
+        { name: "Affenhorde", Aktion: " Mit der Pistole kannst du Affenhorde verjagen. Lege die Pistole hier ab. Ansonsten klauen die Affen euch einen Gegenstand. Lege einen Gegenstand aus dem Inventar in den Vorrat.", ver: true, info: "problem" },
+        { name: "Affenhorde", Aktion: " Mit der Pistole kannst du Affenhorde verjagen. Lege die Pistole hier ab. Ansonsten klauen die Affen euch einen Gegenstand. Lege einen Gegenstand aus dem Inventar in den Vorrat.", ver: true, info: "problem" },
+        { name: "Affenhorde", Aktion: " Mit der Pistole kannst du Affenhorde verjagen. Lege die Pistole hier ab. Ansonsten klauen die Affen euch einen Gegenstand. Lege einen Gegenstand aus dem Inventar in den Vorrat.", ver: true, info: "problem" },
+        { name: "Affenhorde", Aktion: " Mit der Pistole kannst du Affenhorde verjagen. Lege die Pistole hier ab. Ansonsten klauen die Affen euch einen Gegenstand. Lege einen Gegenstand aus dem Inventar in den Vorrat.", hor: true, info: "problem" },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: true },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", ver: true },
@@ -11693,21 +11693,23 @@ var data1 = {
         { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beißt dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", info: "problem", hor: true  },
     ],
     initActions: [
-        { name: "Fluss", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 beenden.", task: true },
-        { name: "Minenfahrt", order: "home", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, alle 4 Höhlen im Spielplan gefunden sind und ihr eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
-        { name: "Schrumpfkopf", Aktion: "Ihr findet einen Schrumpfkopf der Kannibalen.", imgclass: "symbol", task: true },
-        { name: "Tempel", Aktion: "Ihr habt die alte Tempelruine gefunden. Lege das Tagebuch hier ab, dann kennt ihr den Weg zum 'Tal der Kannibalen'.", task: true },
+        { name: "Inschrift", order: "announcement", Aktion: "Eine Steininschrift ist hinter Dschungelpflanzen verborgen. Lege eine Machete hier ab, um die Inschrift freizulegen. Mit dem Tagebuch könnt ihr den Text übersetzen. Er verrät euch die Position des 'Tal der Kannibalen'", task: true },
+       { name: "Traum", order: "announcement", Aktion: "Jane hat einen mysteriösen Traum. Im Tempel findet Sie mit der Fackel und dem Tagebuch den Weg zum Tal der Kanibalen. Legt die Fackel und das Tagebuch im Tempel ab, dann kennt ihr den Weg zum 'Tal der Kannibalen'.", task: true },
         { name: "Lager", Aktion: "Du findest ein verlassenes Lager. Du kannst bis zu 2 Dinge aus dem Vorrat auf passende leere Karten legen. (z.B.: Liane auf Lianenkarte)", task: true },
+        { name: "Explosion", Aktion: "In der Ferne hört ihr ein riesige Explosion. Das Flugzeug ist explodiert. Nehmt die Startkarte in der Spielmitte aus dem Spiel.", task: true },
 
-        { name: "Tierfalle", Aktion: "Jacks Bein verletzt sich in einer Tierfalle des Großwildjägers. Du kannst bis zu einem anderen Eckfeld pro Zug nur 3 Felder weit ziehen. Verwende in Akt 2 eine Aktionskarte mit 'Jäger'", task: true },
-        { name: "Karte", Aktion: "Du findest eine Karte des Dschungels. Ab sofort kannst du Karten auch diagonal anlegen.", task: true },
-        { name: "Sturm", Aktion: "Ein Sturm zieht durch den Dschungel. Alle verwendeten Macheten kommen auf Machetenfelder zurück.", task: true },
-
+        { name: "Tierfalle", Aktion: "Jacks Bein verletzt sich in einer Tierfalle des Jägers Stoephasius. Du kannst bis zu einem anderen Eckfeld pro Zug nur 3 Felder weit ziehen. Verwende in Akt 2 eine Aktionskarte mit 'Jäger'", task: true },
         { name: "Überfall", order: "star", Aktion: "Jack kommt ins Lager zurück und Jane ist verschwunden. Er findet Spuren eines Kampfes und Pfeile der Kannibalen. Lege Janes Inventarkarte zur Seite.Verwende in Akt 2 eine Aktionskarte mit 'Jane'", task: true },
-        { name: "Whiskykiste", order: "star", Aktion: "Jack findet eine Whiskykiste. Er hat Alkoholprobleme, weil seine Frau vor 3 Jahren in einem Hinterhalt erschossen wurde. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
-        { name: "Menschenaffe", order: "star", Aktion: "Jane wird von einem Riesenaffen angegriffen aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jack weist ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
+        { name: "Whiskykiste", order: "star", Aktion: "Jack hat Alkoholprobleme, weil seine Frau vor 3 Jahren in einem Hinterhalt erschossen wurde. Falls du in den letzten 24 Stunden keinen Alkohol getrunken hast, kann sich auch Jack beherrschen. Verwende dann'Jack' in Akt 2. Ansonsten säuft er sich voll und du verlierst einen Gegenstand.", task: true },
+        { name: "Alligator", order: "star", Aktion: "Jane wird von einem Alligator angegriffen, aber im letzten Moment vom Jäger Stoephasius gerettet. Er will sich euch anschliessen, aber Jane weist ihn wütend zurück. Stoephasius verlässt euch mit den Worten: 'Das wird euch noch leid tun.' Akt 2 mit 'Jäger'", task: true },
+        { name: "Karte", Aktion: "Du findest eine Karte des Dschungels. Ab sofort kannst du Karten auch diagonal anlegen.", task: true },
+        { name: "Fluss", order: "home", orderText: "Ausgang", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, könnt ihr mit dem Boot über den Fluss dorthin fahren und den Akt 1 erfolgreich beenden. Lest dann die Karte 'Akt 1 Erfolg'", task: true },
+        { name: "Minenfahrt", order: "home", orderText: "Ausgang", Aktion: "Wenn ihr den Weg zum 'Tal der Kannibalen' kennt, alle 4 Höhlen im Spielplan gefunden sind und ihr eine Fackel besitzt, könnt ihr mit einer Lore in das 'Tal der Kannibalen' fahren. Dabei musst du die Fackel abgeben. Verwende in Akt 2 eine Aktionskarte mit 'Mine'", task: true },
+        { name: "Sturm", Aktion: "Ein Sturm zieht durch den Dschungel. Er entfernt 2 Macheten vom Spielplan in den Vorrat.", task: true },
+
     ],
     start: { name: "Akt I", Aktion: "Jane hat den Piloten Jack für eine geheime Expedition in den Dschungel engagiert.  Das Flugzeug stürzt kurz vor dem Ziel ab. Jemand hat die Tanks durchlöchert...", task: true, type: "Startkarte" },
+    intro: { name: "Intro", Aktion: "1927, Panama, Die junge Archäologin Jane Smith errreicht den Provinzflughafen St. Josephina. Sie spricht den einzigen verfügbaren Dschungelpiloten Jack Manders an: 'Sie sind ja schon Mittags völlig betrunken. Das ist ja widerlich.' Jack: 'Was?' Jane: 'Ich brauche Sie für einen Flug in den Dschungel. Ich bezahle Sie gut. Also stellen Sie sich unter die Dusche und schlafen ihren Rausch aus. Morgen früh geht es los.' Jack: 'Was?' Jane: 'Los Mann. Stehen Sie auf.' Jack: 'Ok. Ok. Ist ja gut. Morgen früh geht's los.' Das Gespräch wird von einer Person im Hintergrund belauscht. Am nächsten Morgen startet Jacks Flugzeug mit den beiden Richtung undurchdringlichem Dschungel.", task: true, type: "Intro" },
 };
 var data2 = {
     akt: 2,
@@ -11763,24 +11765,22 @@ var data2 = {
         { name: "Alligator", Aktion: "Am Fluß wird Jack von einem Alligator angefallen. Wenn ihr keine Pistole habt, wird er verletzt und ihr könnt pro Zug nur noch maximal 4 Schritte gehen.", task: true },
         { name: "Affenhorde",  Aktion: "Die Affenhorde klaut einen offen liegenden Gegenstand auf dem Plan. Wähle einen Gegenstand aus und lege ihn den Vorrat", info: "problem", task: true },
 
-        { name: "Jäger", order: "accessibility", Aktion: "Der Jäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Aktionskarte. Mit der Pistole kannst du sie ihm dort abnehmen. Er ist auf der Suche nach der geheimen Schatzkammer der Kannibalen.",  task: true },
-        { name: "Jäger", order: "accessibility", Aktion: "Der Jäger Stoephasius wurde von Kannibalen gefangen genommen und wird in ihr Dorf transportiert. Mit der Pistole kannst du ihn retten. Aus Dankbarkeit erhälst du einen Bonuspunkt. Ansonsten wird er von den Kannibalen getötet.", info: "warn",  task: true },
+        { name: "Jäger", order: "accessibility", orderText: "Jäger",Aktion: "Der Jäger Stoephasius klaut dir alle Artefakte und bringt sie zur gegenüberliegenden Aktionskarte. Mit der Pistole kannst du sie ihm dort abnehmen. Er ist auf der Suche nach der geheimen Schatzkammer der Kannibalen.",  task: true },
+        { name: "Jäger", order: "accessibility",orderText: "Jäger", Aktion: "Der Jäger Stoephasius wurde von Kannibalen gefangen genommen und wird in ihr Dorf transportiert. Mit der Pistole kannst du ihn retten. Aus Dankbarkeit erhälst du einen Bonuspunkt. Ansonsten wird er von den Kannibalen getötet.",  task: true },
+        { name: "Leiche", order: "accessibility",orderText: "Jäger", Aktion: "Jack findet eine halbverweste Leiche. Es ist der Geschäftspartner des Jägers Stoephasius. Er wurde offensichtlich von hinten erschossen. Jack findet einen Brief, der beweist, dass Stoephasius für den Tod von Jacks Frau verantwortlich ist. Jane ist entsetzt. 1 Bonuspunkt.", task: true },
+        { name: "Gefangen", order: "build", orderText: "Jack",Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist auch Jane gefangen, dann ist das Abenteuer nun beendet.", task: true },
 
-        { name: "Gefangen", order: "build", Aktion: "Jack wird von den Kannibalen überrascht und gefangen. Jane muss den Kannibalen den Schrumpfkopf geben, dann lassen sie Jack frei. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist auch Jane gefangen, dann ist das Abenteuer nun beendet.", task: true },
-        { name: "Leiche", order: "build", Aktion: "Jack findet eine halbverweste Leiche. Es ist der Geschäftspartner des Jägers Stoephasius. Er wurde offensichtlich von hinten erschossen. Jack findet einen Brief, der beweist, dass Stoephasius für den Tod von Jacks Frau verantwortlich ist. Jane ist entsetzt. 1 Bonuspunkt.", task: true },
-        { name: "Abendrot", order: "build", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
-        { name: "Treibsand", order: "build", Aktion: "Jack bleibt im Treibsand stecken. Jane muss eine Liane hierherbringen, um ihn zu retten. Gib die Liane dazu ab. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist Jane nicht dabei, stirbt Jack und das Abenteuer ist zu Ende.", task: true },
+        { name: "Abendrot", order: "build",orderText: "Jack", Aktion: "Im Sonnenuntergang verliebt sich Jack in Jane. Er weis nicht, ob Sie seine Liebe erwidert. Er hat das Gefühl, schon viele Abenteuer mit Jane erlebt zu haben. Schau dir die nächsten drei Karten vom Stapel an und lege Sie gemeinsam zurück oder unter den Stapel.", task: true },
+        { name: "Treibsand", order: "build", orderText: "Jack",Aktion: "Jack bleibt im Treibsand stecken. Jane muss eine Liane hierherbringen, um ihn zu retten. Gib die Liane dazu ab. Bis dahin kannst du Jacks Inventarkarte nicht verwenden. Ist Jane nicht dabei, stirbt Jack und das Abenteuer ist zu Ende.", task: true },
 
-        { name: "Diamantenmine", order: "select-all", Aktion: "Mit der Fackel findest du in der dunklen Mine große Diamanten. Wenn du Sie herausholst, verlierst du die Fackel. Du erhälst einen Bonuspunkt.", info: "warn", imgclass: "symbol", task: true },
-        { name: "Altar", order: "select-all", Aktion: "Ihr findet einen geheimen Zeremonienaltar der Kannibalen. Von dort könnt ihr euch 2 Macheten mitnehmen.", info: "warn", imgclass: "Machete", task: true },
-        { name: "Schlangengrube", order: "select-all", Aktion: "In einer Höhle seid ihr von Schlangen umzingelt. Gebt eine Fackel ab oder legt 3 Dinge vom Inventar auf ihre Felder zurück oder in den Vorrat, um den Schlangen zu entkommen. Habt ihr beides nicht, sterbt ihr in der Schlangengrube.", info: "warn", task: true },
+        { name: "Diamantenmine", order: "select-all", orderText: "Mine", Aktion: "Mit der Fackel findest du in der dunklen Mine große Diamanten. Wenn du Sie herausholst, verlierst du die Fackel. Du erhälst einen Bonuspunkt.",  imgclass: "symbol", task: true },
+        { name: "Altar", order: "select-all", orderText: "Mine", Aktion: "Ihr findet einen geheimen Zeremonienaltar der Kannibalen. Von dort könnt ihr euch 2 Macheten mitnehmen.", imgclass: "Machete", task: true },
+        { name: "Schlangengrube", order: "select-all", orderText: "Mine", Aktion: "In einer Höhle seid ihr von Schlangen umzingelt. Gebt eine Fackel ab oder legt 3 Dinge vom Inventar auf ihre Felder zurück oder in den Vorrat, um den Schlangen zu entkommen. Habt ihr beides nicht, sterbt ihr in der Schlangengrube.",  task: true },
 
 
-        { name: "Königin", order: "gesture", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Jane erzählt dir von einer geheimen Schatzkammer der Kannibalen. Die Fackel geht in den Vorrat.", task: true },
-        { name: "Befreit", order: "gesture", Aktion: "Der Jäger Stoephsius hat Jane aus dem Dorf der Kannibalen befreit, dabei hat er allerdings mehrere Kannibalen getötet. Der Schrumpfkopf schützt euch nun nicht mehr vor den Kannibalen. Du kannst Janes Inventarkarte nun wieder verwenden.", task: true },
-        
-        { name: "Fluss", order: "home", Aktion: "Wenn du alle anderen Aktionskarten erfüllt hast, könnt ihr mit dem Boot über den Fluß das Abenteuer beenden. Wenn du mind. 2 Artefakte dabei hast, kannst du die nächste Expedition mit einem zusätzlichen Stern beginnen.", task: true },
-        { name: "Schatzkammer", order:"exit-to-app", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 3 Artefakte hier ablegt und Jack und Jane dabei sind, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
+        { name: "Königin", order: "gesture", orderText: "Jane", Aktion: "Jane wird von den Kannibalen als Dschungelkönigin verehrt. Lege mit der Fackel ein Feuer, dann kann Jane unbemerkt fliehen. Jane erzählt dir von einer geheimen Schatzkammer der Kannibalen. Die Fackel geht in den Vorrat.", task: true },
+        { name: "Befreit", order: "gesture", orderText: "Jane", Aktion: "Der Jäger Stoephsius hat Jane aus dem Dorf der Kannibalen befreit, dabei hat er allerdings mehrere Kannibalen getötet. Der Schrumpfkopf schützt euch nun nicht mehr vor den Kannibalen. Du kannst Janes Inventarkarte nun wieder verwenden.", task: true },
+        { name: "Schatzkammer", order:"exit-to-app", orderText: "Ende", Aktion: "Ihr habt die Schatzkammer der Kannibalen gefunden. Wenn ihr die 3 Artefakte hier ablegt und Jack und Jane dabei sind, könnt ihr die Tür zur Schatzkammer öffnen. Darin findet ihr ein Geheimnis und beendet die Partie erfolgreich.", task: true },
     ],
     start: {name: "Akt II", task: true,
     Aktion: "Ihr erreicht das 'Tal der Kannibalen'. Jane ist sich sicher, dass Prof. Hampton hier hergekommen ist."},
@@ -11790,6 +11790,67 @@ var data2 = {
         {level: 3, text: "Jane findet einen versteckten Brief ihres Vaters: 'Liebe Jane, wenn du diese Zeilen liest, bin ich bereits auf dem Weg nach Atlantis. Mit Hilfe dieser Schatzkammer konnte ich den genauen Ort ermittlen. Ich habe deine Mutter Mahara vor 25 Jahren kennengelernt. Nach einer gemeinsamen Nacht war Sie verschwunden. Ein Jahr später kam Sie mit dir im Arm zu mir, und bat mich dich aufzuziehen. Sie ist eine der letzten Überlebenden von Atlantis und du bist die letzte Tochter von Atlantis. Folge mir nun (in Teil 2) und komm in deine eigentliche Heimat. Die Kannibalen sind eigentlich friedlich und bewachen den Zugang zur Schatzkammer und den Eingang zum letzten Ort von Atlantis'. VOr Freude fallen sich Jack und Jane in die Arme und es gibt einen langen intensiven Liebeskuss. THE END."},
     ]
  };
+var data3 = {
+    akt: 3,
+    initcards: [
+    { name: "Weg", Aktion: "", flavour: "Jane: 'Was war das für ein Geräusch?'", hor: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jane: 'Was für eine schöne Pflanze.' Jack: 'Vorsicht, die ist giftig.'", ver: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jane: 'Diese Stille ist unheimlich.'", ver: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jack: 'Wir sollten umkehren.'", ver: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jack: 'Hier geht es nicht weiter.'", ver: "true", hor: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jane: 'Puuh, diese Luft bringt mich um.'", ver: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jack: 'Dein Vater ist vermutlich schon tot.' Jane: 'Nein, er lebt noch.'", hor: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jack: 'Hier können wir rasten.'", hor: "true" },
+    { name: "Weg", Aktion: "", flavour: "Jane: 'Hier waren wir doch schon mal.'", hor: "true" },
+    { name: "Rucksack", Aktion: "Du findest einen alten Rucksack. Nimm die Inventarkarte Rucksack hinzu und lege den Rucksack darauf.", ver: "true", imgclass: "symbol" },
+    { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", ver: "true", imgclass: "symbol" },
+    { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", ver: "true", imgclass: "symbol" },
+    { name: "Machete", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", imgclass: "symbol" },
+    { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: "true", imgclass: "symbol" },
+    { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", ver: "true", imgclass: "symbol" },
+    { name: "Liane", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", imgclass: "symbol" },
+    { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", warn: "Fackel", bgc: "blue" },
+    { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", warn: "Fackel", bgc: "blue" },
+    { name: "Höhle", Aktion: "Wenn man die Fackel besitzt, kann man von dieser Höhle direkt zu einer anderen Höhlenkarte ziehen.", ver: "true", warn: "Fackel", bgc: "blue" },
+    { name: "Fackel", Aktion: "Mit einer Fackel kann man von einer Höhle zu einer anderen ziehen. Die Fackel darf man dabei behalten.", ver: "true", imgclass: "symbol", pagebreak: "pagebreak" },
+    { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+    { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+    { name: "Hängebrücke", Aktion: "Die Hängebrücke kannst du mit vollem Inventar nicht überqueren. Lege Dinge dazu auf ihr Feld zurück." },
+    { name: "Schlange", Aktion: "Die Schlange hat ein tödliches Gift und beisst dich. Lege ein Gegengift hier ab, um vor der Schlange geschützt zu sein.", warn: "Gegengift", hor: "true" },
+    { name: "Gegengift", Aktion: "Das Gegengift schützt dich vor einer Schlange. Lege das Gegengift dazu auf die Schlange. ", hor: "true", imgclass: "symbol" },
+    { name: "Fels", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen." },
+    { name: "Weg", level: "schwer", Aktion: "", flavour: "Jack: 'Pause.'", ver: "true", hor: "true" },
+    { name: "Weg", level: "schwer", Aktion: "", flavour: "Jack: 'Pause.'", ver: "true", hor: "true" },
+    { name: "Fels", level: "schwer", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen." },
+
+    { name: "Boot", akt: "3", Aktion: "Wenn du das Boot zum Fluss brinsgt, kannst du mit Jack, Jane und Prof. Hampton das Abenteuer erfolgreich beenden.", hor: true, imgclass: "symbol", type: "Feldkarte" },
+    { name: "Dynamit", akt: "3", Aktion: "Mit dem Dynamit kannst du einen Felsen sprengen. Lege das Dynamit dazu von einem Nachbarfeld ohne Wand dazwischen auf den Felsen.", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Fels", akt: "3", Aktion: "Du kannst dieses Feld nicht betreten und nicht mit der Liane überfliegen. Mit Dynamit und Gura Gora auf einem Felsen, kannst du diesen sprengen und Gura Gora begraben.", type: "Feldkarte" },
+    { name: "Heissluftballon", color: "H", akt: "3", imgclass: "symbol", Aktion: "Ihr findet einen alten Heissluftballon. Er scheint noch zu funktionieren, hat aber keine Luft.", warn: "Boot", bgc: "blue", type: "Feldkarte" },
+    { name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte 1 Feld frei ist. Sonst fangen und töten Sie euch.", type: "Feldkarte" },
+    { name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte 1 Feld frei ist. Sonst fangen und töten Sie euch.", type: "Feldkarte" },
+    { name: "Ureinwohner", akt: "3", Aktion: "Die Ureinwohner durchstreifen das Tal. Ihr könnt euch vorbeischleichen, wenn auf jeder Inventarkarte 1 Feld frei ist. Sonst fangen und töten Sie euch.", type: "Feldkarte" },
+    { name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", ver: "true", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", ver: "true", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", hor: "true", ver: "true", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Liane", akt: "3", Aktion: "Mit der Liane kann man einmal waagrecht oder senkrecht beliebig weit über Wände auf ein offenes Feld springen. Lege die Liane dann in den Vorrat.", ver: "true", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Machete", akt: "3", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Machete", akt: "3", Aktion: "Die Machete kann eine Dschungelwand öffnen. Lege die Machete dazu auf die Wand.", hor: "true", imgclass: "symbol", type: "Feldkarte" },
+    { name: "Schw. Kugel", akt: "3", Aktion: "Die schwarze Kugel ist faustgross und aus einem unbekannten Material. Sie scheint von innen heraus zu leuchten.", imgclass: "symbol", ver: "true", type: "Feldkarte" },
+    { name: "Weiße Kugel", akt: "3", Aktion: "Die weisse Kugel ist faustgross und aus einem unbekannten Material. Sie scheint von innen heraus zu leuchten.", imgclass: "symbol", hor: "true", type: "Feldkarte" }
+  ],
+    initActions: [
+        { name: "Wasserfall", Aktion: "Nach den vielen Erlebnissen und der schwülen Luft erfrischen sich Jack und Jane im See unter dem Wasserfall. Einschliesslich Kuss und erotischer Sexszene.", task: true },
+        { name: "Gura Gora", order: "gesture", orderText: "Gora Gora", Aktion: "Der Affendämon Gura Gora hat euch entdeckt. Nach jedem Zug zieht er 1 Feld waagrecht oder 1 Feld senkrecht auf offenen Karten in eure Richtung. Er ignoriert Dschungelwände. Wenn er euch erreicht, tötet er euch.", win: "Fluss", bgcwin: "blue", warn: "Jane2", bgc: "orange", imgclass: "symbol", task: true, type: "Aktionskarte" },
+        { name: "Prof Hampton", order: "select-all", orderText: "Prof. Hampton", Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Wenn du ihm beide Kugeln bringst, verlässt er mit euch das Tal.", imgclass: "symbol", task: true, type: "Aktionskarte" },
+        { name: "Heisse Quelle", order: "exit-to-app", orderText: "Exit", Aktion: "Ihr könnt den Heissluftballon hier mit heisser Luft füllen. Jack, Jane und Prof. Hampton können das Abenteuer hier erfolgreich beenden.", bgc: "orange", win: "Fluss", bgcwin: "blue", task: true, type: "Aktionskarte" },
+        { name: "Gura Gora", order: "gesture", orderText: "Gora Gora", Aktion: "Der Affendämon Gura Gora hat euch entdeckt. Nach jedem Zug zieht er 1 Feld waagrecht und dann 1 Feld senkrecht auf offenen Karten in eure Richtung. Er ignoriert Dschungelwände. Wenn er euch erreicht, tötet er euch. Vor verdeckten oder fehlenden Karten bliebt er stehen.", win: "Fluss", bgcwin: "blue", warn: "Jane2", bgc: "orange", imgclass: "symbol", task: true, type: "Erweiterung Aktionskarte" },
+        { name: "Prof Hampton", order: "select-all", orderText: "Prof. Hampton", Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Er ist seinen Verletzungen erlegen, und vor 2 Tagen gestorben. Er hat Jane einen Abschiedsbrief hinterlassen.", imgclass: "symbol", task: true, type: "Erweiterung Aktionskarte" },
+        { name: "Prof Hampton", order: "select-all", orderText: "Prof. Hampton", Aktion: "Janes Vater hat sich in einer Höhle vor Gura Gora versteckt. Er ist zu schwach, um Gegenstände tragen zu können.", imgclass: "symbol", task: true, type: "Erweiterung Aktionskarte" },    
+    ],
+    start: {name: "Akt III", task: true,
+    Aktion: "Ihr erreicht das verschollene Tal. Hier muss sich Prof. Hampton befinden. Vielleicht ist er noch am Leben."}
+};
 /**
    * `IronResizableBehavior` is a behavior that can be used in Polymer elements to
    * coordinate the flow of resize events between "resizers" (elements that control the
@@ -12097,8 +12158,8 @@ var data2 = {
 
       /**
        * Fired when the list of selectable items changes (e.g., items are
-       * added or removed). The detail of the event is a list of mutation
-       * records that describe what changed.
+       * added or removed). The detail of the event is a mutation record that
+       * describes what changed.
        *
        * @event iron-items-changed
        */
@@ -12174,6 +12235,15 @@ var data2 = {
       },
 
       /**
+       * Default fallback if the selection based on selected with `attrForSelected`
+       * is not found.
+       */
+      fallbackSelection: {
+        type: String,
+        value: null
+      },
+
+      /**
        * The list of items from which a selection can be made.
        */
       items: {
@@ -12203,7 +12273,8 @@ var data2 = {
 
     observers: [
       '_updateAttrForSelected(attrForSelected)',
-      '_updateSelected(selected)'
+      '_updateSelected(selected)',
+      '_checkFallback(fallbackSelection)'
     ],
 
     created: function() {
@@ -12270,6 +12341,15 @@ var data2 = {
     },
 
     /**
+     * Selects the item at the given index.
+     *
+     * @method selectIndex
+     */
+    selectIndex: function(index) {
+      this.select(this._indexToValue(index));
+    },
+
+    /**
      * Force a synchronous update of the `items` property.
      *
      * NOTE: Consider listening for the `iron-items-changed` event to respond to
@@ -12287,6 +12367,12 @@ var data2 = {
 
     get _shouldUpdateSelection() {
       return this.selected != null;
+    },
+
+    _checkFallback: function() {
+      if (this._shouldUpdateSelection) {
+        this._updateSelected();
+      }
     },
 
     _addListener: function(eventName) {
@@ -12310,7 +12396,7 @@ var data2 = {
 
     _updateAttrForSelected: function() {
       if (this._shouldUpdateSelection) {
-        this.selected = this._indexToValue(this.indexOf(this.selectedItem));        
+        this.selected = this._indexToValue(this.indexOf(this.selectedItem));
       }
     },
 
@@ -12320,6 +12406,11 @@ var data2 = {
 
     _selectSelected: function(selected) {
       this._selection.select(this._valueToItem(this.selected));
+      // Check for items, since this array is populated only when attached
+      // Since Number(0) is falsy, explicitly check for undefined
+      if (this.fallbackSelection && this.items.length && (this._selection.get() === undefined)) {
+        this.selected = this.fallbackSelection;
+      }
     },
 
     _filterItem: function(node) {
@@ -12375,7 +12466,7 @@ var data2 = {
 
     // observe items change under the given node.
     _observeItems: function(node) {
-      return Polymer.dom(node).observeNodes(function(mutations) {
+      return Polymer.dom(node).observeNodes(function(mutation) {
         this._updateItems();
 
         if (this._shouldUpdateSelection) {
@@ -12384,7 +12475,7 @@ var data2 = {
 
         // Let other interested parties know about the change so that
         // we don't have to recreate mutation observers everywhere.
-        this.fire('iron-items-changed', mutations, {
+        this.fire('iron-items-changed', mutation, {
           bubbles: false,
           cancelable: false
         });
@@ -12583,7 +12674,7 @@ var data2 = {
       return transformKey(keyEvent.key, noSpecialChars) ||
         transformKeyIdentifier(keyEvent.keyIdentifier) ||
         transformKeyCode(keyEvent.keyCode) ||
-        transformKey(keyEvent.detail.key, noSpecialChars) || '';
+        transformKey(keyEvent.detail ? keyEvent.detail.key : keyEvent.detail, noSpecialChars) || '';
     }
 
     function keyComboMatchesEvent(keyCombo, event) {
@@ -12872,7 +12963,7 @@ Polymer({
                 },
                 accent: {
                     type: String,
-                    value: 'en-US',
+                    value: 'de-DE',
                     observer: '_accentChanged',
                     notify: true
                 },
@@ -12895,6 +12986,8 @@ Polymer({
                 this._textChanged();
                 this._accentChanged();
 
+                var voices = window.speechSynthesis.getVoices();
+                this.speech.voice = voices.filter(function(voice) { return voice.lang == this.accent; })[0];
                 // Initialize event listeners
                 var events = ['start', 'end', 'error', 'pause', 'resume'];
                 events.forEach(this._propagateEvent.bind(this));
@@ -12928,6 +13021,8 @@ Polymer({
             /* -- Public Methods -------------------------------------------- */
             speak: function() {
                 if ('speechSynthesis' in window) {
+                var voices = window.speechSynthesis.getVoices();
+                this.speech.voice = voices.filter(function(voice) { return voice.lang == this.accent; })[0];
                 window.speechSynthesis.speak(this.speech);
                 }
             },
@@ -13466,12 +13561,15 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
 
       if (event.target === this) {
         this._setFocused(event.type === 'focus');
-      } else if (!this.shadowRoot && !this.isLightDescendant(event.target)) {
-        this.fire(event.type, {sourceEvent: event}, {
-          node: this,
-          bubbles: event.bubbles,
-          cancelable: event.cancelable
-        });
+      } else if (!this.shadowRoot) {
+        var target = /** @type {Node} */(Polymer.dom(event).localTarget);
+        if (!this.isLightDescendant(target)) {
+          this.fire(event.type, {sourceEvent: event}, {
+            node: this,
+            bubbles: event.bubbles,
+            cancelable: event.cancelable
+          });
+        }
       }
     },
 
@@ -13480,7 +13578,7 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
       this.style.pointerEvents = disabled ? 'none' : '';
       if (disabled) {
         this._oldTabIndex = this.tabIndex;
-        this.focused = false;
+        this._setFocused(false);
         this.tabIndex = -1;
         this.blur();
       } else if (this._oldTabIndex !== undefined) {
@@ -13857,6 +13955,11 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
     Polymer.PaperInkyFocusBehaviorImpl
   ];
 /**
+   * Singleton IronMeta instance.
+   */
+  Polymer.IronValidatableBehaviorMeta = null;
+
+  /**
    * `Use Polymer.IronValidatableBehavior` to implement an element that validates user input.
    * Use the related `Polymer.IronValidatorBehavior` to add custom validation logic to an iron-input.
    *
@@ -13885,14 +13988,6 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
     properties: {
 
       /**
-       * Namespace for this validator.
-       */
-      validatorType: {
-        type: String,
-        value: 'validator'
-      },
-
-      /**
        * Name of the validator to use.
        */
       validator: {
@@ -13909,22 +14004,36 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
         value: false
       },
 
+      /**
+       * This property is deprecated and should not be used. Use the global
+       * validator meta singleton, `Polymer.IronValidatableBehaviorMeta` instead.
+       */
       _validatorMeta: {
         type: Object
-      }
+      },
 
+      /**
+       * Namespace for this validator. This property is deprecated and should
+       * not be used. For all intents and purposes, please consider it a
+       * read-only, config-time property.
+       */
+      validatorType: {
+        type: String,
+        value: 'validator'
+      },
+
+      _validator: {
+        type: Object,
+        computed: '__computeValidator(validator)'
+      }
     },
 
     observers: [
       '_invalidChanged(invalid)'
     ],
 
-    get _validator() {
-      return this._validatorMeta && this._validatorMeta.byKey(this.validator);
-    },
-
-    ready: function() {
-      this._validatorMeta = new Polymer.IronMeta({type: this.validatorType});
+    registered: function() {
+      Polymer.IronValidatableBehaviorMeta = new Polymer.IronMeta({type: 'validator'});
     },
 
     _invalidChanged: function() {
@@ -13971,6 +14080,11 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
         return this._validator.validate(value);
       }
       return true;
+    },
+
+    __computeValidator: function() {
+      return Polymer.IronValidatableBehaviorMeta &&
+          Polymer.IronValidatableBehaviorMeta.byKey(this.validator);
     }
   };
 /**
@@ -14190,115 +14304,6 @@ console.warn('This file is deprecated. Please use `iron-flex-layout/iron-flex-la
     Polymer.PaperCheckedElementBehaviorImpl
   ];
 /**
-   * Use `Polymer.NeonAnimationBehavior` to implement an animation.
-   * @polymerBehavior
-   */
-  Polymer.NeonAnimationBehavior = {
-
-    properties: {
-
-      /**
-       * Defines the animation timing.
-       */
-      animationTiming: {
-        type: Object,
-        value: function() {
-          return {
-            duration: 500,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            fill: 'both'
-          }
-        }
-      }
-
-    },
-
-    /**
-     * Can be used to determine that elements implement this behavior.
-     */
-    isNeonAnimation: true,
-
-    /**
-     * Do any animation configuration here.
-     */
-    // configure: function(config) {
-    // },
-
-    /**
-     * Returns the animation timing by mixing in properties from `config` to the defaults defined
-     * by the animation.
-     */
-    timingFromConfig: function(config) {
-      if (config.timing) {
-        for (var property in config.timing) {
-          this.animationTiming[property] = config.timing[property];
-        }
-      }
-      return this.animationTiming;
-    },
-
-    /**
-     * Sets `transform` and `transformOrigin` properties along with the prefixed versions.
-     */
-    setPrefixedProperty: function(node, property, value) {
-      var map = {
-        'transform': ['webkitTransform'],
-        'transformOrigin': ['mozTransformOrigin', 'webkitTransformOrigin']
-      };
-      var prefixes = map[property];
-      for (var prefix, index = 0; prefix = prefixes[index]; index++) {
-        node.style[prefix] = value;
-      }
-      node.style[property] = value;
-    },
-
-    /**
-     * Called when the animation finishes.
-     */
-    complete: function() {}
-
-  };
-// Copyright 2014 Google Inc. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-//     You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//     See the License for the specific language governing permissions and
-// limitations under the License.
-
-!function(a,b){b["true"]=a;var c={},d={},e={},f=null;!function(a){function b(a){if("number"==typeof a)return a;var b={};for(var c in a)b[c]=a[c];return b}function c(){this._delay=0,this._endDelay=0,this._fill="none",this._iterationStart=0,this._iterations=1,this._duration=0,this._playbackRate=1,this._direction="normal",this._easing="linear"}function d(b,d){var e=new c;return d&&(e.fill="both",e.duration="auto"),"number"!=typeof b||isNaN(b)?void 0!==b&&Object.getOwnPropertyNames(b).forEach(function(c){if("auto"!=b[c]){if(("number"==typeof e[c]||"duration"==c)&&("number"!=typeof b[c]||isNaN(b[c])))return;if("fill"==c&&-1==s.indexOf(b[c]))return;if("direction"==c&&-1==t.indexOf(b[c]))return;if("playbackRate"==c&&1!==b[c]&&a.isDeprecated("AnimationEffectTiming.playbackRate","2014-11-28","Use Animation.playbackRate instead."))return;e[c]=b[c]}}):e.duration=b,e}function e(a){return"number"==typeof a&&(a=isNaN(a)?{duration:0}:{duration:a}),a}function f(b,c){b=a.numericTimingToObject(b);var e=d(b,c);return e._easing=i(e.easing),e}function g(a,b,c,d){return 0>a||a>1||0>c||c>1?B:function(e){function f(a,b,c){return 3*a*(1-c)*(1-c)*c+3*b*(1-c)*c*c+c*c*c}if(0==e||1==e)return e;for(var g=0,h=1;;){var i=(g+h)/2,j=f(a,c,i);if(Math.abs(e-j)<.001)return f(b,d,i);e>j?g=i:h=i}}}function h(a,b){return function(c){if(c>=1)return 1;var d=1/a;return c+=b*d,c-c%d}}function i(a){var b=z.exec(a);if(b)return g.apply(this,b.slice(1).map(Number));var c=A.exec(a);if(c)return h(Number(c[1]),{start:u,middle:v,end:w}[c[2]]);var d=x[a];return d?d:B}function j(a){return Math.abs(k(a)/a.playbackRate)}function k(a){return a.duration*a.iterations}function l(a,b,c){return null==b?C:b<c.delay?D:b>=c.delay+a?E:F}function m(a,b,c,d,e){switch(d){case D:return"backwards"==b||"both"==b?0:null;case F:return c-e;case E:return"forwards"==b||"both"==b?a:null;case C:return null}}function n(a,b,c,d){return(d.playbackRate<0?b-a:b)*d.playbackRate+c}function o(a,b,c,d,e){return 1/0===c||c===-1/0||c-d==b&&e.iterations&&(e.iterations+e.iterationStart)%1==0?a:c%a}function p(a,b,c,d){return 0===c?0:b==a?d.iterationStart+d.iterations-1:Math.floor(c/a)}function q(a,b,c,d){var e=a%2>=1,f="normal"==d.direction||d.direction==(e?"alternate-reverse":"alternate"),g=f?c:b-c,h=g/b;return b*d.easing(h)}function r(a,b,c){var d=l(a,b,c),e=m(a,c.fill,b,d,c.delay);if(null===e)return null;if(0===a)return d===D?0:1;var f=c.iterationStart*c.duration,g=n(a,e,f,c),h=o(c.duration,k(c),g,f,c),i=p(c.duration,h,g,c);return q(i,c.duration,h,c)/c.duration}var s="backwards|forwards|both|none".split("|"),t="reverse|alternate|alternate-reverse".split("|");c.prototype={_setMember:function(b,c){this["_"+b]=c,this._effect&&(this._effect._timingInput[b]=c,this._effect._timing=a.normalizeTimingInput(a.normalizeTimingInput(this._effect._timingInput)),this._effect.activeDuration=a.calculateActiveDuration(this._effect._timing),this._effect._animation&&this._effect._animation._rebuildUnderlyingAnimation())},get playbackRate(){return this._playbackRate},set delay(a){this._setMember("delay",a)},get delay(){return this._delay},set endDelay(a){this._setMember("endDelay",a)},get endDelay(){return this._endDelay},set fill(a){this._setMember("fill",a)},get fill(){return this._fill},set iterationStart(a){this._setMember("iterationStart",a)},get iterationStart(){return this._iterationStart},set duration(a){this._setMember("duration",a)},get duration(){return this._duration},set direction(a){this._setMember("direction",a)},get direction(){return this._direction},set easing(a){this._setMember("easing",a)},get easing(){return this._easing},set iterations(a){this._setMember("iterations",a)},get iterations(){return this._iterations}};var u=1,v=.5,w=0,x={ease:g(.25,.1,.25,1),"ease-in":g(.42,0,1,1),"ease-out":g(0,0,.58,1),"ease-in-out":g(.42,0,.58,1),"step-start":h(1,u),"step-middle":h(1,v),"step-end":h(1,w)},y="\\s*(-?\\d+\\.?\\d*|-?\\.\\d+)\\s*",z=new RegExp("cubic-bezier\\("+y+","+y+","+y+","+y+"\\)"),A=/steps\(\s*(\d+)\s*,\s*(start|middle|end)\s*\)/,B=function(a){return a},C=0,D=1,E=2,F=3;a.cloneTimingInput=b,a.makeTiming=d,a.numericTimingToObject=e,a.normalizeTimingInput=f,a.calculateActiveDuration=j,a.calculateTimeFraction=r,a.calculatePhase=l,a.toTimingFunction=i}(c,f),function(a){function b(a,b){return a in h?h[a][b]||b:b}function c(a,c,d){var g=e[a];if(g){f.style[a]=c;for(var h in g){var i=g[h],j=f.style[i];d[i]=b(i,j)}}else d[a]=b(a,c)}function d(b){function d(){var a=e.length;null==e[a-1].offset&&(e[a-1].offset=1),a>1&&null==e[0].offset&&(e[0].offset=0);for(var b=0,c=e[0].offset,d=1;a>d;d++){var f=e[d].offset;if(null!=f){for(var g=1;d-b>g;g++)e[b+g].offset=c+(f-c)*g/(d-b);b=d,c=f}}}if(!Array.isArray(b)&&null!==b)throw new TypeError("Keyframes must be null or an array of keyframes");if(null==b)return[];for(var e=b.map(function(b){var d={};for(var e in b){var f=b[e];if("offset"==e){if(null!=f&&(f=Number(f),!isFinite(f)))throw new TypeError("keyframe offsets must be numbers.")}else{if("composite"==e)throw{type:DOMException.NOT_SUPPORTED_ERR,name:"NotSupportedError",message:"add compositing is not supported"};f="easing"==e?a.toTimingFunction(f):""+f}c(e,f,d)}return void 0==d.offset&&(d.offset=null),void 0==d.easing&&(d.easing=a.toTimingFunction("linear")),d}),f=!0,g=-1/0,h=0;h<e.length;h++){var i=e[h].offset;if(null!=i){if(g>i)throw{code:DOMException.INVALID_MODIFICATION_ERR,name:"InvalidModificationError",message:"Keyframes are not loosely sorted by offset. Sort or specify offsets."};g=i}else f=!1}return e=e.filter(function(a){return a.offset>=0&&a.offset<=1}),f||d(),e}var e={background:["backgroundImage","backgroundPosition","backgroundSize","backgroundRepeat","backgroundAttachment","backgroundOrigin","backgroundClip","backgroundColor"],border:["borderTopColor","borderTopStyle","borderTopWidth","borderRightColor","borderRightStyle","borderRightWidth","borderBottomColor","borderBottomStyle","borderBottomWidth","borderLeftColor","borderLeftStyle","borderLeftWidth"],borderBottom:["borderBottomWidth","borderBottomStyle","borderBottomColor"],borderColor:["borderTopColor","borderRightColor","borderBottomColor","borderLeftColor"],borderLeft:["borderLeftWidth","borderLeftStyle","borderLeftColor"],borderRadius:["borderTopLeftRadius","borderTopRightRadius","borderBottomRightRadius","borderBottomLeftRadius"],borderRight:["borderRightWidth","borderRightStyle","borderRightColor"],borderTop:["borderTopWidth","borderTopStyle","borderTopColor"],borderWidth:["borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth"],flex:["flexGrow","flexShrink","flexBasis"],font:["fontFamily","fontSize","fontStyle","fontVariant","fontWeight","lineHeight"],margin:["marginTop","marginRight","marginBottom","marginLeft"],outline:["outlineColor","outlineStyle","outlineWidth"],padding:["paddingTop","paddingRight","paddingBottom","paddingLeft"]},f=document.createElementNS("http://www.w3.org/1999/xhtml","div"),g={thin:"1px",medium:"3px",thick:"5px"},h={borderBottomWidth:g,borderLeftWidth:g,borderRightWidth:g,borderTopWidth:g,fontSize:{"xx-small":"60%","x-small":"75%",small:"89%",medium:"100%",large:"120%","x-large":"150%","xx-large":"200%"},fontWeight:{normal:"400",bold:"700"},outlineWidth:g,textShadow:{none:"0px 0px 0px transparent"},boxShadow:{none:"0px 0px 0px 0px transparent"}};a.normalizeKeyframes=d}(c,f),function(a){var b={};a.isDeprecated=function(a,c,d,e){var f=e?"are":"is",g=new Date,h=new Date(c);return h.setMonth(h.getMonth()+3),h>g?(a in b||console.warn("Web Animations: "+a+" "+f+" deprecated and will stop working on "+h.toDateString()+". "+d),b[a]=!0,!1):!0},a.deprecated=function(b,c,d,e){var f=e?"are":"is";if(a.isDeprecated(b,c,d,e))throw new Error(b+" "+f+" no longer supported. "+d)}}(c),function(){if(document.documentElement.animate){var a=document.documentElement.animate([],0),b=!0;if(a&&(b=!1,"play|currentTime|pause|reverse|playbackRate|cancel|finish|startTime|playState".split("|").forEach(function(c){void 0===a[c]&&(b=!0)})),!b)return}!function(a,b){function c(a){for(var b={},c=0;c<a.length;c++)for(var d in a[c])if("offset"!=d&&"easing"!=d&&"composite"!=d){var e={offset:a[c].offset,easing:a[c].easing,value:a[c][d]};b[d]=b[d]||[],b[d].push(e)}for(var f in b){var g=b[f];if(0!=g[0].offset||1!=g[g.length-1].offset)throw{type:DOMException.NOT_SUPPORTED_ERR,name:"NotSupportedError",message:"Partial keyframes are not supported"}}return b}function d(a){var c=[];for(var d in a)for(var e=a[d],f=0;f<e.length-1;f++){var g=e[f].offset,h=e[f+1].offset,i=e[f].value,j=e[f+1].value;g==h&&(1==h?i=j:j=i),c.push({startTime:g,endTime:h,easing:e[f].easing,property:d,interpolation:b.propertyInterpolation(d,i,j)})}return c.sort(function(a,b){return a.startTime-b.startTime}),c}b.convertEffectInput=function(e){var f=a.normalizeKeyframes(e),g=c(f),h=d(g);return function(a,c){if(null!=c)h.filter(function(a){return 0>=c&&0==a.startTime||c>=1&&1==a.endTime||c>=a.startTime&&c<=a.endTime}).forEach(function(d){var e=c-d.startTime,f=d.endTime-d.startTime,g=0==f?0:d.easing(e/f);b.apply(a,d.property,d.interpolation(g))});else for(var d in g)"offset"!=d&&"easing"!=d&&"composite"!=d&&b.clear(a,d)}}}(c,d,f),function(a){function b(a,b,c){e[c]=e[c]||[],e[c].push([a,b])}function c(a,c,d){for(var e=0;e<d.length;e++){var f=d[e];b(a,c,f),/-/.test(f)&&b(a,c,f.replace(/-(.)/g,function(a,b){return b.toUpperCase()}))}}function d(b,c,d){if("initial"==c||"initial"==d){var g=b.replace(/-(.)/g,function(a,b){return b.toUpperCase()});"initial"==c&&(c=f[g]),"initial"==d&&(d=f[g])}for(var h=c==d?[]:e[b],i=0;h&&i<h.length;i++){var j=h[i][0](c),k=h[i][0](d);if(void 0!==j&&void 0!==k){var l=h[i][1](j,k);if(l){var m=a.Interpolation.apply(null,l);return function(a){return 0==a?c:1==a?d:m(a)}}}}return a.Interpolation(!1,!0,function(a){return a?d:c})}var e={};a.addPropertiesHandler=c;var f={backgroundColor:"transparent",backgroundPosition:"0% 0%",borderBottomColor:"currentColor",borderBottomLeftRadius:"0px",borderBottomRightRadius:"0px",borderBottomWidth:"3px",borderLeftColor:"currentColor",borderLeftWidth:"3px",borderRightColor:"currentColor",borderRightWidth:"3px",borderSpacing:"2px",borderTopColor:"currentColor",borderTopLeftRadius:"0px",borderTopRightRadius:"0px",borderTopWidth:"3px",bottom:"auto",clip:"rect(0px, 0px, 0px, 0px)",color:"black",fontSize:"100%",fontWeight:"400",height:"auto",left:"auto",letterSpacing:"normal",lineHeight:"120%",marginBottom:"0px",marginLeft:"0px",marginRight:"0px",marginTop:"0px",maxHeight:"none",maxWidth:"none",minHeight:"0px",minWidth:"0px",opacity:"1.0",outlineColor:"invert",outlineOffset:"0px",outlineWidth:"3px",paddingBottom:"0px",paddingLeft:"0px",paddingRight:"0px",paddingTop:"0px",right:"auto",textIndent:"0px",textShadow:"0px 0px 0px transparent",top:"auto",transform:"",verticalAlign:"0px",visibility:"visible",width:"auto",wordSpacing:"normal",zIndex:"auto"};a.propertyInterpolation=d}(d,f),function(a,b){function c(b){var c=a.calculateActiveDuration(b),d=function(d){return a.calculateTimeFraction(c,d,b)};return d._totalDuration=b.delay+c+b.endDelay,d._isCurrent=function(d){var e=a.calculatePhase(c,d,b);return e===PhaseActive||e===PhaseBefore},d}b.KeyframeEffect=function(d,e,f){var g,h=c(a.normalizeTimingInput(f)),i=b.convertEffectInput(e),j=function(){i(d,g)};return j._update=function(a){return g=h(a),null!==g},j._clear=function(){i(d,null)},j._hasSameTarget=function(a){return d===a},j._isCurrent=h._isCurrent,j._totalDuration=h._totalDuration,j},b.NullEffect=function(a){var b=function(){a&&(a(),a=null)};return b._update=function(){return null},b._totalDuration=0,b._isCurrent=function(){return!1},b._hasSameTarget=function(){return!1},b}}(c,d,f),function(a){a.apply=function(b,c,d){b.style[a.propertyName(c)]=d},a.clear=function(b,c){b.style[a.propertyName(c)]=""}}(d,f),function(a){window.Element.prototype.animate=function(b,c){return a.timeline._play(a.KeyframeEffect(this,b,c))}}(d),function(a){function b(a,c,d){if("number"==typeof a&&"number"==typeof c)return a*(1-d)+c*d;if("boolean"==typeof a&&"boolean"==typeof c)return.5>d?a:c;if(a.length==c.length){for(var e=[],f=0;f<a.length;f++)e.push(b(a[f],c[f],d));return e}throw"Mismatched interpolation arguments "+a+":"+c}a.Interpolation=function(a,c,d){return function(e){return d(b(a,c,e))}}}(d,f),function(a,b){a.sequenceNumber=0;var c=function(a,b,c){this.target=a,this.currentTime=b,this.timelineTime=c,this.type="finish",this.bubbles=!1,this.cancelable=!1,this.currentTarget=a,this.defaultPrevented=!1,this.eventPhase=Event.AT_TARGET,this.timeStamp=Date.now()};b.Animation=function(b){this._sequenceNumber=a.sequenceNumber++,this._currentTime=0,this._startTime=null,this._paused=!1,this._playbackRate=1,this._inTimeline=!0,this._finishedFlag=!1,this.onfinish=null,this._finishHandlers=[],this._effect=b,this._inEffect=this._effect._update(0),this._idle=!0,this._currentTimePending=!1},b.Animation.prototype={_ensureAlive:function(){this._inEffect=this._effect._update(this.playbackRate<0&&0===this.currentTime?-1:this.currentTime),this._inTimeline||!this._inEffect&&this._finishedFlag||(this._inTimeline=!0,b.timeline._animations.push(this))},_tickCurrentTime:function(a,b){a!=this._currentTime&&(this._currentTime=a,this._isFinished&&!b&&(this._currentTime=this._playbackRate>0?this._totalDuration:0),this._ensureAlive())},get currentTime(){return this._idle||this._currentTimePending?null:this._currentTime},set currentTime(a){a=+a,isNaN(a)||(b.restart(),this._paused||null==this._startTime||(this._startTime=this._timeline.currentTime-a/this._playbackRate),this._currentTimePending=!1,this._currentTime!=a&&(this._tickCurrentTime(a,!0),b.invalidateEffects()))},get startTime(){return this._startTime},set startTime(a){a=+a,isNaN(a)||this._paused||this._idle||(this._startTime=a,this._tickCurrentTime((this._timeline.currentTime-this._startTime)*this.playbackRate),b.invalidateEffects())},get playbackRate(){return this._playbackRate},set playbackRate(a){if(a!=this._playbackRate){var b=this.currentTime;this._playbackRate=a,this._startTime=null,"paused"!=this.playState&&"idle"!=this.playState&&this.play(),null!=b&&(this.currentTime=b)}},get _isFinished(){return!this._idle&&(this._playbackRate>0&&this._currentTime>=this._totalDuration||this._playbackRate<0&&this._currentTime<=0)},get _totalDuration(){return this._effect._totalDuration},get playState(){return this._idle?"idle":null==this._startTime&&!this._paused&&0!=this.playbackRate||this._currentTimePending?"pending":this._paused?"paused":this._isFinished?"finished":"running"},play:function(){this._paused=!1,(this._isFinished||this._idle)&&(this._currentTime=this._playbackRate>0?0:this._totalDuration,this._startTime=null,b.invalidateEffects()),this._finishedFlag=!1,b.restart(),this._idle=!1,this._ensureAlive()},pause:function(){this._isFinished||this._paused||this._idle||(this._currentTimePending=!0),this._startTime=null,this._paused=!0},finish:function(){this._idle||(this.currentTime=this._playbackRate>0?this._totalDuration:0,this._startTime=this._totalDuration-this.currentTime,this._currentTimePending=!1)},cancel:function(){this._inEffect&&(this._inEffect=!1,this._idle=!0,this.currentTime=0,this._startTime=null,this._effect._update(null),b.invalidateEffects(),b.restart())},reverse:function(){this.playbackRate*=-1,this.play()},addEventListener:function(a,b){"function"==typeof b&&"finish"==a&&this._finishHandlers.push(b)},removeEventListener:function(a,b){if("finish"==a){var c=this._finishHandlers.indexOf(b);c>=0&&this._finishHandlers.splice(c,1)}},_fireEvents:function(a){var b=this._isFinished;if((b||this._idle)&&!this._finishedFlag){var d=new c(this,this._currentTime,a),e=this._finishHandlers.concat(this.onfinish?[this.onfinish]:[]);setTimeout(function(){e.forEach(function(a){a.call(d.target,d)})},0)}this._finishedFlag=b},_tick:function(a){return this._idle||this._paused||(null==this._startTime?this.startTime=a-this._currentTime/this.playbackRate:this._isFinished||this._tickCurrentTime((a-this._startTime)*this.playbackRate)),this._currentTimePending=!1,this._fireEvents(a),!this._idle&&(this._inEffect||!this._finishedFlag)}}}(c,d,f),function(a,b){function c(a){var b=i;i=[],a<s.currentTime&&(a=s.currentTime),g(a),b.forEach(function(b){b[1](a)}),o&&g(a),f(),l=void 0}function d(a,b){return a._sequenceNumber-b._sequenceNumber}function e(){this._animations=[],this.currentTime=window.performance&&performance.now?performance.now():0}function f(){p.forEach(function(a){a()}),p.length=0}function g(a){n=!1;var c=b.timeline;c.currentTime=a,c._animations.sort(d),m=!1;var e=c._animations;c._animations=[];var f=[],g=[];e=e.filter(function(b){return b._inTimeline=b._tick(a),b._inEffect?g.push(b._effect):f.push(b._effect),b._isFinished||b._paused||b._idle||(m=!0),b._inTimeline}),p.push.apply(p,f),p.push.apply(p,g),c._animations.push.apply(c._animations,e),o=!1,m&&requestAnimationFrame(function(){})}var h=window.requestAnimationFrame,i=[],j=0;window.requestAnimationFrame=function(a){var b=j++;return 0==i.length&&h(c),i.push([b,a]),b},window.cancelAnimationFrame=function(a){i.forEach(function(b){b[0]==a&&(b[1]=function(){})})},e.prototype={_play:function(c){c._timing=a.normalizeTimingInput(c.timing);var d=new b.Animation(c);return d._idle=!1,d._timeline=this,this._animations.push(d),b.restart(),b.invalidateEffects(),d}};var k,l=void 0,k=function(){return void 0==l&&(l=window.performance&&performance.now?performance.now():Date.now()),l},m=!1,n=!1;b.restart=function(){return m||(m=!0,requestAnimationFrame(function(){}),n=!0),n};var o=!1;b.invalidateEffects=function(){o=!0};var p=[],q=1e3/60,r=window.getComputedStyle;Object.defineProperty(window,"getComputedStyle",{configurable:!0,enumerable:!0,value:function(){if(o){var a=k();a-s.currentTime>0&&(s.currentTime+=q*(Math.floor((a-s.currentTime)/q)+1)),g(s.currentTime)}return f(),r.apply(this,arguments)}});var s=new e;b.timeline=s}(c,d,f),function(a){function b(a,b){var c=a.exec(b);return c?(c=a.ignoreCase?c[0].toLowerCase():c[0],[c,b.substr(c.length)]):void 0}function c(a,b){b=b.replace(/^\s*/,"");var c=a(b);return c?[c[0],c[1].replace(/^\s*/,"")]:void 0}function d(a,d,e){a=c.bind(null,a);for(var f=[];;){var g=a(e);if(!g)return[f,e];if(f.push(g[0]),e=g[1],g=b(d,e),!g||""==g[1])return[f,e];e=g[1]}}function e(a,b){for(var c=0,d=0;d<b.length&&(!/\s|,/.test(b[d])||0!=c);d++)if("("==b[d])c++;else if(")"==b[d]&&(c--,0==c&&d++,0>=c))break;var e=a(b.substr(0,d));return void 0==e?void 0:[e,b.substr(d)]}function f(a,b){for(var c=a,d=b;c&&d;)c>d?c%=d:d%=c;return c=a*b/(c+d)}function g(a){return function(b){var c=a(b);return c&&(c[0]=void 0),c}}function h(a,b){return function(c){var d=a(c);return d?d:[b,c]}}function i(b,c){for(var d=[],e=0;e<b.length;e++){var f=a.consumeTrimmed(b[e],c);if(!f||""==f[0])return;void 0!==f[0]&&d.push(f[0]),c=f[1]}return""==c?d:void 0}function j(a,b,c,d,e){for(var g=[],h=[],i=[],j=f(d.length,e.length),k=0;j>k;k++){var l=b(d[k%d.length],e[k%e.length]);if(!l)return;g.push(l[0]),h.push(l[1]),i.push(l[2])}return[g,h,function(b){var d=b.map(function(a,b){return i[b](a)}).join(c);return a?a(d):d}]}function k(a,b,c){for(var d=[],e=[],f=[],g=0,h=0;h<c.length;h++)if("function"==typeof c[h]){var i=c[h](a[g],b[g++]);d.push(i[0]),e.push(i[1]),f.push(i[2])}else!function(a){d.push(!1),e.push(!1),f.push(function(){return c[a]})}(h);return[d,e,function(a){for(var b="",c=0;c<a.length;c++)b+=f[c](a[c]);return b}]}a.consumeToken=b,a.consumeTrimmed=c,a.consumeRepeated=d,a.consumeParenthesised=e,a.ignore=g,a.optional=h,a.consumeList=i,a.mergeNestedRepeated=j.bind(null,null),a.mergeWrappedNestedRepeated=j,a.mergeList=k}(d),function(a){function b(b){function c(b){var c=a.consumeToken(/^inset/i,b);if(c)return d.inset=!0,c;var c=a.consumeLengthOrPercent(b);if(c)return d.lengths.push(c[0]),c;var c=a.consumeColor(b);return c?(d.color=c[0],c):void 0}var d={inset:!1,lengths:[],color:null},e=a.consumeRepeated(c,/^/,b);return e&&e[0].length?[d,e[1]]:void 0}function c(c){var d=a.consumeRepeated(b,/^,/,c);return d&&""==d[1]?d[0]:void 0}function d(b,c){for(;b.lengths.length<Math.max(b.lengths.length,c.lengths.length);)b.lengths.push({px:0});for(;c.lengths.length<Math.max(b.lengths.length,c.lengths.length);)c.lengths.push({px:0});if(b.inset==c.inset&&!!b.color==!!c.color){for(var d,e=[],f=[[],0],g=[[],0],h=0;h<b.lengths.length;h++){var i=a.mergeDimensions(b.lengths[h],c.lengths[h],2==h);f[0].push(i[0]),g[0].push(i[1]),e.push(i[2])}if(b.color&&c.color){var j=a.mergeColors(b.color,c.color);f[1]=j[0],g[1]=j[1],d=j[2]}return[f,g,function(a){for(var c=b.inset?"inset ":" ",f=0;f<e.length;f++)c+=e[f](a[0][f])+" ";return d&&(c+=d(a[1])),c}]}}function e(b,c,d,e){function f(a){return{inset:a,color:[0,0,0,0],lengths:[{px:0},{px:0},{px:0},{px:0}]}}for(var g=[],h=[],i=0;i<d.length||i<e.length;i++){var j=d[i]||f(e[i].inset),k=e[i]||f(d[i].inset);g.push(j),h.push(k)}return a.mergeNestedRepeated(b,c,g,h)}var f=e.bind(null,d,", ");a.addPropertiesHandler(c,f,["box-shadow","text-shadow"])}(d),function(a){function b(a){return a.toFixed(3).replace(".000","")}function c(a,b,c){return Math.min(b,Math.max(a,c))}function d(a){return/^\s*[-+]?(\d*\.)?\d+\s*$/.test(a)?Number(a):void 0}function e(a,c){return[a,c,b]}function f(a,b){return 0!=a?h(0,1/0)(a,b):void 0}function g(a,b){return[a,b,function(a){return Math.round(c(1,1/0,a))}]}function h(a,d){return function(e,f){return[e,f,function(e){return b(c(a,d,e))}]}}function i(a,b){return[a,b,Math.round]}a.clamp=c,a.addPropertiesHandler(d,h(0,1/0),["border-image-width","line-height"]),a.addPropertiesHandler(d,h(0,1),["opacity","shape-image-threshold"]),a.addPropertiesHandler(d,f,["flex-grow","flex-shrink"]),a.addPropertiesHandler(d,g,["orphans","widows"]),a.addPropertiesHandler(d,i,["z-index"]),a.parseNumber=d,a.mergeNumbers=e,a.numberToString=b}(d,f),function(a){function b(a,b){return"visible"==a||"visible"==b?[0,1,function(c){return 0>=c?a:c>=1?b:"visible"}]:void 0}a.addPropertiesHandler(String,b,["visibility"])}(d),function(a){function b(a){a=a.trim(),e.fillStyle="#000",e.fillStyle=a;var b=e.fillStyle;if(e.fillStyle="#fff",e.fillStyle=a,b==e.fillStyle){e.fillRect(0,0,1,1);var c=e.getImageData(0,0,1,1).data;e.clearRect(0,0,1,1);var d=c[3]/255;return[c[0]*d,c[1]*d,c[2]*d,d]}}function c(b,c){return[b,c,function(b){function c(a){return Math.max(0,Math.min(255,a))}if(b[3])for(var d=0;3>d;d++)b[d]=Math.round(c(b[d]/b[3]));return b[3]=a.numberToString(a.clamp(0,1,b[3])),"rgba("+b.join(",")+")"}]}var d=document.createElementNS("http://www.w3.org/1999/xhtml","canvas");d.width=d.height=1;var e=d.getContext("2d");a.addPropertiesHandler(b,c,["background-color","border-bottom-color","border-left-color","border-right-color","border-top-color","color","outline-color","text-decoration-color"]),a.consumeColor=a.consumeParenthesised.bind(null,b),a.mergeColors=c}(d,f),function(a,b){function c(a,b){if(b=b.trim().toLowerCase(),"0"==b&&"px".search(a)>=0)return{px:0};if(/^[^(]*$|^calc/.test(b)){b=b.replace(/calc\(/g,"(");var c={};b=b.replace(a,function(a){return c[a]=null,"U"+a});for(var d="U("+a.source+")",e=b.replace(/[-+]?(\d*\.)?\d+/g,"N").replace(new RegExp("N"+d,"g"),"D").replace(/\s[+-]\s/g,"O").replace(/\s/g,""),f=[/N\*(D)/g,/(N|D)[*\/]N/g,/(N|D)O\1/g,/\((N|D)\)/g],g=0;g<f.length;)f[g].test(e)?(e=e.replace(f[g],"$1"),g=0):g++;if("D"==e){for(var h in c){var i=eval(b.replace(new RegExp("U"+h,"g"),"").replace(new RegExp(d,"g"),"*0"));if(!isFinite(i))return;c[h]=i}return c}}}function d(a,b){return e(a,b,!0)}function e(b,c,d){var e,f=[];for(e in b)f.push(e);for(e in c)f.indexOf(e)<0&&f.push(e);return b=f.map(function(a){return b[a]||0}),c=f.map(function(a){return c[a]||0}),[b,c,function(b){var c=b.map(function(c,e){return 1==b.length&&d&&(c=Math.max(c,0)),a.numberToString(c)+f[e]}).join(" + ");return b.length>1?"calc("+c+")":c}]}var f="px|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc",g=c.bind(null,new RegExp(f,"g")),h=c.bind(null,new RegExp(f+"|%","g")),i=c.bind(null,/deg|rad|grad|turn/g);a.parseLength=g,a.parseLengthOrPercent=h,a.consumeLengthOrPercent=a.consumeParenthesised.bind(null,h),a.parseAngle=i,a.mergeDimensions=e;var j=a.consumeParenthesised.bind(null,g),k=a.consumeRepeated.bind(void 0,j,/^/),l=a.consumeRepeated.bind(void 0,k,/^,/);a.consumeSizePairList=l;var m=function(a){var b=l(a);return b&&""==b[1]?b[0]:void 0},n=a.mergeNestedRepeated.bind(void 0,d," "),o=a.mergeNestedRepeated.bind(void 0,n,",");a.mergeNonNegativeSizePair=n,a.addPropertiesHandler(m,o,["background-size"]),a.addPropertiesHandler(h,d,["border-bottom-width","border-image-width","border-left-width","border-right-width","border-top-width","flex-basis","font-size","height","line-height","max-height","max-width","outline-width","width"]),a.addPropertiesHandler(h,e,["border-bottom-left-radius","border-bottom-right-radius","border-top-left-radius","border-top-right-radius","bottom","left","letter-spacing","margin-bottom","margin-left","margin-right","margin-top","min-height","min-width","outline-offset","padding-bottom","padding-left","padding-right","padding-top","perspective","right","shape-margin","text-indent","top","vertical-align","word-spacing"])}(d,f),function(a){function b(b){return a.consumeLengthOrPercent(b)||a.consumeToken(/^auto/,b)}function c(c){var d=a.consumeList([a.ignore(a.consumeToken.bind(null,/^rect/)),a.ignore(a.consumeToken.bind(null,/^\(/)),a.consumeRepeated.bind(null,b,/^,/),a.ignore(a.consumeToken.bind(null,/^\)/))],c);return d&&4==d[0].length?d[0]:void 0}function d(b,c){return"auto"==b||"auto"==c?[!0,!1,function(d){var e=d?b:c;if("auto"==e)return"auto";var f=a.mergeDimensions(e,e);return f[2](f[0])}]:a.mergeDimensions(b,c)}function e(a){return"rect("+a+")"}var f=a.mergeWrappedNestedRepeated.bind(null,e,d,", ");a.parseBox=c,a.mergeBoxes=f,a.addPropertiesHandler(c,f,["clip"])}(d,f),function(a){function b(a){return function(b){var c=0;return a.map(function(a){return a===j?b[c++]:a})}}function c(a){return a}function d(b){if(b=b.toLowerCase().trim(),"none"==b)return[];for(var c,d=/\s*(\w+)\(([^)]*)\)/g,e=[],f=0;c=d.exec(b);){if(c.index!=f)return;f=c.index+c[0].length;var g=c[1],h=m[g];if(!h)return;var i=c[2].split(","),j=h[0];if(j.length<i.length)return;for(var n=[],o=0;o<j.length;o++){var p,q=i[o],r=j[o];if(p=q?{A:function(b){return"0"==b.trim()?l:a.parseAngle(b)},N:a.parseNumber,T:a.parseLengthOrPercent,L:a.parseLength}[r.toUpperCase()](q):{a:l,n:n[0],t:k}[r],void 0===p)return;n.push(p)}if(e.push({t:g,d:n}),d.lastIndex==b.length)return e}}function e(a){return a.toFixed(6).replace(".000000","")}function f(b,c){if(b.decompositionPair!==c){b.decompositionPair=c;var d=a.makeMatrixDecomposition(b)}if(c.decompositionPair!==b){c.decompositionPair=b;var f=a.makeMatrixDecomposition(c)}return null==d[0]||null==f[0]?[[!1],[!0],function(a){return a?c[0].d:b[0].d}]:(d[0].push(0),f[0].push(1),[d,f,function(b){var c=a.quat(d[0][3],f[0][3],b[5]),g=a.composeMatrix(b[0],b[1],b[2],c,b[4]),h=g.map(e).join(",");return h}])}function g(a){return a.replace(/[xy]/,"")}function h(a){return a.replace(/(x|y|z|3d)?$/,"3d")}function i(b,c){var d=a.makeMatrixDecomposition&&!0,e=!1;if(!b.length||!c.length){b.length||(e=!0,b=c,c=[]);for(var i=0;i<b.length;i++){var j=b[i].t,k=b[i].d,l="scale"==j.substr(0,5)?1:0;c.push({t:j,d:k.map(function(a){if("number"==typeof a)return l;var b={};for(var c in a)b[c]=l;return b})})}}var n=function(a,b){return"perspective"==a&&"perspective"==b||("matrix"==a||"matrix3d"==a)&&("matrix"==b||"matrix3d"==b)},o=[],p=[],q=[];if(b.length!=c.length){if(!d)return;var r=f(b,c);o=[r[0]],p=[r[1]],q=[["matrix",[r[2]]]]}else for(var i=0;i<b.length;i++){var j,s=b[i].t,t=c[i].t,u=b[i].d,v=c[i].d,w=m[s],x=m[t];if(n(s,t)){if(!d)return;var r=f([b[i]],[c[i]]);o.push(r[0]),p.push(r[1]),q.push(["matrix",[r[2]]])}else{if(s==t)j=s;else if(w[2]&&x[2]&&g(s)==g(t))j=g(s),u=w[2](u),v=x[2](v);else{if(!w[1]||!x[1]||h(s)!=h(t)){if(!d)return;var r=f(b,c);o=[r[0]],p=[r[1]],q=[["matrix",[r[2]]]];break}j=h(s),u=w[1](u),v=x[1](v)}for(var y=[],z=[],A=[],B=0;B<u.length;B++){var C="number"==typeof u[B]?a.mergeNumbers:a.mergeDimensions,r=C(u[B],v[B]);y[B]=r[0],z[B]=r[1],A.push(r[2])}o.push(y),p.push(z),q.push([j,A])}}if(e){var D=o;o=p,p=D}return[o,p,function(a){return a.map(function(a,b){var c=a.map(function(a,c){return q[b][1][c](a)}).join(",");return"matrix"==q[b][0]&&16==c.split(",").length&&(q[b][0]="matrix3d"),q[b][0]+"("+c+")"}).join(" ")}]}var j=null,k={px:0},l={deg:0},m={matrix:["NNNNNN",[j,j,0,0,j,j,0,0,0,0,1,0,j,j,0,1],c],matrix3d:["NNNNNNNNNNNNNNNN",c],rotate:["A"],rotatex:["A"],rotatey:["A"],rotatez:["A"],rotate3d:["NNNA"],perspective:["L"],scale:["Nn",b([j,j,1]),c],scalex:["N",b([j,1,1]),b([j,1])],scaley:["N",b([1,j,1]),b([1,j])],scalez:["N",b([1,1,j])],scale3d:["NNN",c],skew:["Aa",null,c],skewx:["A",null,b([j,l])],skewy:["A",null,b([l,j])],translate:["Tt",b([j,j,k]),c],translatex:["T",b([j,k,k]),b([j,k])],translatey:["T",b([k,j,k]),b([k,j])],translatez:["L",b([k,k,j])],translate3d:["TTL",c]};a.addPropertiesHandler(d,i,["transform"])}(d,f),function(a){function b(a,b){b.concat([a]).forEach(function(b){b in document.documentElement.style&&(c[a]=b)})}var c={};b("transform",["webkitTransform","msTransform"]),b("transformOrigin",["webkitTransformOrigin"]),b("perspective",["webkitPerspective"]),b("perspectiveOrigin",["webkitPerspectiveOrigin"]),a.propertyName=function(a){return c[a]||a}}(d,f)}(),!function(a,b){function c(a){var b=window.document.timeline;b.currentTime=a,b._discardAnimations(),0==b._animations.length?e=!1:requestAnimationFrame(c)}var d=window.requestAnimationFrame;window.requestAnimationFrame=function(a){return d(function(b){window.document.timeline._updateAnimationsPromises(),a(b),window.document.timeline._updateAnimationsPromises()})},b.AnimationTimeline=function(){this._animations=[],this.currentTime=void 0},b.AnimationTimeline.prototype={getAnimations:function(){return this._discardAnimations(),this._animations.slice()},_updateAnimationsPromises:function(){b.animationsWithPromises=b.animationsWithPromises.filter(function(a){return a._updatePromises()})},_discardAnimations:function(){this._updateAnimationsPromises(),this._animations=this._animations.filter(function(a){return"finished"!=a.playState&&"idle"!=a.playState})},_play:function(a){var c=new b.Animation(a,this);return this._animations.push(c),b.restartWebAnimationsNextTick(),c._updatePromises(),c._animation.play(),c._updatePromises(),c},play:function(a){return a&&a.remove(),this._play(a)}};var e=!1;b.restartWebAnimationsNextTick=function(){e||(e=!0,requestAnimationFrame(c))};var f=new b.AnimationTimeline;b.timeline=f;try{Object.defineProperty(window.document,"timeline",{configurable:!0,get:function(){return f}})}catch(g){}try{window.document.timeline=f}catch(g){}}(c,e,f),function(a,b){b.animationsWithPromises=[],b.Animation=function(b,c){if(this.effect=b,b&&(b._animation=this),!c)throw new Error("Animation with null timeline is not supported");this._timeline=c,this._sequenceNumber=a.sequenceNumber++,this._holdTime=0,this._paused=!1,this._isGroup=!1,this._animation=null,this._childAnimations=[],this._callback=null,this._oldPlayState="idle",this._rebuildUnderlyingAnimation(),this._animation.cancel(),this._updatePromises()},b.Animation.prototype={_updatePromises:function(){var a=this._oldPlayState,b=this.playState;return this._readyPromise&&b!==a&&("idle"==b?(this._rejectReadyPromise(),this._readyPromise=void 0):"pending"==a?this._resolveReadyPromise():"pending"==b&&(this._readyPromise=void 0)),this._finishedPromise&&b!==a&&("idle"==b?(this._rejectFinishedPromise(),this._finishedPromise=void 0):"finished"==b?this._resolveFinishedPromise():"finished"==a&&(this._finishedPromise=void 0)),this._oldPlayState=this.playState,this._readyPromise||this._finishedPromise},_rebuildUnderlyingAnimation:function(){this._updatePromises();var a,c,d,e,f=this._animation?!0:!1;f&&(a=this.playbackRate,c=this._paused,d=this.startTime,e=this.currentTime,this._animation.cancel(),this._animation._wrapper=null,this._animation=null),(!this.effect||this.effect instanceof window.KeyframeEffect)&&(this._animation=b.newUnderlyingAnimationForKeyframeEffect(this.effect),b.bindAnimationForKeyframeEffect(this)),(this.effect instanceof window.SequenceEffect||this.effect instanceof window.GroupEffect)&&(this._animation=b.newUnderlyingAnimationForGroup(this.effect),b.bindAnimationForGroup(this)),this.effect&&this.effect._onsample&&b.bindAnimationForCustomEffect(this),f&&(1!=a&&(this.playbackRate=a),null!==d?this.startTime=d:null!==e?this.currentTime=e:null!==this._holdTime&&(this.currentTime=this._holdTime),c&&this.pause()),this._updatePromises()
-},_updateChildren:function(){if(this.effect&&"idle"!=this.playState){var a=this.effect._timing.delay;this._childAnimations.forEach(function(c){this._arrangeChildren(c,a),this.effect instanceof window.SequenceEffect&&(a+=b.groupChildDuration(c.effect))}.bind(this))}},_setExternalAnimation:function(a){if(this.effect&&this._isGroup)for(var b=0;b<this.effect.children.length;b++)this.effect.children[b]._animation=a,this._childAnimations[b]._setExternalAnimation(a)},_constructChildAnimations:function(){if(this.effect&&this._isGroup){var a=this.effect._timing.delay;this._removeChildAnimations(),this.effect.children.forEach(function(c){var d=window.document.timeline._play(c);this._childAnimations.push(d),d.playbackRate=this.playbackRate,this._paused&&d.pause(),c._animation=this.effect._animation,this._arrangeChildren(d,a),this.effect instanceof window.SequenceEffect&&(a+=b.groupChildDuration(c))}.bind(this))}},_arrangeChildren:function(a,b){null===this.startTime?a.currentTime=this.currentTime-b/this.playbackRate:a.startTime!==this.startTime+b/this.playbackRate&&(a.startTime=this.startTime+b/this.playbackRate)},get timeline(){return this._timeline},get playState(){return this._animation?this._animation.playState:"idle"},get finished(){return window.Promise?(this._finishedPromise||(-1==b.animationsWithPromises.indexOf(this)&&b.animationsWithPromises.push(this),this._finishedPromise=new Promise(function(a,b){this._resolveFinishedPromise=function(){a(this)},this._rejectFinishedPromise=function(){b({type:DOMException.ABORT_ERR,name:"AbortError"})}}.bind(this)),"finished"==this.playState&&this._resolveFinishedPromise()),this._finishedPromise):(console.warn("Animation Promises require JavaScript Promise constructor"),null)},get ready(){return window.Promise?(this._readyPromise||(-1==b.animationsWithPromises.indexOf(this)&&b.animationsWithPromises.push(this),this._readyPromise=new Promise(function(a,b){this._resolveReadyPromise=function(){a(this)},this._rejectReadyPromise=function(){b({type:DOMException.ABORT_ERR,name:"AbortError"})}}.bind(this)),"pending"!==this.playState&&this._resolveReadyPromise()),this._readyPromise):(console.warn("Animation Promises require JavaScript Promise constructor"),null)},get onfinish(){return this._onfinish},set onfinish(a){"function"==typeof a?(this._onfinish=a,this._animation.onfinish=function(b){b.target=this,a.call(this,b)}.bind(this)):(this._animation.onfinish=a,this.onfinish=this._animation.onfinish)},get currentTime(){this._updatePromises();var a=this._animation.currentTime;return this._updatePromises(),a},set currentTime(a){this._updatePromises(),this._animation.currentTime=isFinite(a)?a:Math.sign(a)*Number.MAX_VALUE,this._register(),this._forEachChild(function(b,c){b.currentTime=a-c}),this._updatePromises()},get startTime(){return this._animation.startTime},set startTime(a){this._updatePromises(),this._animation.startTime=isFinite(a)?a:Math.sign(a)*Number.MAX_VALUE,this._register(),this._forEachChild(function(b,c){b.startTime=a+c}),this._updatePromises()},get playbackRate(){return this._animation.playbackRate},set playbackRate(a){this._updatePromises();var b=this.currentTime;this._animation.playbackRate=a,this._forEachChild(function(b){b.playbackRate=a}),"paused"!=this.playState&&"idle"!=this.playState&&this.play(),null!==b&&(this.currentTime=b),this._updatePromises()},play:function(){this._updatePromises(),this._paused=!1,this._animation.play(),-1==this._timeline._animations.indexOf(this)&&this._timeline._animations.push(this),this._register(),b.awaitStartTime(this),this._forEachChild(function(a){var b=a.currentTime;a.play(),a.currentTime=b}),this._updatePromises()},pause:function(){this._updatePromises(),this.currentTime&&(this._holdTime=this.currentTime),this._animation.pause(),this._register(),this._forEachChild(function(a){a.pause()}),this._paused=!0,this._updatePromises()},finish:function(){this._updatePromises(),this._animation.finish(),this._register(),this._updatePromises()},cancel:function(){this._updatePromises(),this._animation.cancel(),this._register(),this._removeChildAnimations(),this._updatePromises()},reverse:function(){this._updatePromises();var a=this.currentTime;this._animation.reverse(),this._forEachChild(function(a){a.reverse()}),null!==a&&(this.currentTime=a),this._updatePromises()},addEventListener:function(a,b){var c=b;"function"==typeof b&&(c=function(a){a.target=this,b.call(this,a)}.bind(this),b._wrapper=c),this._animation.addEventListener(a,c)},removeEventListener:function(a,b){this._animation.removeEventListener(a,b&&b._wrapper||b)},_removeChildAnimations:function(){for(;this._childAnimations.length;)this._childAnimations.pop().cancel()},_forEachChild:function(b){var c=0;if(this.effect.children&&this._childAnimations.length<this.effect.children.length&&this._constructChildAnimations(),this._childAnimations.forEach(function(a){b.call(this,a,c),this.effect instanceof window.SequenceEffect&&(c+=a.effect.activeDuration)}.bind(this)),"pending"!=this.playState){var d=this.effect._timing,e=this.currentTime;null!==e&&(e=a.calculateTimeFraction(a.calculateActiveDuration(d),e,d)),(null==e||isNaN(e))&&this._removeChildAnimations()}}},window.Animation=b.Animation}(c,e,f),function(a,b){function c(b){this._frames=a.normalizeKeyframes(b)}function d(){for(var a=!1;h.length;){var b=h.shift();b._updateChildren(),a=!0}return a}var e=function(a){if(a._animation=void 0,a instanceof window.SequenceEffect||a instanceof window.GroupEffect)for(var b=0;b<a.children.length;b++)e(a.children[b])};b.removeMulti=function(a){for(var b=[],c=0;c<a.length;c++){var d=a[c];d._parent?(-1==b.indexOf(d._parent)&&b.push(d._parent),d._parent.children.splice(d._parent.children.indexOf(d),1),d._parent=null,e(d)):d._animation&&d._animation.effect==d&&(d._animation.cancel(),d._animation.effect=new KeyframeEffect(null,[]),d._animation._callback&&(d._animation._callback._animation=null),d._animation._rebuildUnderlyingAnimation(),e(d))}for(c=0;c<b.length;c++)b[c]._rebuild()},b.KeyframeEffect=function(b,d,e){return this.target=b,this._parent=null,e=a.numericTimingToObject(e),this._timingInput=a.cloneTimingInput(e),this._timing=a.normalizeTimingInput(e),this.timing=a.makeTiming(e,!1,this),this.timing._effect=this,"function"==typeof d?(a.deprecated("Custom KeyframeEffect","2015-06-22","Use KeyframeEffect.onsample instead."),this._normalizedKeyframes=d):this._normalizedKeyframes=new c(d),this._keyframes=d,this.activeDuration=a.calculateActiveDuration(this._timing),this},b.KeyframeEffect.prototype={getFrames:function(){return"function"==typeof this._normalizedKeyframes?this._normalizedKeyframes:this._normalizedKeyframes._frames},set onsample(a){if("function"==typeof this.getFrames())throw new Error("Setting onsample on custom effect KeyframeEffect is not supported.");this._onsample=a,this._animation&&this._animation._rebuildUnderlyingAnimation()},get parent(){return this._parent},clone:function(){if("function"==typeof this.getFrames())throw new Error("Cloning custom effects is not supported.");var b=new KeyframeEffect(this.target,[],a.cloneTimingInput(this._timingInput));return b._normalizedKeyframes=this._normalizedKeyframes,b._keyframes=this._keyframes,b},remove:function(){b.removeMulti([this])}};var f=Element.prototype.animate;Element.prototype.animate=function(a,c){return b.timeline._play(new b.KeyframeEffect(this,a,c))};var g=document.createElementNS("http://www.w3.org/1999/xhtml","div");b.newUnderlyingAnimationForKeyframeEffect=function(a){if(a){var b=a.target||g,c=a._keyframes;"function"==typeof c&&(c=[]);var d=a._timingInput}else var b=g,c=[],d=0;return f.apply(b,[c,d])},b.bindAnimationForKeyframeEffect=function(a){a.effect&&"function"==typeof a.effect._normalizedKeyframes&&b.bindAnimationForCustomEffect(a)};var h=[];b.awaitStartTime=function(a){null===a.startTime&&a._isGroup&&(0==h.length&&requestAnimationFrame(d),h.push(a))};var i=window.getComputedStyle;Object.defineProperty(window,"getComputedStyle",{configurable:!0,enumerable:!0,value:function(){window.document.timeline._updateAnimationsPromises();var a=i.apply(this,arguments);return d()&&(a=i.apply(this,arguments)),window.document.timeline._updateAnimationsPromises(),a}}),window.KeyframeEffect=b.KeyframeEffect,window.Element.prototype.getAnimations=function(){return document.timeline.getAnimations().filter(function(a){return null!==a.effect&&a.effect.target==this}.bind(this))}}(c,e,f),function(a,b){function c(a){a._registered||(a._registered=!0,f.push(a),g||(g=!0,requestAnimationFrame(d)))}function d(){var a=f;f=[],a.sort(function(a,b){return a._sequenceNumber-b._sequenceNumber}),a=a.filter(function(a){a();var b=a._animation?a._animation.playState:"idle";return"running"!=b&&"pending"!=b&&(a._registered=!1),a._registered}),f.push.apply(f,a),f.length?(g=!0,requestAnimationFrame(d)):g=!1}var e=(document.createElementNS("http://www.w3.org/1999/xhtml","div"),0);b.bindAnimationForCustomEffect=function(b){var d,f=b.effect.target,g="function"==typeof b.effect.getFrames();d=g?b.effect.getFrames():b.effect._onsample;var h=b.effect.timing,i=null;h=a.normalizeTimingInput(h);var j=function(){var c=j._animation?j._animation.currentTime:null;null!==c&&(c=a.calculateTimeFraction(a.calculateActiveDuration(h),c,h),isNaN(c)&&(c=null)),c!==i&&(g?d(c,f,b.effect):d(c,b.effect,b.effect._animation)),i=c};j._animation=b,j._registered=!1,j._sequenceNumber=e++,b._callback=j,c(j)};var f=[],g=!1;b.Animation.prototype._register=function(){this._callback&&c(this._callback)}}(c,e,f),function(a,b){function c(a){return a._timing.delay+a.activeDuration+a._timing.endDelay}function d(b,c){this._parent=null,this.children=b||[],this._reparent(this.children),c=a.numericTimingToObject(c),this._timingInput=a.cloneTimingInput(c),this._timing=a.normalizeTimingInput(c,!0),this.timing=a.makeTiming(c,!0,this),this.timing._effect=this,"auto"===this._timing.duration&&(this._timing.duration=this.activeDuration)}window.SequenceEffect=function(){d.apply(this,arguments)},window.GroupEffect=function(){d.apply(this,arguments)},d.prototype={_isAncestor:function(a){for(var b=this;null!==b;){if(b==a)return!0;b=b._parent}return!1},_rebuild:function(){for(var a=this;a;)"auto"===a.timing.duration&&(a._timing.duration=a.activeDuration),a=a._parent;this._animation&&this._animation._rebuildUnderlyingAnimation()},_reparent:function(a){b.removeMulti(a);for(var c=0;c<a.length;c++)a[c]._parent=this},_putChild:function(a,b){for(var c=b?"Cannot append an ancestor or self":"Cannot prepend an ancestor or self",d=0;d<a.length;d++)if(this._isAncestor(a[d]))throw{type:DOMException.HIERARCHY_REQUEST_ERR,name:"HierarchyRequestError",message:c};for(var d=0;d<a.length;d++)b?this.children.push(a[d]):this.children.unshift(a[d]);this._reparent(a),this._rebuild()},append:function(){this._putChild(arguments,!0)},prepend:function(){this._putChild(arguments,!1)},get parent(){return this._parent},get firstChild(){return this.children.length?this.children[0]:null},get lastChild(){return this.children.length?this.children[this.children.length-1]:null},clone:function(){for(var b=a.cloneTimingInput(this._timingInput),c=[],d=0;d<this.children.length;d++)c.push(this.children[d].clone());return this instanceof GroupEffect?new GroupEffect(c,b):new SequenceEffect(c,b)},remove:function(){b.removeMulti([this])}},window.SequenceEffect.prototype=Object.create(d.prototype),Object.defineProperty(window.SequenceEffect.prototype,"activeDuration",{get:function(){var a=0;return this.children.forEach(function(b){a+=c(b)}),Math.max(a,0)}}),window.GroupEffect.prototype=Object.create(d.prototype),Object.defineProperty(window.GroupEffect.prototype,"activeDuration",{get:function(){var a=0;return this.children.forEach(function(b){a=Math.max(a,c(b))}),a}}),b.newUnderlyingAnimationForGroup=function(c){var d,e=null,f=function(b){var c=d._wrapper;return c&&"pending"!=c.playState&&c.effect?null==b?void c._removeChildAnimations():0==b&&c.playbackRate<0&&(e||(e=a.normalizeTimingInput(c.effect.timing)),b=a.calculateTimeFraction(a.calculateActiveDuration(e),-1,e),isNaN(b)||null==b)?(c._forEachChild(function(a){a.currentTime=-1}),void c._removeChildAnimations()):void 0:void 0},g=new KeyframeEffect(null,[],c._timing);return g.onsample=f,d=b.timeline._play(g)},b.bindAnimationForGroup=function(a){a._animation._wrapper=a,a._isGroup=!0,b.awaitStartTime(a),a._constructChildAnimations(),a._setExternalAnimation(a)},b.groupChildDuration=c}(c,e,f)}({},function(){return this}());
-//# sourceMappingURL=web-animations-next-lite.min.js.map
-Polymer({
-
-    is: 'opaque-animation',
-
-    behaviors: [
-      Polymer.NeonAnimationBehavior
-    ],
-
-    configure: function(config) {
-      var node = config.node;
-      node.style.opacity = '0';
-      this._effect = new KeyframeEffect(node, [
-        {'opacity': '1'},
-        {'opacity': '1'}
-      ], this.timingFromConfig(config));
-      return this._effect;
-    },
-
-    complete: function(config) {
-      config.node.style.opacity = '';
-    }
-
-  });
-/**
    * `Polymer.NeonAnimatableBehavior` is implemented by elements containing animations for use with
    * elements implementing `Polymer.NeonAnimationRunnerBehavior`.
    * @polymerBehavior
@@ -14336,21 +14341,10 @@ Polymer({
 
     _entryAnimationChanged: function() {
       this.animationConfig = this.animationConfig || {};
-      if (this.entryAnimation !== 'fade-in-animation') {
-        // insert polyfill hack
-        this.animationConfig['entry'] = [{
-          name: 'opaque-animation',
-          node: this
-        }, {
-          name: this.entryAnimation,
-          node: this
-        }];
-      } else {
-        this.animationConfig['entry'] = [{
-          name: this.entryAnimation,
-          node: this
-        }];
-      }
+      this.animationConfig['entry'] = [{
+        name: this.entryAnimation,
+        node: this
+      }];
     },
 
     _exitAnimationChanged: function() {
@@ -14502,27 +14496,30 @@ Polymer({
       if (!allConfigs) {
         return;
       }
-      var allAnimations = this._configureAnimationEffects(allConfigs);
-      var allEffects = allAnimations.map(function(animation) {
-        return animation.effect;
-      });
+      try {
+        var allAnimations = this._configureAnimationEffects(allConfigs);
+        var allEffects = allAnimations.map(function(animation) {
+          return animation.effect;
+        });
 
-      if (allEffects.length > 0) {
-        this._player = this._runAnimationEffects(allEffects);
-        this._player.onfinish = function() {
-          this._completeAnimations(allAnimations);
+        if (allEffects.length > 0) {
+          this._player = this._runAnimationEffects(allEffects);
+          this._player.onfinish = function() {
+            this._completeAnimations(allAnimations);
 
-          if (this._player) {
-            this._player.cancel();
-            this._player = null;
-          }
+            if (this._player) {
+              this._player.cancel();
+              this._player = null;
+            }
 
-          this.fire('neon-animation-finish', cookie, {bubbles: false});
-        }.bind(this);
-
-      } else {
-        this.fire('neon-animation-finish', cookie, {bubbles: false});
+            this.fire('neon-animation-finish', cookie, {bubbles: false});
+          }.bind(this);
+          return;
+        }
+      } catch (e) {
+        console.warn('Couldnt play', '(', type, allConfigs, ').', e);
       }
+      this.fire('neon-animation-finish', cookie, {bubbles: false});
     },
 
     /**
@@ -14541,7 +14538,7 @@ Polymer({
     Polymer.NeonAnimationRunnerBehaviorImpl
   ];
 /**
-Polymer.IronFitBehavior fits an element in another element using `max-height` and `max-width`, and
+`Polymer.IronFitBehavior` fits an element in another element using `max-height` and `max-width`, and
 optionally centers it in the window or another element.
 
 The element will only be sized and/or positioned if it has not already been sized and/or positioned
@@ -14552,8 +14549,25 @@ CSS properties               | Action
 `position` set               | Element is not centered horizontally or vertically
 `top` or `bottom` set        | Element is not vertically centered
 `left` or `right` set        | Element is not horizontally centered
-`max-height` or `height` set | Element respects `max-height` or `height`
-`max-width` or `width` set   | Element respects `max-width` or `width`
+`max-height` set             | Element respects `max-height`
+`max-width` set              | Element respects `max-width`
+
+`Polymer.IronFitBehavior` can position an element into another element using
+`verticalAlign` and `horizontalAlign`. This will override the element's css position.
+
+      <div class="container">
+        <iron-fit-impl vertical-align="top" horizontal-align="auto">
+          Positioned into the container
+        </iron-fit-impl>
+      </div>
+
+Use `noOverlap` to position the element around another element without overlapping it.
+
+      <div class="container">
+        <iron-fit-impl no-overlap vertical-align="auto" horizontal-align="auto">
+          Positioned around the container
+        </iron-fit-impl>
+      </div>
 
 @demo demo/index.html
 @polymerBehavior
@@ -14585,6 +14599,66 @@ CSS properties               | Action
       },
 
       /**
+       * Will position the element around the positionTarget without overlapping it.
+       */
+      noOverlap: {
+        type: Boolean
+      },
+
+      /**
+       * The element that should be used to position the element. If not set, it will
+       * default to the parent node.
+       * @type {!Element}
+       */
+      positionTarget: {
+        type: Element
+      },
+
+      /**
+       * The orientation against which to align the element horizontally
+       * relative to the `positionTarget`. Possible values are "left", "right", "auto".
+       */
+      horizontalAlign: {
+        type: String
+      },
+
+      /**
+       * The orientation against which to align the element vertically
+       * relative to the `positionTarget`. Possible values are "top", "bottom", "auto".
+       */
+      verticalAlign: {
+        type: String
+      },
+
+      /**
+       * If true, it will use `horizontalAlign` and `verticalAlign` values as preferred alignment
+       * and if there's not enough space, it will pick the values which minimize the cropping.
+       */
+      dynamicAlign: {
+        type: Boolean
+      },
+
+      /**
+       * The same as setting margin-left and margin-right css properties.
+       * @deprecated
+       */
+      horizontalOffset: {
+        type: Number,
+        value: 0,
+        notify: true
+      },
+
+      /**
+       * The same as setting margin-top and margin-bottom css properties.
+       * @deprecated
+       */
+      verticalOffset: {
+        type: Number,
+        value: 0,
+        notify: true
+      },
+
+      /**
        * Set to true to auto-fit on attach.
        */
       autoFitOnAttach: {
@@ -14596,7 +14670,6 @@ CSS properties               | Action
       _fitInfo: {
         type: Object
       }
-
     },
 
     get _fitWidth() {
@@ -14639,7 +14712,40 @@ CSS properties               | Action
       return fitTop;
     },
 
+    /**
+     * The element that should be used to position the element,
+     * if no position target is configured.
+     */
+    get _defaultPositionTarget() {
+      var parent = Polymer.dom(this).parentNode;
+
+      if (parent && parent.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        parent = parent.host;
+      }
+
+      return parent;
+    },
+
+    /**
+     * The horizontal align value, accounting for the RTL/LTR text direction.
+     */
+    get _localeHorizontalAlign() {
+      if (this._isRTL) {
+        // In RTL, "left" becomes "right".
+        if (this.horizontalAlign === 'right') {
+          return 'left';
+        }
+        if (this.horizontalAlign === 'left') {
+          return 'right';
+        }
+      }
+      return this.horizontalAlign;
+    },
+
     attached: function() {
+      // Memoize this to avoid expensive calculations & relayouts.
+      this._isRTL = window.getComputedStyle(this).direction == 'rtl';
+      this.positionTarget = this.positionTarget || this._defaultPositionTarget;
       if (this.autoFitOnAttach) {
         if (window.getComputedStyle(this).display === 'none') {
           setTimeout(function() {
@@ -14652,10 +14758,11 @@ CSS properties               | Action
     },
 
     /**
-     * Fits and optionally centers the element into the window, or `fitInfo` if specified.
+     * Positions and fits the element into the `fitInto` element.
      */
     fit: function() {
       this._discoverInfo();
+      this.position();
       this.constrain();
       this.center();
     },
@@ -14669,21 +14776,29 @@ CSS properties               | Action
       }
       var target = window.getComputedStyle(this);
       var sizer = window.getComputedStyle(this.sizingTarget);
+
       this._fitInfo = {
         inlineStyle: {
           top: this.style.top || '',
-          left: this.style.left || ''
+          left: this.style.left || '',
+          position: this.style.position || ''
+        },
+        sizerInlineStyle: {
+          maxWidth: this.sizingTarget.style.maxWidth || '',
+          maxHeight: this.sizingTarget.style.maxHeight || '',
+          boxSizing: this.sizingTarget.style.boxSizing || ''
         },
         positionedBy: {
           vertically: target.top !== 'auto' ? 'top' : (target.bottom !== 'auto' ?
             'bottom' : null),
           horizontally: target.left !== 'auto' ? 'left' : (target.right !== 'auto' ?
-            'right' : null),
-          css: target.position
+            'right' : null)
         },
         sizedBy: {
           height: sizer.maxHeight !== 'none',
-          width: sizer.maxWidth !== 'none'
+          width: sizer.maxWidth !== 'none',
+          minWidth: parseInt(sizer.minWidth, 10) || 0,
+          minHeight: parseInt(sizer.minHeight, 10) || 0
         },
         margin: {
           top: parseInt(target.marginTop, 10) || 0,
@@ -14692,6 +14807,20 @@ CSS properties               | Action
           left: parseInt(target.marginLeft, 10) || 0
         }
       };
+
+      // Support these properties until they are removed.
+      if (this.verticalOffset) {
+        this._fitInfo.margin.top = this._fitInfo.margin.bottom = this.verticalOffset;
+        this._fitInfo.inlineStyle.marginTop = this.style.marginTop || '';
+        this._fitInfo.inlineStyle.marginBottom = this.style.marginBottom || '';
+        this.style.marginTop = this.style.marginBottom = this.verticalOffset + 'px';
+      }
+      if (this.horizontalOffset) {
+        this._fitInfo.margin.left = this._fitInfo.margin.right = this.horizontalOffset;
+        this._fitInfo.inlineStyle.marginLeft = this.style.marginLeft || '';
+        this._fitInfo.inlineStyle.marginRight = this.style.marginRight || '';
+        this.style.marginLeft = this.style.marginRight = this.horizontalOffset + 'px';
+      }
     },
 
     /**
@@ -14699,61 +14828,138 @@ CSS properties               | Action
      * the memoized data.
      */
     resetFit: function() {
-      if (!this._fitInfo || !this._fitInfo.sizedBy.width) {
-        this.sizingTarget.style.maxWidth = '';
+      var info = this._fitInfo || {};
+      for (var property in info.sizerInlineStyle) {
+        this.sizingTarget.style[property] = info.sizerInlineStyle[property];
       }
-      if (!this._fitInfo || !this._fitInfo.sizedBy.height) {
-        this.sizingTarget.style.maxHeight = '';
+      for (var property in info.inlineStyle) {
+        this.style[property] = info.inlineStyle[property];
       }
-      this.style.top = this._fitInfo ? this._fitInfo.inlineStyle.top : '';
-      this.style.left = this._fitInfo ? this._fitInfo.inlineStyle.left : '';
-      if (this._fitInfo) {
-        this.style.position = this._fitInfo.positionedBy.css;
-      }
+
       this._fitInfo = null;
     },
 
     /**
-     * Equivalent to calling `resetFit()` and `fit()`. Useful to call this after the element,
-     * the window, or the `fitInfo` element has been resized.
+     * Equivalent to calling `resetFit()` and `fit()`. Useful to call this after
+     * the element or the `fitInto` element has been resized, or if any of the
+     * positioning properties (e.g. `horizontalAlign, verticalAlign`) is updated.
+     * It preserves the scroll position of the sizingTarget.
      */
     refit: function() {
+      var scrollLeft = this.sizingTarget.scrollLeft;
+      var scrollTop = this.sizingTarget.scrollTop;
       this.resetFit();
       this.fit();
+      this.sizingTarget.scrollLeft = scrollLeft;
+      this.sizingTarget.scrollTop = scrollTop;
     },
 
     /**
-     * Constrains the size of the element to the window or `fitInfo` by setting `max-height`
+     * Positions the element according to `horizontalAlign, verticalAlign`.
+     */
+    position: function() {
+      if (!this.horizontalAlign && !this.verticalAlign) {
+        // needs to be centered, and it is done after constrain.
+        return;
+      }
+
+      this.style.position = 'fixed';
+      // Need border-box for margin/padding.
+      this.sizingTarget.style.boxSizing = 'border-box';
+      // Set to 0, 0 in order to discover any offset caused by parent stacking contexts.
+      this.style.left = '0px';
+      this.style.top = '0px';
+
+      var rect = this.getBoundingClientRect();
+      var positionRect = this.__getNormalizedRect(this.positionTarget);
+      var fitRect = this.__getNormalizedRect(this.fitInto);
+
+      var margin = this._fitInfo.margin;
+
+      // Consider the margin as part of the size for position calculations.
+      var size = {
+        width: rect.width + margin.left + margin.right,
+        height: rect.height + margin.top + margin.bottom
+      };
+
+      var position = this.__getPosition(this._localeHorizontalAlign, this.verticalAlign, size, positionRect, fitRect);
+
+      var left = position.left + margin.left;
+      var top = position.top + margin.top;
+
+      // Use original size (without margin).
+      var right = Math.min(fitRect.right - margin.right, left + rect.width);
+      var bottom = Math.min(fitRect.bottom - margin.bottom, top + rect.height);
+
+      var minWidth = this._fitInfo.sizedBy.minWidth;
+      var minHeight = this._fitInfo.sizedBy.minHeight;
+      if (left < margin.left) {
+        left = margin.left;
+        if (right - left < minWidth) {
+          left = right - minWidth;
+        }
+      }
+      if (top < margin.top) {
+        top = margin.top;
+        if (bottom - top < minHeight) {
+          top = bottom - minHeight;
+        }
+      }
+
+      this.sizingTarget.style.maxWidth = (right - left) + 'px';
+      this.sizingTarget.style.maxHeight = (bottom - top) + 'px';
+
+      // Remove the offset caused by any stacking context.
+      this.style.left = (left - rect.left) + 'px';
+      this.style.top = (top - rect.top) + 'px';
+    },
+
+    /**
+     * Constrains the size of the element to `fitInto` by setting `max-height`
      * and/or `max-width`.
      */
     constrain: function() {
+      if (this.horizontalAlign || this.verticalAlign) {
+        return;
+      }
       var info = this._fitInfo;
       // position at (0px, 0px) if not already positioned, so we can measure the natural size.
-      if (!this._fitInfo.positionedBy.vertically) {
+      if (!info.positionedBy.vertically) {
+        this.style.position = 'fixed';
         this.style.top = '0px';
       }
-      if (!this._fitInfo.positionedBy.horizontally) {
+      if (!info.positionedBy.horizontally) {
+        this.style.position = 'fixed';
         this.style.left = '0px';
       }
-      if (!this._fitInfo.positionedBy.vertically || !this._fitInfo.positionedBy.horizontally) {
-        // need position:fixed to properly size the element
-        this.style.position = 'fixed';
-      }
+
       // need border-box for margin/padding
       this.sizingTarget.style.boxSizing = 'border-box';
       // constrain the width and height if not already set
       var rect = this.getBoundingClientRect();
       if (!info.sizedBy.height) {
-        this._sizeDimension(rect, info.positionedBy.vertically, 'top', 'bottom', 'Height');
+        this.__sizeDimension(rect, info.positionedBy.vertically, 'top', 'bottom', 'Height');
       }
       if (!info.sizedBy.width) {
-        this._sizeDimension(rect, info.positionedBy.horizontally, 'left', 'right', 'Width');
+        this.__sizeDimension(rect, info.positionedBy.horizontally, 'left', 'right', 'Width');
       }
     },
 
+    /**
+     * @protected
+     * @deprecated
+     */
     _sizeDimension: function(rect, positionedBy, start, end, extent) {
+      this.__sizeDimension(rect, positionedBy, start, end, extent);
+    },
+
+    /**
+     * @private
+     */
+    __sizeDimension: function(rect, positionedBy, start, end, extent) {
       var info = this._fitInfo;
-      var max = extent === 'Width' ? this._fitWidth : this._fitHeight;
+      var fitRect = this.__getNormalizedRect(this.fitInto);
+      var max = extent === 'Width' ? fitRect.width : fitRect.height;
       var flip = (positionedBy === end);
       var offset = flip ? max - rect[end] : rect[start];
       var margin = info.margin[flip ? start : end];
@@ -14767,6 +14973,9 @@ CSS properties               | Action
      * `position:fixed`.
      */
     center: function() {
+      if (this.horizontalAlign || this.verticalAlign) {
+        return;
+      }
       var positionedBy = this._fitInfo.positionedBy;
       if (positionedBy.vertically && positionedBy.horizontally) {
         // Already positioned.
@@ -14785,14 +14994,125 @@ CSS properties               | Action
       }
       // It will take in consideration margins and transforms
       var rect = this.getBoundingClientRect();
+      var fitRect = this.__getNormalizedRect(this.fitInto);
       if (!positionedBy.vertically) {
-        var top = this._fitTop - rect.top + (this._fitHeight - rect.height) / 2;
+        var top = fitRect.top - rect.top + (fitRect.height - rect.height) / 2;
         this.style.top = top + 'px';
       }
       if (!positionedBy.horizontally) {
-        var left = this._fitLeft - rect.left + (this._fitWidth - rect.width) / 2;
+        var left = fitRect.left - rect.left + (fitRect.width - rect.width) / 2;
         this.style.left = left + 'px';
       }
+    },
+
+    __getNormalizedRect: function(target) {
+      if (target === document.documentElement || target === window) {
+        return {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          right: window.innerWidth,
+          bottom: window.innerHeight
+        };
+      }
+      return target.getBoundingClientRect();
+    },
+
+    __getCroppedArea: function(position, size, fitRect) {
+      var verticalCrop = Math.min(0, position.top) + Math.min(0, fitRect.bottom - (position.top + size.height));
+      var horizontalCrop = Math.min(0, position.left) + Math.min(0, fitRect.right - (position.left + size.width));
+      return Math.abs(verticalCrop) * size.width + Math.abs(horizontalCrop) * size.height;
+    },
+
+
+    __getPosition: function(hAlign, vAlign, size, positionRect, fitRect) {
+      // All the possible configurations.
+      // Ordered as top-left, top-right, bottom-left, bottom-right.
+      var positions = [{
+        verticalAlign: 'top',
+        horizontalAlign: 'left',
+        top: positionRect.top,
+        left: positionRect.left
+      }, {
+        verticalAlign: 'top',
+        horizontalAlign: 'right',
+        top: positionRect.top,
+        left: positionRect.right - size.width
+      }, {
+        verticalAlign: 'bottom',
+        horizontalAlign: 'left',
+        top: positionRect.bottom - size.height,
+        left: positionRect.left
+      }, {
+        verticalAlign: 'bottom',
+        horizontalAlign: 'right',
+        top: positionRect.bottom - size.height,
+        left: positionRect.right - size.width
+      }];
+
+      if (this.noOverlap) {
+        // Duplicate.
+        for (var i = 0, l = positions.length; i < l; i++) {
+          var copy = {};
+          for (var key in positions[i]) {
+            copy[key] = positions[i][key];
+          }
+          positions.push(copy);
+        }
+        // Horizontal overlap only.
+        positions[0].top = positions[1].top += positionRect.height;
+        positions[2].top = positions[3].top -= positionRect.height;
+        // Vertical overlap only.
+        positions[4].left = positions[6].left += positionRect.width;
+        positions[5].left = positions[7].left -= positionRect.width;
+      }
+
+      // Consider auto as null for coding convenience.
+      vAlign = vAlign === 'auto' ? null : vAlign;
+      hAlign = hAlign === 'auto' ? null : hAlign;
+
+      var position;
+      for (var i = 0; i < positions.length; i++) {
+        var pos = positions[i];
+
+        // If both vAlign and hAlign are defined, return exact match.
+        // For dynamicAlign and noOverlap we'll have more than one candidate, so
+        // we'll have to check the croppedArea to make the best choice.
+        if (!this.dynamicAlign && !this.noOverlap &&
+            pos.verticalAlign === vAlign && pos.horizontalAlign === hAlign) {
+          position = pos;
+          break;
+        }
+
+        // Align is ok if alignment preferences are respected. If no preferences,
+        // it is considered ok.
+        var alignOk = (!vAlign || pos.verticalAlign === vAlign) &&
+                      (!hAlign || pos.horizontalAlign === hAlign);
+
+        // Filter out elements that don't match the alignment (if defined).
+        // With dynamicAlign, we need to consider all the positions to find the
+        // one that minimizes the cropped area.
+        if (!this.dynamicAlign && !alignOk) {
+          continue;
+        }
+
+        position = position || pos;
+        pos.croppedArea = this.__getCroppedArea(pos, size, fitRect);
+        var diff = pos.croppedArea - position.croppedArea;
+        // Check which crops less. If it crops equally, check if align is ok.
+        if (diff < 0 || (diff === 0 && alignOk)) {
+          position = pos;
+        }
+        // If not cropped and respects the align requirements, keep it.
+        // This allows to prefer positions overlapping horizontally over the
+        // ones overlapping vertically.
+        if (position.croppedArea === 0 && alignOk) {
+          break;
+        }
+      }
+
+      return position;
     }
 
   };
@@ -14821,10 +15141,10 @@ CSS properties               | Action
      */
     this._backdropElement = null;
 
-    // Listen to mousedown or touchstart to be sure to be the first to capture
-    // clicks outside the overlay.
-    var clickEvent = ('ontouchstart' in window) ? 'touchstart' : 'mousedown';
-    document.addEventListener(clickEvent, this._onCaptureClick.bind(this), true);
+    // Enable document-wide tap recognizer.
+    Polymer.Gestures.add(document, 'tap', null);
+    // Need to have useCapture=true, Polymer.Gestures doesn't offer that.
+    document.addEventListener('tap', this._onCaptureClick.bind(this), true);
     document.addEventListener('focus', this._onCaptureFocus.bind(this), true);
     document.addEventListener('keydown', this._onCaptureKeyDown.bind(this), true);
   };
@@ -14835,7 +15155,7 @@ CSS properties               | Action
 
     /**
      * The shared backdrop element.
-     * @type {Element} backdropElement
+     * @type {!Element} backdropElement
      */
     get backdropElement() {
       if (!this._backdropElement) {
@@ -14846,7 +15166,7 @@ CSS properties               | Action
 
     /**
      * The deepest active element.
-     * @type {Element} activeElement the active element
+     * @type {!Element} activeElement the active element
      */
     get deepActiveElement() {
       // document.activeElement can be null
@@ -14866,13 +15186,17 @@ CSS properties               | Action
      */
     _bringOverlayAtIndexToFront: function(i) {
       var overlay = this._overlays[i];
+      if (!overlay) {
+        return;
+      }
       var lastI = this._overlays.length - 1;
+      var currentOverlay = this._overlays[lastI];
       // Ensure always-on-top overlay stays on top.
-      if (!overlay.alwaysOnTop && this._overlays[lastI].alwaysOnTop) {
+      if (currentOverlay && this._shouldBeBehindOverlay(overlay, currentOverlay)) {
         lastI--;
       }
       // If already the top element, return.
-      if (!overlay || i >= lastI) {
+      if (i >= lastI) {
         return;
       }
       // Update z-index to be on top.
@@ -14892,7 +15216,7 @@ CSS properties               | Action
     /**
      * Adds the overlay and updates its z-index if it's opened, or removes it if it's closed.
      * Also updates the backdrop z-index.
-     * @param {Element} overlay
+     * @param {!Element} overlay
      */
     addOrRemoveOverlay: function(overlay) {
       if (overlay.opened) {
@@ -14900,18 +15224,18 @@ CSS properties               | Action
       } else {
         this.removeOverlay(overlay);
       }
-      this.trackBackdrop();
     },
 
     /**
      * Tracks overlays for z-index and focus management.
      * Ensures the last added overlay with always-on-top remains on top.
-     * @param {Element} overlay
+     * @param {!Element} overlay
      */
     addOverlay: function(overlay) {
       var i = this._overlays.indexOf(overlay);
       if (i >= 0) {
         this._bringOverlayAtIndexToFront(i);
+        this.trackBackdrop();
         return;
       }
       var insertionIndex = this._overlays.length;
@@ -14920,7 +15244,7 @@ CSS properties               | Action
       var newZ = this._getZ(overlay);
 
       // Ensure always-on-top overlay stays on top.
-      if (currentOverlay && currentOverlay.alwaysOnTop && !overlay.alwaysOnTop) {
+      if (currentOverlay && this._shouldBeBehindOverlay(overlay, currentOverlay)) {
         // This bumps the z-index of +2.
         this._applyOverlayZ(currentOverlay, minimumZ);
         insertionIndex--;
@@ -14938,10 +15262,11 @@ CSS properties               | Action
       // Get focused node.
       var element = this.deepActiveElement;
       overlay.restoreFocusNode = this._overlayParent(element) ? null : element;
+      this.trackBackdrop();
     },
 
     /**
-     * @param {Element} overlay
+     * @param {!Element} overlay
      */
     removeOverlay: function(overlay) {
       var i = this._overlays.indexOf(overlay);
@@ -14956,6 +15281,7 @@ CSS properties               | Action
       if (node && Polymer.dom(document.body).deepContains(node)) {
         node.focus();
       }
+      this.trackBackdrop();
     },
 
     /**
@@ -15003,7 +15329,13 @@ CSS properties               | Action
      * Updates the backdrop z-index.
      */
     trackBackdrop: function() {
-      this.backdropElement.style.zIndex = this.backdropZ();
+      var overlay = this._overlayWithBackdrop();
+      // Avoid creating the backdrop if there is no overlay with backdrop.
+      if (!overlay && !this._backdropElement) {
+        return;
+      }
+      this.backdropElement.style.zIndex = this._getZ(overlay) - 1;
+      this.backdropElement.opened = !!overlay;
     },
 
     /**
@@ -15059,7 +15391,7 @@ CSS properties               | Action
     },
 
     /**
-     * @param {Element} element
+     * @param {!Element} element
      * @param {number|string} z
      * @private
      */
@@ -15068,7 +15400,7 @@ CSS properties               | Action
     },
 
     /**
-     * @param {Element} overlay
+     * @param {!Element} overlay
      * @param {number} aboveZ
      * @private
      */
@@ -15148,11 +15480,23 @@ CSS properties               | Action
           overlay._onCaptureTab(event);
         }
       }
+    },
+
+    /**
+     * Returns if the overlay1 should be behind overlay2.
+     * @param {!Element} overlay1
+     * @param {!Element} overlay2
+     * @return {boolean}
+     * @private
+     */
+    _shouldBeBehindOverlay: function(overlay1, overlay2) {
+      var o1 = /** @type {?} */ (overlay1);
+      var o2 = /** @type {?} */ (overlay2);
+      return !o1.alwaysOnTop && o2.alwaysOnTop;
     }
   };
 
   Polymer.IronOverlayManager = new Polymer.IronOverlayManagerClass();
-// IIFE to help scripts concatenation.
 (function() {
 'use strict';
 
@@ -15250,7 +15594,9 @@ context. You should place this element as a child of `<body>` whenever possible.
       },
 
       /**
-       * Returns the reason this dialog was last closed.
+       * Contains the reason(s) this overlay was last closed (see `iron-overlay-closed`).
+       * `IronOverlayBehavior` provides the `canceled` reason; implementers of the
+       * behavior can provide other reasons in addition to `canceled`.
        */
       closingReason: {
         // was a getter before, but needs to be a property so other
@@ -15392,10 +15738,6 @@ context. You should place this element as a child of `<body>` whenever possible.
       Polymer.dom(this).unobserveNodes(this._observer);
       this._observer = null;
       this.opened = false;
-      if (this.withBackdrop) {
-        // Allow user interactions right away.
-        this.backdropElement.close();
-      }
     },
 
     /**
@@ -15457,26 +15799,36 @@ context. You should place this element as a child of `<body>` whenever possible.
         return;
       }
 
-      this._manager.addOrRemoveOverlay(this);
+      if (this.__openChangedAsync) {
+        window.cancelAnimationFrame(this.__openChangedAsync);
+      }
+
+      // Synchronously remove the overlay.
+      // The adding is done asynchronously to go out of the scope of the event
+      // which might have generated the opening.
+      if (!this.opened) {
+        this._manager.removeOverlay(this);
+      }
+
+      // Defer any animation-related code on attached
+      // (_openedChanged gets called again on attached).
+      if (!this.isAttached) {
+        return;
+      }
 
       this.__isAnimating = true;
 
       // requestAnimationFrame for non-blocking rendering
-      if (this.__openChangedAsync) {
-        cancelAnimationFrame(this.__openChangedAsync);
-      }
-      if (this.opened) {
-        if (this.withBackdrop) {
-          this.backdropElement.prepare();
-        }
-        this.__openChangedAsync = requestAnimationFrame(function() {
-          this.__openChangedAsync = null;
+      this.__openChangedAsync = window.requestAnimationFrame(function() {
+        this.__openChangedAsync = null;
+        if (this.opened) {
+          this._manager.addOverlay(this);
           this._prepareRenderOpened();
           this._renderOpened();
-        }.bind(this));
-      } else {
-        this._renderClosed();
-      }
+        } else {
+          this._renderClosed();
+        }
+      }.bind(this));
     },
 
     _canceledChanged: function() {
@@ -15493,17 +15845,8 @@ context. You should place this element as a child of `<body>` whenever possible.
         this.removeAttribute('tabindex');
         this.__shouldRemoveTabIndex = false;
       }
-      if (this.opened) {
+      if (this.opened && this.isAttached) {
         this._manager.trackBackdrop();
-        if (this.withBackdrop) {
-          this.backdropElement.prepare();
-          // Give time to be added to document.
-          this.async(function(){
-            this.backdropElement.open();
-          }, 1);
-        } else {
-          this.backdropElement.close();
-        }
       }
     },
 
@@ -15531,9 +15874,6 @@ context. You should place this element as a child of `<body>` whenever possible.
      * @protected
      */
     _renderOpened: function() {
-      if (this.withBackdrop) {
-        this.backdropElement.open();
-      }
       this._finishRenderOpened();
     },
 
@@ -15542,9 +15882,6 @@ context. You should place this element as a child of `<body>` whenever possible.
      * @protected
      */
     _renderClosed: function() {
-      if (this.withBackdrop) {
-        this.backdropElement.close();
-      }
       this._finishRenderClosed();
     },
 
@@ -15558,6 +15895,12 @@ context. You should place this element as a child of `<body>` whenever possible.
 
       this.notifyResize();
       this.__isAnimating = false;
+
+      // Store it so we don't query too much.
+      var focusableNodes = this._focusableNodes;
+      this.__firstFocusableNode = focusableNodes[0];
+      this.__lastFocusableNode = focusableNodes[focusableNodes.length - 1];
+
       this.fire('iron-overlay-opened');
     },
 
@@ -15662,15 +16005,45 @@ context. You should place this element as a child of `<body>` whenever possible.
      * @protected
      */
     _onCaptureTab: function(event) {
+      if (!this.withBackdrop) {
+        return;
+      }
       // TAB wraps from last to first focusable.
       // Shift + TAB wraps from first to last focusable.
       var shift = event.shiftKey;
       var nodeToCheck = shift ? this.__firstFocusableNode : this.__lastFocusableNode;
       var nodeToSet = shift ? this.__lastFocusableNode : this.__firstFocusableNode;
-      if (this.withBackdrop && this._focusedChild === nodeToCheck) {
-        // We set here the _focusedChild so that _onCaptureFocus will handle the
-        // wrapping of the focus (the next event after tab is focus).
+      var shouldWrap = false;
+      if (nodeToCheck === nodeToSet) {
+        // If nodeToCheck is the same as nodeToSet, it means we have an overlay
+        // with 0 or 1 focusables; in either case we still need to trap the
+        // focus within the overlay.
+        shouldWrap = true;
+      } else {
+        // In dom=shadow, the manager will receive focus changes on the main
+        // root but not the ones within other shadow roots, so we can't rely on
+        // _focusedChild, but we should check the deepest active element.
+        var focusedNode = this._manager.deepActiveElement;
+        // If the active element is not the nodeToCheck but the overlay itself,
+        // it means the focus is about to go outside the overlay, hence we
+        // should prevent that (e.g. user opens the overlay and hit Shift+TAB).
+        shouldWrap = (focusedNode === nodeToCheck || focusedNode === this);
+      }
+
+      if (shouldWrap) {
+        // When the overlay contains the last focusable element of the document
+        // and it's already focused, pressing TAB would move the focus outside
+        // the document (e.g. to the browser search bar). Similarly, when the
+        // overlay contains the first focusable element of the document and it's
+        // already focused, pressing Shift+TAB would move the focus outside the
+        // document (e.g. to the browser search bar).
+        // In both cases, we would not receive a focus event, but only a blur.
+        // In order to achieve focus wrapping, we prevent this TAB event and
+        // force the focus. This will also prevent the focus to temporarily move
+        // outside the overlay, which might cause scrolling.
+        event.preventDefault();
         this._focusedChild = nodeToSet;
+        this._applyFocus();
       }
     },
 
@@ -15680,11 +16053,11 @@ context. You should place this element as a child of `<body>` whenever possible.
      */
     _onIronResize: function() {
       if (this.__onIronResizeAsync) {
-        cancelAnimationFrame(this.__onIronResizeAsync);
+        window.cancelAnimationFrame(this.__onIronResizeAsync);
         this.__onIronResizeAsync = null;
       }
       if (this.opened && !this.__isAnimating) {
-        this.__onIronResizeAsync = requestAnimationFrame(function() {
+        this.__onIronResizeAsync = window.requestAnimationFrame(function() {
           this.__onIronResizeAsync = null;
           this.refit();
         }.bind(this));
@@ -15700,10 +16073,6 @@ context. You should place this element as a child of `<body>` whenever possible.
       if (this.opened && !this.__isAnimating) {
         this.notifyResize();
       }
-      // Store it so we don't query too much.
-      var focusableNodes = this._focusableNodes;
-      this.__firstFocusableNode = focusableNodes[0];
-      this.__lastFocusableNode = focusableNodes[focusableNodes.length - 1];
     }
   };
 
@@ -15711,24 +16080,24 @@ context. You should place this element as a child of `<body>` whenever possible.
   Polymer.IronOverlayBehavior = [Polymer.IronFitBehavior, Polymer.IronResizableBehavior, Polymer.IronOverlayBehaviorImpl];
 
   /**
-  * Fired after the `iron-overlay` opens.
-  * @event iron-overlay-opened
-  */
+   * Fired after the overlay opens.
+   * @event iron-overlay-opened
+   */
 
   /**
-  * Fired when the `iron-overlay` is canceled, but before it is closed.
-  * Cancel the event to prevent the `iron-overlay` from closing.
-  * @event iron-overlay-canceled
-  * @param {Event} event The closing of the `iron-overlay` can be prevented
-  * by calling `event.preventDefault()`. The `event.detail` is the original event that originated
-  * the canceling (e.g. ESC keyboard event or click event outside the `iron-overlay`).
-  */
+   * Fired when the overlay is canceled, but before it is closed.
+   * @event iron-overlay-canceled
+   * @param {Event} event The closing of the overlay can be prevented
+   * by calling `event.preventDefault()`. The `event.detail` is the original event that
+   * originated the canceling (e.g. ESC keyboard event or click event outside the overlay).
+   */
 
   /**
-  * Fired after the `iron-overlay` closes.
-  * @event iron-overlay-closed
-  * @param {{canceled: (boolean|undefined)}} closingReason Contains `canceled` (whether the overlay was canceled).
-  */
+   * Fired after the overlay closes.
+   * @event iron-overlay-closed
+   * @param {Event} event The `event.detail` is the `closingReason` property
+   * (contains `canceled`, whether the overlay was canceled).
+   */
 
 })();
 /**
@@ -15753,18 +16122,6 @@ Use the `<h2>` tag for the header and the `buttons` class for the action area. Y
 Use the `dialog-dismiss` and `dialog-confirm` attributes on interactive controls to close the
 dialog. If the user dismisses the dialog with `dialog-confirm`, the `closingReason` will update
 to include `confirmed: true`.
-
-### Styling
-
-The following custom properties and mixins are available for styling.
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-dialog-background-color` | Dialog background color                     | `--primary-background-color`
-`--paper-dialog-color`            | Dialog foreground color                     | `--primary-text-color`
-`--paper-dialog`                  | Mixin applied to the dialog                 | `{}`
-`--paper-dialog-title`            | Mixin applied to the title (`<h2>`) element | `{}`
-`--paper-dialog-button-color`     | Button area foreground color                | `--default-primary-color`
 
 ### Accessibility
 
@@ -16933,6 +17290,7 @@ Polymer({
         computed: 'getSymbolName(carddata)'
         },
         akt: String,
+        sound: Boolean,
         item: { notify: true },
         selected: {
           type: String,
@@ -16969,7 +17327,7 @@ Polymer({
       },
       toggle: function () {
         var card = this.$.card;
-        if(this.$.player != undefined) {
+        if(this.$.player != undefined && this.sound) {
             if (card.selected == 0) {
             this.$.player.cancel();
             this.$.player.speak();
@@ -17203,7 +17561,7 @@ Polymer({
                 header.classList.remove('animate');
               }, animateDuration);
             } else {
-              header.classList.toggle('animate', configs.tallMode[newMode]);
+              this.toggleClass('animate', configs.tallMode[newMode], header);
             }
           }
           this._keepScrollingState();
@@ -17731,6 +18089,7 @@ Polymer({
 
     });
 (function() {
+'use strict';
 
   Polymer({
 
@@ -17742,75 +18101,98 @@ Polymer({
        * Returns true if the backdrop is opened.
        */
       opened: {
-        readOnly: true,
         reflectToAttribute: true,
         type: Boolean,
-        value: false
-      },
-
-      _manager: {
-        type: Object,
-        value: Polymer.IronOverlayManager
+        value: false,
+        observer: '_openedChanged'
       }
 
     },
 
     listeners: {
-      'transitionend' : '_onTransitionend'
+      'transitionend': '_onTransitionend'
+    },
+
+    created: function() {
+      // Used to cancel previous requestAnimationFrame calls when opened changes.
+      this.__openedRaf = null;
+    },
+
+    attached: function() {
+      this.opened && this._openedChanged(this.opened);
     },
 
     /**
-     * Appends the backdrop to document body and sets its `z-index` to be below the latest overlay.
+     * Appends the backdrop to document body if needed.
      */
     prepare: function() {
-      if (!this.parentNode) {
+      if (this.opened && !this.parentNode) {
         Polymer.dom(document.body).appendChild(this);
       }
     },
 
     /**
-     * Shows the backdrop if needed.
+     * Shows the backdrop.
      */
     open: function() {
-      // only need to make the backdrop visible if this is called by the first overlay with a backdrop
-      if (this._manager.getBackdrops().length < 2) {
-        this._setOpened(true);
-      }
+      this.opened = true;
     },
 
     /**
-     * Hides the backdrop if needed.
+     * Hides the backdrop.
      */
     close: function() {
-      // close only if no element with backdrop is left
-      if (this._manager.getBackdrops().length === 0) {
-        // Read style before setting opened.
-        var cs = getComputedStyle(this);
-        var noAnimation = (cs.transitionDuration === '0s' || cs.opacity == 0);
-        this._setOpened(false);
-        // In case of no animations, complete
-        if (noAnimation) {
-          this.complete();
-        }
-      }
+      this.opened = false;
     },
 
     /**
      * Removes the backdrop from document body if needed.
      */
     complete: function() {
-      // only remove the backdrop if there are no more overlays with backdrops
-      if (this._manager.getBackdrops().length === 0 && this.parentNode) {
+      if (!this.opened && this.parentNode === document.body) {
         Polymer.dom(this.parentNode).removeChild(this);
       }
     },
 
-    _onTransitionend: function (event) {
+    _onTransitionend: function(event) {
       if (event && event.target === this) {
         this.complete();
       }
-    }
+    },
 
+    /**
+     * @param {boolean} opened
+     * @private
+     */
+    _openedChanged: function(opened) {
+      if (opened) {
+        // Auto-attach.
+        this.prepare();
+      } else {
+        // Animation might be disabled via the mixin or opacity custom property.
+        // If it is disabled in other ways, it's up to the user to call complete.
+        var cs = window.getComputedStyle(this);
+        if (cs.transitionDuration === '0s' || cs.opacity == 0) {
+          this.complete();
+        }
+      }
+
+      if (!this.isAttached) {
+        return;
+      }
+
+      // Always cancel previous requestAnimationFrame.
+      if (this.__openedRaf) {
+        window.cancelAnimationFrame(this.__openedRaf);
+        this.__openedRaf = null;
+      }
+      // Force relayout to ensure proper transitions.
+      this.scrollTop = this.scrollTop;
+      this.__openedRaf = window.requestAnimationFrame(function() {
+        this.__openedRaf = null;
+        this.toggleClass('opened', this.opened);
+      }.bind(this));
+    }
   });
 
 })();
@@ -17857,41 +18239,41 @@ Polymer({
 
 })();
 Polymer({
-    is: 'paper-button',
+      is: 'paper-button',
 
-    behaviors: [
-      Polymer.PaperButtonBehavior
-    ],
+      behaviors: [
+        Polymer.PaperButtonBehavior
+      ],
 
-    properties: {
+      properties: {
+        /**
+         * If true, the button should be styled with a shadow.
+         */
+        raised: {
+          type: Boolean,
+          reflectToAttribute: true,
+          value: false,
+          observer: '_calculateElevation'
+        }
+      },
+
+      _calculateElevation: function() {
+        if (!this.raised) {
+          this._setElevation(0);
+        } else {
+          Polymer.PaperButtonBehaviorImpl._calculateElevation.apply(this);
+        }
+      }
+
       /**
-       * If true, the button should be styled with a shadow.
-       */
-      raised: {
-        type: Boolean,
-        reflectToAttribute: true,
-        value: false,
-        observer: '_calculateElevation'
-      }
-    },
+      Fired when the animation finishes.
+      This is useful if you want to wait until
+      the ripple animation finishes to perform some action.
 
-    _calculateElevation: function() {
-      if (!this.raised) {
-        this._setElevation(0);
-      } else {
-        Polymer.PaperButtonBehaviorImpl._calculateElevation.apply(this);
-      }
-    }
-    /**
-
-    Fired when the animation finishes.
-    This is useful if you want to wait until
-    the ripple animation finishes to perform some action.
-
-    @event transitionend
-    @param {{node: Object}} detail Contains the animated node.
-    */
-  });
+      @event transitionend
+      Event param: {{node: Object}} detail Contains the animated node.
+      */
+    });
 Polymer({
       is: 'game-show-details',
       properties: {
@@ -17901,6 +18283,7 @@ Polymer({
           value: 'Jack',
           notify: true
         },
+        sound: Boolean,
         symbol: { notify: true },
         text: { type: String, notify: true },
         message: { type: String, notify: true },
@@ -17923,7 +18306,7 @@ Polymer({
         this.message = 'heard: ' + detail.message;
       },
       talk: function () {
-        if(this.$.player != undefined) {
+        if(this.$.player != undefined && this.sound) {
           this.$.player.cancel();
           this.$.player.speak();
         }
@@ -17991,17 +18374,20 @@ function get(name) {
                 }
                 if (this.config.akt == 2) {
                     this.data = data2;
-
+                }
+                if (this.config.akt == 3) {
+                    this.data = data3;
                 }
 
                 var actions = shuffle(this.data.initActions);
                 var actIn = [];
                  if (this.config.akt == 1) {
-                   this.config.akt1 = ['home', undefined, undefined, undefined];
+                   this.config.akt1 = ['home', 'announcement', undefined, undefined];
                     for (var i=0; i<this.config.stars;i++) {
-                        this.config.akt1[i+1] = 'star';
+                        this.config.akt1[i+2] = 'star';
                     }
                    actIn = this.config.akt1;
+                   this.showCard("", {card: this.data.intro});
 
                 }
                  if (this.config.akt == 2) {
@@ -18027,6 +18413,27 @@ function get(name) {
                         this.config.akt2[i+1] = undefined;
                     }
                    actIn = this.config.akt2;
+                }
+                 if (this.config.akt == 3) {
+                    if(this.config.check == undefined)
+                        this.config.check = {};
+                       this.config.akt3 = ['exit-to-app'];
+                   if(this.config.check.jane) {
+                       this.config.akt3.push('gesture');
+                   }
+                   if(this.config.check.jaeger) {
+                       this.config.akt3.push('accessibility');
+                   }
+                   if(this.config.check.jack) {
+                       this.config.akt3.push('build');
+                   }
+                   if(this.config.check.mine) {
+                       this.config.akt3.push('select-all');
+                   }
+                     for (var i=this.config.akt3.length; i<4;i++) {
+                        this.config.akt3[i+1] = undefined;
+                    }
+                   actIn = this.config.akt3;
                 }
                 console.log(actIn);
                 var actOut = [];
@@ -18094,7 +18501,6 @@ function get(name) {
                     }
 
                 });
-
             },
             openAll: function () {
                 for (var i = 0; i < 49; i++) {

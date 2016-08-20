@@ -7,7 +7,7 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-// @version 0.7.21
+// @version 0.7.22
 (function() {
   window.WebComponents = window.WebComponents || {
     flags: {}
@@ -914,14 +914,29 @@ if (typeof WeakMap === "undefined") {
 
 (function() {
   var needsTemplate = typeof HTMLTemplateElement === "undefined";
+  if (/Trident/.test(navigator.userAgent)) {
+    (function() {
+      var importNode = document.importNode;
+      document.importNode = function() {
+        var n = importNode.apply(document, arguments);
+        if (n.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+          var f = document.createDocumentFragment();
+          f.appendChild(n);
+          return f;
+        } else {
+          return n;
+        }
+      };
+    })();
+  }
   var needsCloning = function() {
     if (!needsTemplate) {
-      var frag = document.createDocumentFragment();
       var t = document.createElement("template");
-      frag.appendChild(t);
-      t.content.appendChild(document.createElement("div"));
-      var clone = frag.cloneNode(true);
-      return clone.firstChild.content.childNodes.length === 0;
+      var t2 = document.createElement("template");
+      t2.content.appendChild(document.createElement("div"));
+      t.content.appendChild(t2);
+      var clone = t.cloneNode(true);
+      return clone.content.childNodes.length === 0 || clone.content.firstChild.content.childNodes.length === 0;
     }
   }();
   var TEMPLATE_TAG = "template";
@@ -943,6 +958,9 @@ if (typeof WeakMap === "undefined") {
       while (child = template.firstChild) {
         template.content.appendChild(child);
       }
+      template.cloneNode = function(deep) {
+        return TemplateImpl.cloneNode(this, deep);
+      };
       if (canDecorate) {
         try {
           Object.defineProperty(template, "innerHTML", {
@@ -965,9 +983,6 @@ if (typeof WeakMap === "undefined") {
             },
             configurable: true
           });
-          template.cloneNode = function(deep) {
-            return TemplateImpl.cloneNode(this, deep);
-          };
         } catch (err) {
           canDecorate = false;
         }
@@ -987,7 +1002,7 @@ if (typeof WeakMap === "undefined") {
     document.createElement = function() {
       "use strict";
       var el = createElement.apply(document, arguments);
-      if (el.localName == "template") {
+      if (el.localName === "template") {
         TemplateImpl.decorate(el);
       }
       return el;
@@ -1015,7 +1030,7 @@ if (typeof WeakMap === "undefined") {
   if (needsTemplate || needsCloning) {
     var nativeCloneNode = Node.prototype.cloneNode;
     TemplateImpl.cloneNode = function(template, deep) {
-      var clone = nativeCloneNode.call(template);
+      var clone = nativeCloneNode.call(template, false);
       if (this.decorate) {
         this.decorate(clone);
       }
@@ -1026,6 +1041,7 @@ if (typeof WeakMap === "undefined") {
       return clone;
     };
     TemplateImpl.fixClonedDom = function(clone, source) {
+      if (!source.querySelectorAll) return;
       var s$ = source.querySelectorAll(TEMPLATE_TAG);
       var t$ = clone.querySelectorAll(TEMPLATE_TAG);
       for (var i = 0, l = t$.length, t, s; i < l; i++) {
@@ -1063,7 +1079,7 @@ if (typeof WeakMap === "undefined") {
     }
   }
   if (needsTemplate) {
-    HTMLTemplateElement = TemplateImpl;
+    window.HTMLTemplateElement = TemplateImpl;
   }
 })();
 
@@ -2231,6 +2247,9 @@ window.CustomElements.addModule(function(scope) {
       definition.prototype = Object.create(HTMLElement.prototype);
     }
     definition.__name = name.toLowerCase();
+    if (definition.extends) {
+      definition.extends = definition.extends.toLowerCase();
+    }
     definition.lifecycle = definition.lifecycle || {};
     definition.ancestry = ancestry(definition.extends);
     resolveTagName(definition);
@@ -2403,21 +2422,6 @@ window.CustomElements.addModule(function(scope) {
   }
   wrapDomMethodToForceUpgrade(Node.prototype, "cloneNode");
   wrapDomMethodToForceUpgrade(document, "importNode");
-  if (isIE) {
-    (function() {
-      var importNode = document.importNode;
-      document.importNode = function() {
-        var n = importNode.apply(document, arguments);
-        if (n.nodeType == n.DOCUMENT_FRAGMENT_NODE) {
-          var f = document.createDocumentFragment();
-          f.appendChild(n);
-          return f;
-        } else {
-          return n;
-        }
-      };
-    })();
-  }
   document.registerElement = register;
   document.createElement = createElement;
   document.createElementNS = createElementNS;
@@ -2512,8 +2516,7 @@ resolve();
 addEventListener('DOMContentLoaded', resolve);
 }
 }
-}());
-window.Polymer = {
+}());window.Polymer = {
 Settings: function () {
 var settings = window.Polymer || {};
 var parts = location.search.slice(1).split('&');
@@ -2532,8 +2535,7 @@ settings.useNativeShadow = settings.useShadow && settings.nativeShadow;
 settings.usePolyfillProto = !settings.useNativeCustomElements && !Object.__proto__;
 return settings;
 }()
-};
-(function () {
+};(function () {
 var userPolymer = window.Polymer;
 window.Polymer = function (prototype) {
 if (typeof prototype === 'function') {
@@ -2580,15 +2582,13 @@ Polymer.log && this._regLog(prototype);
 dumpRegistrations: function () {
 this.registrations.forEach(this._regLog);
 }
-};
-Object.defineProperty(window, 'currentImport', {
+};Object.defineProperty(window, 'currentImport', {
 enumerable: true,
 configurable: true,
 get: function () {
 return (document._currentScript || document.currentScript).ownerDocument;
 }
-});
-Polymer.RenderStatus = {
+});Polymer.RenderStatus = {
 _ready: false,
 _callbacks: [],
 whenReady: function (cb) {
@@ -2656,8 +2656,7 @@ Polymer.RenderStatus._catchFirstRender();
 Polymer.RenderStatus._catchFirstRender();
 }
 Polymer.ImportStatus = Polymer.RenderStatus;
-Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;
-(function () {
+Polymer.ImportStatus.whenLoaded = Polymer.ImportStatus.whenReady;(function () {
 'use strict';
 var settings = Polymer.Settings;
 Polymer.Base = {
@@ -2692,6 +2691,9 @@ if (proto._finishRegisterFeatures) {
 proto._finishRegisterFeatures();
 }
 proto._doBehavior('registered');
+if (settings.usePolyfillProto && proto !== this) {
+proto.extend(this, proto);
+}
 }
 },
 attachedCallback: function () {
@@ -2702,8 +2704,11 @@ self._doBehavior('attached');
 });
 },
 detachedCallback: function () {
-this.isAttached = false;
-this._doBehavior('detached');
+var self = this;
+Polymer.RenderStatus.whenReady(function () {
+self.isAttached = false;
+self._doBehavior('detached');
+});
 },
 attributeChangedCallback: function (name, oldValue, newValue) {
 this._attributeChangedImpl(name);
@@ -2737,15 +2742,36 @@ if (pd) {
 Object.defineProperty(target, name, pd);
 }
 },
-_log: console.log.apply.bind(console.log, console),
-_warn: console.warn.apply.bind(console.warn, console),
-_error: console.error.apply.bind(console.error, console),
+_logger: function (level, args) {
+if (args.length === 1 && Array.isArray(args[0])) {
+args = args[0];
+}
+switch (level) {
+case 'log':
+case 'warn':
+case 'error':
+console[level].apply(console, args);
+break;
+}
+},
+_log: function () {
+var args = Array.prototype.slice.call(arguments, 0);
+this._logger('log', args);
+},
+_warn: function () {
+var args = Array.prototype.slice.call(arguments, 0);
+this._logger('warn', args);
+},
+_error: function () {
+var args = Array.prototype.slice.call(arguments, 0);
+this._logger('error', args);
+},
 _logf: function () {
-return this._logPrefix.concat([this.is]).concat(Array.prototype.slice.call(arguments, 0));
+return this._logPrefix.concat(this.is).concat(Array.prototype.slice.call(arguments, 0));
 }
 };
 Polymer.Base._logPrefix = function () {
-var color = window.chrome || /firefox/i.test(navigator.userAgent);
+var color = window.chrome && !/edge/i.test(navigator.userAgent) || /firefox/i.test(navigator.userAgent);
 return color ? [
 '%c[%s::%s]:',
 'font-weight: bold; background-color:#EEEE00;'
@@ -2772,8 +2798,7 @@ Polymer.isInstance = function (obj) {
 return Boolean(obj && obj.__isPolymerInstance__);
 };
 Polymer.telemetry.instanceCount = 0;
-}());
-(function () {
+}());(function () {
 var modules = {};
 var lcModules = {};
 var findModule = function (id) {
@@ -2826,8 +2851,7 @@ CustomElements.upgrade(m);
 }
 }
 }
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 _prepIs: function () {
 if (!this.is) {
 var module = (document._currentScript || document.currentScript).parentNode;
@@ -2840,8 +2864,7 @@ if (this.is) {
 this.is = this.is.toLowerCase();
 }
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 behaviors: [],
 _desugarBehaviors: function () {
 if (this.behaviors.length) {
@@ -2922,8 +2945,7 @@ attached: true,
 detached: true,
 attributeChanged: true,
 ready: true
-};
-Polymer.Base._addFeature({
+};Polymer.Base._addFeature({
 _getExtendedPrototype: function (tag) {
 return this._getExtendedNativePrototype(tag);
 },
@@ -2940,8 +2962,7 @@ return p;
 getNativePrototype: function (tag) {
 return Object.getPrototypeOf(document.createElement(tag));
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 _prepConstructor: function () {
 this._factoryArgs = this.extends ? [
 this.extends,
@@ -2967,8 +2988,7 @@ this.factoryImpl.apply(elt, args);
 }
 return elt;
 }
-});
-Polymer.nob = Object.create(null);
+});Polymer.nob = Object.create(null);
 Polymer.Base._addFeature({
 properties: {},
 getPropertyInfo: function (property) {
@@ -3027,8 +3047,7 @@ t.readOnly = s.readOnly;
 }
 }
 }
-});
-Polymer.CaseMap = {
+});Polymer.CaseMap = {
 _caseMap: {},
 _rx: {
 dashToCamel: /-[a-z]/g,
@@ -3042,8 +3061,7 @@ return m[1].toUpperCase();
 camelToDashCase: function (camel) {
 return this._caseMap[camel] || (this._caseMap[camel] = camel.replace(this._rx.camelToDash, '-$1').toLowerCase());
 }
-};
-Polymer.Base._addFeature({
+};Polymer.Base._addFeature({
 _addHostAttributes: function (attributes) {
 if (!this._aggregatedAttributes) {
 this._aggregatedAttributes = {};
@@ -3153,9 +3171,7 @@ default:
 return value != null ? value : undefined;
 }
 }
-});
-Polymer.version = '1.4.0';
-Polymer.Base._addFeature({
+});Polymer.version = "1.5.0";Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepBehaviors();
@@ -3193,8 +3209,7 @@ instanceTemplate: function (template) {
 var dom = document.importNode(template._content || template.content, true);
 return dom;
 }
-});
-(function () {
+});(function () {
 var baseAttachedCallback = Polymer.Base.attachedCallback;
 Polymer.Base._addFeature({
 _hostStack: [],
@@ -3270,8 +3285,7 @@ this._attachedPending = true;
 }
 }
 });
-}());
-Polymer.ArraySplice = function () {
+}());Polymer.ArraySplice = function () {
 function newSplice(index, removed, addedCount) {
 return {
 index: index,
@@ -3440,8 +3454,7 @@ return currentValue === previousValue;
 }
 };
 return new ArraySplice();
-}();
-Polymer.domInnerHTML = function () {
+}();Polymer.domInnerHTML = function () {
 var escapeAttrRegExp = /[&\u00A0"]/g;
 var escapeDataRegExp = /[&\u00A0<>]/g;
 function escapeReplace(c) {
@@ -3537,8 +3550,7 @@ s += getOuterHTML(child, node, composed);
 return s;
 }
 return { getInnerHTML: getInnerHTML };
-}();
-(function () {
+}();(function () {
 'use strict';
 var nativeInsertBefore = Element.prototype.insertBefore;
 var nativeAppendChild = Element.prototype.appendChild;
@@ -3734,8 +3746,7 @@ removeChild: function (parentNode, node) {
 return nativeRemoveChild.call(parentNode, node);
 }
 };
-}());
-Polymer.DomApi = function () {
+}());Polymer.DomApi = function () {
 'use strict';
 var Settings = Polymer.Settings;
 var TreeApi = Polymer.TreeApi;
@@ -3852,8 +3863,7 @@ return DomApi.factory(obj, patch);
 var p = Element.prototype;
 DomApi.matchesSelector = p.matches || p.matchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector || p.webkitMatchesSelector;
 return DomApi;
-}();
-(function () {
+}();(function () {
 'use strict';
 var Settings = Polymer.Settings;
 var DomApi = Polymer.DomApi;
@@ -4322,8 +4332,7 @@ configurable: true
 DomApi.hasInsertionPoint = function (root) {
 return Boolean(root && root._insertionPoints.length);
 };
-}());
-(function () {
+}());(function () {
 'use strict';
 var Settings = Polymer.Settings;
 var TreeApi = Polymer.TreeApi;
@@ -4441,8 +4450,7 @@ forwardProperties([
 'nextElementSibling',
 'previousElementSibling'
 ]);
-}());
-Polymer.Base.extend(Polymer.dom, {
+}());Polymer.Base.extend(Polymer.dom, {
 _flushGuard: 0,
 _FLUSH_MAX: 100,
 _needsTakeRecords: !Polymer.Settings.useNativeCustomElements,
@@ -4490,8 +4498,7 @@ this._finishDebouncer = Polymer.Debounce(this._finishDebouncer, this._finishFlus
 _finishFlush: function () {
 Polymer.dom._debouncers = [];
 }
-});
-Polymer.EventApi = function () {
+});Polymer.EventApi = function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var Settings = Polymer.Settings;
@@ -4559,8 +4566,7 @@ event.__eventApi = new DomApi.Event(event);
 return event.__eventApi;
 };
 return { factory: factory };
-}();
-(function () {
+}();(function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var useShadow = Polymer.Settings.useShadow;
@@ -4599,8 +4605,7 @@ contains: function () {
 return this.node.classList.contains.apply(this.node.classList, arguments);
 }
 };
-}());
-(function () {
+}());(function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var Settings = Polymer.Settings;
@@ -4800,8 +4805,7 @@ h._alwaysNotify = h._isContentListener;
 }
 });
 }
-}());
-(function () {
+}());(function () {
 'use strict';
 var DomApi = Polymer.DomApi.ctor;
 var Settings = Polymer.Settings;
@@ -4852,8 +4856,7 @@ this._observer = null;
 }
 });
 }
-}());
-(function () {
+}());(function () {
 var DomApi = Polymer.DomApi;
 var TreeApi = Polymer.TreeApi;
 Polymer.Base._addFeature({
@@ -5160,8 +5163,7 @@ CustomElements.upgrade(children[i]);
 }
 }
 }
-}());
-if (Polymer.Settings.useShadow) {
+}());if (Polymer.Settings.useShadow) {
 Polymer.Base._addFeature({
 _poolContent: function () {
 },
@@ -5179,8 +5181,7 @@ this.shadowRoot.appendChild(this.root);
 this.root = this.shadowRoot;
 }
 });
-}
-Polymer.Async = {
+}Polymer.Async = {
 _currVal: 0,
 _lastVal: 0,
 _callbacks: [],
@@ -5230,8 +5231,7 @@ this._lastVal += len;
 };
 new window.MutationObserver(function () {
 Polymer.Async._atEndOfMicrotask();
-}).observe(Polymer.Async._twiddle, { characterData: true });
-Polymer.Debounce = function () {
+}).observe(Polymer.Async._twiddle, { characterData: true });Polymer.Debounce = function () {
 var Async = Polymer.Async;
 var Debouncer = function (context) {
 this.context = context;
@@ -5253,12 +5253,14 @@ stop: function () {
 if (this.finish) {
 this.finish();
 this.finish = null;
+this.callback = null;
 }
 },
 complete: function () {
 if (this.finish) {
+var callback = this.callback;
 this.stop();
-this.callback.call(this.context);
+callback.call(this.context);
 }
 }
 };
@@ -5272,8 +5274,7 @@ debouncer.go(callback, wait);
 return debouncer;
 }
 return debounce;
-}();
-Polymer.Base._addFeature({
+}();Polymer.Base._addFeature({
 _setupDebouncers: function () {
 this._debouncers = {};
 },
@@ -5296,8 +5297,7 @@ if (debouncer) {
 debouncer.stop();
 }
 }
-});
-Polymer.DomModule = document.createElement('dom-module');
+});Polymer.DomModule = document.createElement('dom-module');
 Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
@@ -5543,8 +5543,7 @@ return n;
 return root;
 }
 }
-};
-(function () {
+};(function () {
 function resolveCss(cssText, ownerDocument) {
 return cssText.replace(CSS_URL_RX, function (m, pre, url, post) {
 return pre + '\'' + resolve(url.replace(/["']/g, ''), ownerDocument) + '\'' + post;
@@ -5602,8 +5601,7 @@ resolveCss: resolveCss,
 resolveAttrs: resolveAttrs,
 resolveUrl: resolveUrl
 };
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 _prepAnnotations: function () {
 if (!this._template) {
 this._notes = [];
@@ -5643,10 +5641,12 @@ this._processAnnotations(note.templateContent._notes);
 var pp = note.templateContent._parentProps = this._discoverTemplateParentProps(note.templateContent._notes);
 var bindings = [];
 for (var prop in pp) {
+var name = '_parent_' + prop;
 bindings.push({
 index: note.index,
 kind: 'property',
-name: '_parent_' + prop,
+name: name,
+propertyName: name,
 parts: [{
 mode: '{',
 model: prop,
@@ -5670,6 +5670,9 @@ var model = args[kk].model;
 if (model) {
 pp[model] = true;
 }
+}
+if (p.signature.dynamicFn) {
+pp[p.signature.method] = true;
 }
 } else {
 if (p.model) {
@@ -5761,8 +5764,7 @@ this.listen(node, e.name, e.value);
 }
 }
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 listeners: {},
 _listenListeners: function (listeners) {
 var node, name, eventName;
@@ -5843,8 +5845,7 @@ node.addEventListener(eventName, handler);
 _unlisten: function (node, eventName, handler) {
 node.removeEventListener(eventName, handler);
 }
-});
-(function () {
+});(function () {
 'use strict';
 var wrap = Polymer.DomApi.wrap;
 var HAS_NATIVE_TA = typeof document.head.style.touchAction === 'string';
@@ -6025,9 +6026,9 @@ if (type === 'touchstart' || type === 'touchmove') {
 Gestures.handleTouchAction(ev);
 }
 }
-if (type === 'touchend' && !ev.__polymerSimulatedTouch) {
+if (type === 'touchend') {
 POINTERSTATE.mouse.target = Polymer.dom(ev).rootTarget;
-ignoreMouse(true);
+ignoreMouse();
 }
 }
 }
@@ -6174,6 +6175,11 @@ prevent: function (evName) {
 var recognizer = this.findRecognizerByEvent(evName);
 if (recognizer.info) {
 recognizer.info.prevent = true;
+}
+},
+resetMouseCanceller: function () {
+if (POINTERSTATE.mouse.mouseIgnoreJob) {
+POINTERSTATE.mouse.mouseIgnoreJob.complete();
 }
 }
 };
@@ -6487,8 +6493,7 @@ Gestures.setTouchAction(node, DIRECTION_MAP[direction] || 'auto');
 }
 });
 Polymer.Gestures = Gestures;
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 $$: function (slctr) {
 return Polymer.dom(this.root).querySelector(slctr);
 },
@@ -6664,9 +6669,7 @@ return this !== node && this.contains(node) && Polymer.dom(this).getOwnerRoot() 
 isLocalDescendant: function (node) {
 return this.root === Polymer.dom(node).getOwnerRoot();
 }
-});
-Polymer.Bind = {
-_dataEventCache: {},
+});Polymer.Bind = {
 prepareModel: function (model) {
 Polymer.Base.mixin(model, this._modelApi);
 },
@@ -6839,8 +6842,7 @@ element.addEventListener(event, function (e) {
 return context._notifyListener(changedFn, e);
 });
 }
-};
-Polymer.Base.extend(Polymer.Bind, {
+};Polymer.Base.extend(Polymer.Bind, {
 _shouldAddListener: function (effect) {
 return effect.name && effect.kind != 'attribute' && effect.kind != 'text' && !effect.isCompound && effect.parts[0].mode === '{';
 },
@@ -6849,10 +6851,7 @@ if (source != effect.value) {
 value = this._get(effect.value);
 this.__data__[effect.value] = value;
 }
-var calc = effect.negate ? !value : value;
-if (!effect.customEvent || this._nodes[effect.index][effect.name] !== calc) {
-return this._applyEffectValue(effect, calc);
-}
+this._applyEffectValue(effect, value);
 },
 _reflectEffect: function (source, value, effect) {
 this.reflectPropertyToAttribute(source, effect.attribute, value);
@@ -6905,9 +6904,6 @@ if (fn) {
 var args = Polymer.Bind._marshalArgs(this.__data__, effect, source, value);
 if (args) {
 var computedvalue = fn.apply(computedHost, args);
-if (effect.negate) {
-computedvalue = !computedvalue;
-}
 this._applyEffectValue(effect, computedvalue);
 }
 } else if (effect.dynamicFn) {
@@ -6925,17 +6921,19 @@ var name = arg.name;
 var v;
 if (arg.literal) {
 v = arg.value;
-} else if (arg.structured) {
-v = Polymer.Base._get(name, model);
+} else if (path === name) {
+v = value;
 } else {
 v = model[name];
+if (v === undefined && arg.structured) {
+v = Polymer.Base._get(name, model);
+}
 }
 if (bailoutEarly && v === undefined) {
 return;
 }
 if (arg.wildcard) {
-var baseChanged = name.indexOf(path + '.') === 0;
-var matches = effect.trigger.name.indexOf(name) === 0 && !baseChanged;
+var matches = path.indexOf(name + '.') === 0;
 values[i] = {
 path: matches ? path : name,
 value: matches ? value : v,
@@ -6947,8 +6945,7 @@ values[i] = v;
 }
 return values;
 }
-});
-Polymer.Base._addFeature({
+});Polymer.Base._addFeature({
 _addPropertyEffect: function (property, kind, effect) {
 var prop = Polymer.Bind.addPropertyEffect(this, property, kind, effect);
 prop.pathFn = this['_' + prop.kind + 'PathEffect'];
@@ -7183,33 +7180,45 @@ Polymer.Bind.setupBindListeners(this);
 _applyEffectValue: function (info, value) {
 var node = this._nodes[info.index];
 var property = info.name;
+value = this._computeFinalAnnotationValue(node, property, value, info);
+if (info.customEvent && node[property] === value) {
+return;
+}
+if (info.kind == 'attribute') {
+this.serializeValueToAttribute(value, property, node);
+} else {
+var pinfo = node._propertyInfo && node._propertyInfo[property];
+if (pinfo && pinfo.readOnly) {
+return;
+}
+this.__setProperty(property, value, false, node);
+}
+},
+_computeFinalAnnotationValue: function (node, property, value, info) {
+if (info.negate) {
+value = !value;
+}
 if (info.isCompound) {
 var storage = node.__compoundStorage__[property];
 storage[info.compoundIndex] = value;
 value = storage.join('');
 }
-if (info.kind == 'attribute') {
-this.serializeValueToAttribute(value, property, node);
-} else {
+if (info.kind !== 'attribute') {
 if (property === 'className') {
 value = this._scopeElementClass(node, value);
 }
 if (property === 'textContent' || node.localName == 'input' && property == 'value') {
 value = value == undefined ? '' : value;
 }
-var pinfo;
-if (!node._propertyInfo || !(pinfo = node._propertyInfo[property]) || !pinfo.readOnly) {
-this.__setProperty(property, value, false, node);
 }
-}
+return value;
 },
 _executeStaticEffects: function () {
 if (this._propertyEffects && this._propertyEffects.__static__) {
 this._effectEffects('__static__', null, this._propertyEffects.__static__);
 }
 }
-});
-(function () {
+});(function () {
 var usePolyfillProto = Polymer.Settings.usePolyfillProto;
 Polymer.Base._addFeature({
 _setupConfigure: function (initialConfig) {
@@ -7276,13 +7285,14 @@ for (var p in config) {
 var fx = fx$[p];
 if (fx) {
 for (var i = 0, l = fx.length, x; i < l && (x = fx[i]); i++) {
-if (x.kind === 'annotation' && !x.isCompound) {
+if (x.kind === 'annotation') {
 var node = this._nodes[x.effect.index];
 var name = x.effect.propertyName;
 var isAttr = x.effect.kind == 'attribute';
 var hasEffect = node._propertyEffects && node._propertyEffects[name];
 if (node._configValue && (hasEffect || !isAttr)) {
 var value = p === x.effect.value ? config[p] : this._get(x.effect.value, config);
+value = this._computeFinalAnnotationValue(node, name, value, x.effect);
 if (isAttr) {
 value = node.deserialize(this.serialize(value), node._propertyInfo[name].type);
 }
@@ -7336,13 +7346,15 @@ h[0].call(this, h[1], h[2], h[3]);
 this._handlers = [];
 }
 });
-}());
-(function () {
+}());(function () {
 'use strict';
 Polymer.Base._addFeature({
 notifyPath: function (path, value, fromAbove) {
 var info = {};
-this._get(path, this, info);
+var v = this._get(path, this, info);
+if (arguments.length === 1) {
+value = v;
+}
 if (info.path) {
 this._notifyPath(info.path, value, fromAbove);
 }
@@ -7540,17 +7552,13 @@ var change = {
 keySplices: Polymer.Collection.applySplices(array, splices),
 indexSplices: splices
 };
-if (!array.hasOwnProperty('splices')) {
-Object.defineProperty(array, 'splices', {
-configurable: true,
-writable: true
-});
-}
-array.splices = change;
-this._notifyPath(path + '.splices', change);
+var splicesPath = path + '.splices';
+this._notifyPath(splicesPath, change);
 this._notifyPath(path + '.length', array.length);
-change.keySplices = null;
-change.indexSplices = null;
+this.__data__[splicesPath] = {
+keySplices: null,
+indexSplices: null
+};
 },
 _notifySplice: function (array, path, index, added, removed) {
 this._notifySplices(array, path, [{
@@ -7645,8 +7653,7 @@ _getPathParts: Polymer.Base._getPathParts
 });
 }
 });
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 resolveUrl: function (url) {
 var module = Polymer.DomModule.import(this.is);
 var root = '';
@@ -7656,8 +7663,7 @@ root = Polymer.ResolveUrl.resolveUrl(assetPath, module.ownerDocument.baseURI);
 }
 return Polymer.ResolveUrl.resolveUrl(url, root);
 }
-});
-Polymer.CssParse = function () {
+});Polymer.CssParse = function () {
 return {
 parse: function (text) {
 text = this._clean(text);
@@ -7801,8 +7807,7 @@ VAR_START: '--',
 MEDIA_START: '@media',
 AT_START: '@'
 };
-}();
-Polymer.StyleUtil = function () {
+}();Polymer.StyleUtil = function () {
 return {
 MODULE_STYLES_SELECTOR: 'style, link[rel=import][type~=css], template',
 INCLUDE_ATTR: 'include',
@@ -7852,6 +7857,9 @@ this.forEachRule(r, styleRuleCallback, keyframesRuleCallback);
 },
 applyCss: function (cssText, moniker, target, contextNode) {
 var style = this.createScopeStyle(cssText, moniker);
+return this.applyStyle(style, target, contextNode);
+},
+applyStyle: function (style, target, contextNode) {
 target = target || document.head;
 var after = contextNode && contextNode.nextSibling || target.firstChild;
 this.__lastHeadApplyNode = style;
@@ -7920,8 +7928,7 @@ resolveCss: Polymer.ResolveUrl.resolveCss,
 parser: Polymer.CssParse,
 ruleTypes: Polymer.CssParse.types
 };
-}();
-Polymer.StyleTransformer = function () {
+}();Polymer.StyleTransformer = function () {
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var styleUtil = Polymer.StyleUtil;
 var api = {
@@ -8104,8 +8111,7 @@ var PSEUDO_PREFIX = ':';
 var CLASS = 'class';
 var CONTENT_START = new RegExp('^(' + CONTENT + ')');
 return api;
-}();
-Polymer.StyleExtends = function () {
+}();Polymer.StyleExtends = function () {
 var styleUtil = Polymer.StyleUtil;
 return {
 hasExtends: function (cssText) {
@@ -8175,8 +8181,7 @@ EXTEND: /@extends\(([^)]*)\)\s*?;/gim,
 STRIP: /%[^,]*$/
 }
 };
-}();
-(function () {
+}();(function () {
 var prepElement = Polymer.Base._prepElement;
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var styleUtil = Polymer.StyleUtil;
@@ -8281,8 +8286,7 @@ return mo;
 }
 }
 });
-}());
-Polymer.StyleProperties = function () {
+}());Polymer.StyleProperties = function () {
 'use strict';
 var nativeShadow = Polymer.Settings.useNativeShadow;
 var matchesSelector = Polymer.DomApi.matchesSelector;
@@ -8544,12 +8548,20 @@ if (s._useCount <= 0 && s.parentNode) {
 s.parentNode.removeChild(s);
 }
 }
-if (nativeShadow || (!style || !style.parentNode)) {
-if (nativeShadow && element._customStyle) {
+if (nativeShadow) {
+if (element._customStyle) {
 element._customStyle.textContent = cssText;
 style = element._customStyle;
 } else if (cssText) {
-style = styleUtil.applyCss(cssText, selector, nativeShadow ? element.root : null, element._scopeStyle);
+style = styleUtil.applyCss(cssText, selector, element.root);
+}
+} else {
+if (!style) {
+if (cssText) {
+style = styleUtil.applyCss(cssText, selector, null, element._scopeStyle);
+}
+} else if (!style.parentNode) {
+styleUtil.applyStyle(style, null, element._scopeStyle);
 }
 }
 if (style) {
@@ -8590,8 +8602,7 @@ var o = parseInt(n / 32);
 var v = 1 << n % 32;
 bits[o] = (bits[o] || 0) | v;
 }
-}();
-(function () {
+}();(function () {
 Polymer.StyleCache = function () {
 this.cache = {};
 };
@@ -8637,8 +8648,7 @@ _objectsStrictlyEqual: function (target, source) {
 return this._objectsEqual(target, source) && this._objectsEqual(source, target);
 }
 };
-}());
-Polymer.StyleDefaults = function () {
+}());Polymer.StyleDefaults = function () {
 var styleProperties = Polymer.StyleProperties;
 var StyleCache = Polymer.StyleCache;
 var api = {
@@ -8679,8 +8689,7 @@ s._apply();
 }
 };
 return api;
-}();
-(function () {
+}();(function () {
 'use strict';
 var serializeValueToAttribute = Polymer.Base.serializeValueToAttribute;
 var propertyUtils = Polymer.StyleProperties;
@@ -8841,8 +8850,7 @@ var styleCache = new Polymer.StyleCache();
 Polymer.customStyleCache = styleCache;
 var SCOPE_NAME = styleTransformer.SCOPE_NAME;
 var XSCOPE_NAME = propertyUtils.XSCOPE_NAME;
-}());
-Polymer.Base._addFeature({
+}());Polymer.Base._addFeature({
 _registerFeatures: function () {
 this._prepIs();
 this._prepConstructor();
@@ -8888,8 +8896,7 @@ if (b.listeners) {
 this._listenListeners(b.listeners);
 }
 }
-});
-(function () {
+});(function () {
 var propertyUtils = Polymer.StyleProperties;
 var styleUtil = Polymer.StyleUtil;
 var cssParse = Polymer.CssParse;
@@ -8962,8 +8969,7 @@ rule.cssText = propertyUtils.valueForProperties(css, props);
 });
 }
 });
-}());
-Polymer.Templatizer = {
+}());Polymer.Templatizer = {
 properties: { __hideTemplateChildren__: { observer: '_showHideChildren' } },
 _instanceProps: Polymer.nob,
 _parentPropPrefix: '_parent_',
@@ -9153,7 +9159,7 @@ var dot = path.indexOf('.');
 var root = dot < 0 ? path : path.slice(0, dot);
 dataHost._forwardInstancePath.call(dataHost, this, path, value);
 if (root in dataHost._parentProps) {
-dataHost._templatized.notifyPath(dataHost._parentPropPrefix + path, value);
+dataHost._templatized._notifyPath(dataHost._parentPropPrefix + path, value);
 }
 },
 _pathEffectorImpl: function (path, value, fromAbove) {
@@ -9206,6 +9212,7 @@ var host = this._rootDataHost;
 if (host) {
 return host._scopeElementClass(node, value);
 }
+return value;
 },
 stamp: function (model) {
 model = model || {};
@@ -9233,8 +9240,7 @@ el = el.parentNode;
 }
 }
 }
-};
-Polymer({
+};Polymer({
 is: 'dom-template',
 extends: 'template',
 _template: null,
@@ -9242,8 +9248,7 @@ behaviors: [Polymer.Templatizer],
 ready: function () {
 this.templatize(this);
 }
-});
-Polymer._collections = new WeakMap();
+});Polymer._collections = new WeakMap();
 Polymer.Collection = function (userArray) {
 Polymer._collections.set(userArray, this);
 this.userArray = userArray;
@@ -9378,8 +9383,7 @@ return Polymer._collections.get(userArray) || new Polymer.Collection(userArray);
 Polymer.Collection.applySplices = function (userArray, splices) {
 var coll = Polymer._collections.get(userArray);
 return coll ? coll._applySplices(splices) : null;
-};
-Polymer({
+};Polymer({
 is: 'dom-repeat',
 extends: 'template',
 _template: null,
@@ -9845,8 +9849,7 @@ indexForElement: function (el) {
 var instance = this.modelForElement(el);
 return instance && instance[this.indexAs];
 }
-});
-Polymer({
+});Polymer({
 is: 'array-selector',
 _template: null,
 properties: {
@@ -9937,8 +9940,7 @@ this.linkPaths('selectedItem', 'items.' + key);
 }
 }
 }
-});
-Polymer({
+});Polymer({
 is: 'dom-if',
 extends: 'template',
 _template: null,
@@ -10038,8 +10040,7 @@ if (this._instance) {
 this._instance._notifyPath(path, value, true);
 }
 }
-});
-Polymer({
+});Polymer({
 is: 'dom-bind',
 extends: 'template',
 _template: null,
@@ -10400,7 +10401,11 @@ X.prototype.Xe=function(a,b){D("Firebase.removeUser",1,2,arguments.length);sg("F
 X.prototype.se=function(a,b){D("Firebase.changePassword",1,2,arguments.length);sg("Firebase.changePassword",1,a,!1);tg("Firebase.changePassword",a,"email");tg("Firebase.changePassword",a,"oldPassword");tg("Firebase.changePassword",a,"newPassword");F("Firebase.changePassword",2,b,!0);var c=new B;this.k.O.se(a,C(c,b));return c.D};X.prototype.changePassword=X.prototype.se;
 X.prototype.re=function(a,b){D("Firebase.changeEmail",1,2,arguments.length);sg("Firebase.changeEmail",1,a,!1);tg("Firebase.changeEmail",a,"oldEmail");tg("Firebase.changeEmail",a,"newEmail");tg("Firebase.changeEmail",a,"password");F("Firebase.changeEmail",2,b,!0);var c=new B;this.k.O.re(a,C(c,b));return c.D};X.prototype.changeEmail=X.prototype.re;
 X.prototype.Ze=function(a,b){D("Firebase.resetPassword",1,2,arguments.length);sg("Firebase.resetPassword",1,a,!1);tg("Firebase.resetPassword",a,"email");F("Firebase.resetPassword",2,b,!0);var c=new B;this.k.O.Ze(a,C(c,b));return c.D};X.prototype.resetPassword=X.prototype.Ze;})();
-/** @polymerBehavior */
+/** @polymerBehavior
+  **Note: This element is for the older Firebase 2 API**
+  For the latest official Firebase 3.0-compatible component from the Firebase team,
+  see the [polymerfire](https://github.com/firebase/polymerfire) component.
+  */
   Polymer.FirebaseQueryBehavior = {
     properties: {
       /**
@@ -10555,6 +10560,11 @@ X.prototype.Ze=function(a,b){D("Firebase.resetPassword",1,2,arguments.length);sg
       this.disconnect();
     },
 
+    _fireQueryError: function(error) {
+      this.fire('firebase-query-error', error);
+      this._error(error);
+    },
+
     _log: function() {
       var args;
 
@@ -10573,13 +10583,13 @@ X.prototype.Ze=function(a,b){D("Firebase.resetPassword",1,2,arguments.length);sg
 
     _warn: function() {
       if (this.log) {
-        Polymer.Base._warn(this._logf.apply(this, arguments));
+        Polymer.Base._warn(this._log.apply(this, arguments));
       }
     },
 
     _error: function() {
       if (this.log) {
-        Polymer.Base._error(this._logf.apply(this, arguments));
+        Polymer.Base._error(this._log.apply(this, arguments));
       }
     }
   };
@@ -10639,27 +10649,715 @@ Polymer({
       if (!location) {
         return;
       }
+      var query;
+      try {
 
-      return new Firebase(location);
+        query =  new Firebase(location);
+
+      } catch(e) {
+
+        this._fireQueryError('Query cannot be instantiated with location ' + location + ' (' + e.toString() + ')');
+
+      } finally {
+        return query;
+      }
     },
 
     _updateRemoteDocument: function() {
       this._log('Updating remote document');
+
+      if (!this.query) {
+
+        this._fireQueryError('Query does not exist');
+        return;
+
+      }
+
       this.query.update(this.dataAsObject);
+
     },
 
     _setRemoteDocumentChild: function(key, value) {
+      if (!this.query) {
+
+        this._fireQueryError('Query does not exist');
+        return;
+
+      }
+
       this.debounce('set-' + key, function() {
         this._log('Setting child "' + key + '" to', value);
         this.query.child(key).set(value);
       });
+
     },
 
     _removeRemoteDocumentChild: function(key) {
       this._log('Removing child "' + key + '"');
+
+      if (!this.query) {
+
+        this._fireQueryError('Query does not exist');
+        return;
+
+      }
+
       this.query.child(key).remove();
     }
   });
+/**
+   * `IronResizableBehavior` is a behavior that can be used in Polymer elements to
+   * coordinate the flow of resize events between "resizers" (elements that control the
+   * size or hidden state of their children) and "resizables" (elements that need to be
+   * notified when they are resized or un-hidden by their parents in order to take
+   * action on their new measurements).
+   * 
+   * Elements that perform measurement should add the `IronResizableBehavior` behavior to
+   * their element definition and listen for the `iron-resize` event on themselves.
+   * This event will be fired when they become showing after having been hidden,
+   * when they are resized explicitly by another resizable, or when the window has been
+   * resized.
+   * 
+   * Note, the `iron-resize` event is non-bubbling.
+   *
+   * @polymerBehavior Polymer.IronResizableBehavior
+   * @demo demo/index.html
+   **/
+  Polymer.IronResizableBehavior = {
+    properties: {
+      /**
+       * The closest ancestor element that implements `IronResizableBehavior`.
+       */
+      _parentResizable: {
+        type: Object,
+        observer: '_parentResizableChanged'
+      },
+
+      /**
+       * True if this element is currently notifying its descedant elements of
+       * resize.
+       */
+      _notifyingDescendant: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    listeners: {
+      'iron-request-resize-notifications': '_onIronRequestResizeNotifications'
+    },
+
+    created: function() {
+      // We don't really need property effects on these, and also we want them
+      // to be created before the `_parentResizable` observer fires:
+      this._interestedResizables = [];
+      this._boundNotifyResize = this.notifyResize.bind(this);
+    },
+
+    attached: function() {
+      this.fire('iron-request-resize-notifications', null, {
+        node: this,
+        bubbles: true,
+        cancelable: true
+      });
+
+      if (!this._parentResizable) {
+        window.addEventListener('resize', this._boundNotifyResize);
+        this.notifyResize();
+      }
+    },
+
+    detached: function() {
+      if (this._parentResizable) {
+        this._parentResizable.stopResizeNotificationsFor(this);
+      } else {
+        window.removeEventListener('resize', this._boundNotifyResize);
+      }
+
+      this._parentResizable = null;
+    },
+
+    /**
+     * Can be called to manually notify a resizable and its descendant
+     * resizables of a resize change.
+     */
+    notifyResize: function() {
+      if (!this.isAttached) {
+        return;
+      }
+
+      this._interestedResizables.forEach(function(resizable) {
+        if (this.resizerShouldNotify(resizable)) {
+          this._notifyDescendant(resizable);
+        }
+      }, this);
+
+      this._fireResize();
+    },
+
+    /**
+     * Used to assign the closest resizable ancestor to this resizable
+     * if the ancestor detects a request for notifications.
+     */
+    assignParentResizable: function(parentResizable) {
+      this._parentResizable = parentResizable;
+    },
+
+    /**
+     * Used to remove a resizable descendant from the list of descendants
+     * that should be notified of a resize change.
+     */
+    stopResizeNotificationsFor: function(target) {
+      var index = this._interestedResizables.indexOf(target);
+
+      if (index > -1) {
+        this._interestedResizables.splice(index, 1);
+        this.unlisten(target, 'iron-resize', '_onDescendantIronResize');
+      }
+    },
+
+    /**
+     * This method can be overridden to filter nested elements that should or
+     * should not be notified by the current element. Return true if an element
+     * should be notified, or false if it should not be notified.
+     *
+     * @param {HTMLElement} element A candidate descendant element that
+     * implements `IronResizableBehavior`.
+     * @return {boolean} True if the `element` should be notified of resize.
+     */
+    resizerShouldNotify: function(element) { return true; },
+
+    _onDescendantIronResize: function(event) {
+      if (this._notifyingDescendant) {
+        event.stopPropagation();
+        return;
+      }
+
+      // NOTE(cdata): In ShadowDOM, event retargetting makes echoing of the
+      // otherwise non-bubbling event "just work." We do it manually here for
+      // the case where Polymer is not using shadow roots for whatever reason:
+      if (!Polymer.Settings.useShadow) {
+        this._fireResize();
+      }
+    },
+
+    _fireResize: function() {
+      this.fire('iron-resize', null, {
+        node: this,
+        bubbles: false
+      });
+    },
+
+    _onIronRequestResizeNotifications: function(event) {
+      var target = event.path ? event.path[0] : event.target;
+
+      if (target === this) {
+        return;
+      }
+
+      if (this._interestedResizables.indexOf(target) === -1) {
+        this._interestedResizables.push(target);
+        this.listen(target, 'iron-resize', '_onDescendantIronResize');
+      }
+
+      target.assignParentResizable(this);
+      this._notifyDescendant(target);
+
+      event.stopPropagation();
+    },
+
+    _parentResizableChanged: function(parentResizable) {
+      if (parentResizable) {
+        window.removeEventListener('resize', this._boundNotifyResize);
+      }
+    },
+
+    _notifyDescendant: function(descendant) {
+      // NOTE(cdata): In IE10, attached is fired on children first, so it's
+      // important not to notify them if the parent is not attached yet (or
+      // else they will get redundantly notified when the parent attaches).
+      if (!this.isAttached) {
+        return;
+      }
+
+      this._notifyingDescendant = true;
+      descendant.notifyResize();
+      this._notifyingDescendant = false;
+    }
+  };
+/**
+   * @param {!Function} selectCallback
+   * @constructor
+   */
+  Polymer.IronSelection = function(selectCallback) {
+    this.selection = [];
+    this.selectCallback = selectCallback;
+  };
+
+  Polymer.IronSelection.prototype = {
+
+    /**
+     * Retrieves the selected item(s).
+     *
+     * @method get
+     * @returns Returns the selected item(s). If the multi property is true,
+     * `get` will return an array, otherwise it will return
+     * the selected item or undefined if there is no selection.
+     */
+    get: function() {
+      return this.multi ? this.selection.slice() : this.selection[0];
+    },
+
+    /**
+     * Clears all the selection except the ones indicated.
+     *
+     * @method clear
+     * @param {Array} excludes items to be excluded.
+     */
+    clear: function(excludes) {
+      this.selection.slice().forEach(function(item) {
+        if (!excludes || excludes.indexOf(item) < 0) {
+          this.setItemSelected(item, false);
+        }
+      }, this);
+    },
+
+    /**
+     * Indicates if a given item is selected.
+     *
+     * @method isSelected
+     * @param {*} item The item whose selection state should be checked.
+     * @returns Returns true if `item` is selected.
+     */
+    isSelected: function(item) {
+      return this.selection.indexOf(item) >= 0;
+    },
+
+    /**
+     * Sets the selection state for a given item to either selected or deselected.
+     *
+     * @method setItemSelected
+     * @param {*} item The item to select.
+     * @param {boolean} isSelected True for selected, false for deselected.
+     */
+    setItemSelected: function(item, isSelected) {
+      if (item != null) {
+        if (isSelected !== this.isSelected(item)) {
+          // proceed to update selection only if requested state differs from current
+          if (isSelected) {
+            this.selection.push(item);
+          } else {
+            var i = this.selection.indexOf(item);
+            if (i >= 0) {
+              this.selection.splice(i, 1);
+            }
+          }
+          if (this.selectCallback) {
+            this.selectCallback(item, isSelected);
+          }
+        }
+      }
+    },
+
+    /**
+     * Sets the selection state for a given item. If the `multi` property
+     * is true, then the selected state of `item` will be toggled; otherwise
+     * the `item` will be selected.
+     *
+     * @method select
+     * @param {*} item The item to select.
+     */
+    select: function(item) {
+      if (this.multi) {
+        this.toggle(item);
+      } else if (this.get() !== item) {
+        this.setItemSelected(this.get(), false);
+        this.setItemSelected(item, true);
+      }
+    },
+
+    /**
+     * Toggles the selection state for `item`.
+     *
+     * @method toggle
+     * @param {*} item The item to toggle.
+     */
+    toggle: function(item) {
+      this.setItemSelected(item, !this.isSelected(item));
+    }
+
+  };
+/** @polymerBehavior */
+  Polymer.IronSelectableBehavior = {
+
+      /**
+       * Fired when iron-selector is activated (selected or deselected).
+       * It is fired before the selected items are changed.
+       * Cancel the event to abort selection.
+       *
+       * @event iron-activate
+       */
+
+      /**
+       * Fired when an item is selected
+       *
+       * @event iron-select
+       */
+
+      /**
+       * Fired when an item is deselected
+       *
+       * @event iron-deselect
+       */
+
+      /**
+       * Fired when the list of selectable items changes (e.g., items are
+       * added or removed). The detail of the event is a mutation record that
+       * describes what changed.
+       *
+       * @event iron-items-changed
+       */
+
+    properties: {
+
+      /**
+       * If you want to use an attribute value or property of an element for
+       * `selected` instead of the index, set this to the name of the attribute
+       * or property. Hyphenated values are converted to camel case when used to
+       * look up the property of a selectable element. Camel cased values are
+       * *not* converted to hyphenated values for attribute lookup. It's
+       * recommended that you provide the hyphenated form of the name so that
+       * selection works in both cases. (Use `attr-or-property-name` instead of
+       * `attrOrPropertyName`.)
+       */
+      attrForSelected: {
+        type: String,
+        value: null
+      },
+
+      /**
+       * Gets or sets the selected element. The default is to use the index of the item.
+       * @type {string|number}
+       */
+      selected: {
+        type: String,
+        notify: true
+      },
+
+      /**
+       * Returns the currently selected item.
+       *
+       * @type {?Object}
+       */
+      selectedItem: {
+        type: Object,
+        readOnly: true,
+        notify: true
+      },
+
+      /**
+       * The event that fires from items when they are selected. Selectable
+       * will listen for this event from items and update the selection state.
+       * Set to empty string to listen to no events.
+       */
+      activateEvent: {
+        type: String,
+        value: 'tap',
+        observer: '_activateEventChanged'
+      },
+
+      /**
+       * This is a CSS selector string.  If this is set, only items that match the CSS selector
+       * are selectable.
+       */
+      selectable: String,
+
+      /**
+       * The class to set on elements when selected.
+       */
+      selectedClass: {
+        type: String,
+        value: 'iron-selected'
+      },
+
+      /**
+       * The attribute to set on elements when selected.
+       */
+      selectedAttribute: {
+        type: String,
+        value: null
+      },
+
+      /**
+       * Default fallback if the selection based on selected with `attrForSelected`
+       * is not found.
+       */
+      fallbackSelection: {
+        type: String,
+        value: null
+      },
+
+      /**
+       * The list of items from which a selection can be made.
+       */
+      items: {
+        type: Array,
+        readOnly: true,
+        notify: true,
+        value: function() {
+          return [];
+        }
+      },
+
+      /**
+       * The set of excluded elements where the key is the `localName`
+       * of the element that will be ignored from the item list.
+       *
+       * @default {template: 1}
+       */
+      _excludedLocalNames: {
+        type: Object,
+        value: function() {
+          return {
+            'template': 1
+          };
+        }
+      }
+    },
+
+    observers: [
+      '_updateAttrForSelected(attrForSelected)',
+      '_updateSelected(selected)',
+      '_checkFallback(fallbackSelection)'
+    ],
+
+    created: function() {
+      this._bindFilterItem = this._filterItem.bind(this);
+      this._selection = new Polymer.IronSelection(this._applySelection.bind(this));
+    },
+
+    attached: function() {
+      this._observer = this._observeItems(this);
+      this._updateItems();
+      if (!this._shouldUpdateSelection) {
+        this._updateSelected();
+      }
+      this._addListener(this.activateEvent);
+    },
+
+    detached: function() {
+      if (this._observer) {
+        Polymer.dom(this).unobserveNodes(this._observer);
+      }
+      this._removeListener(this.activateEvent);
+    },
+
+    /**
+     * Returns the index of the given item.
+     *
+     * @method indexOf
+     * @param {Object} item
+     * @returns Returns the index of the item
+     */
+    indexOf: function(item) {
+      return this.items.indexOf(item);
+    },
+
+    /**
+     * Selects the given value.
+     *
+     * @method select
+     * @param {string|number} value the value to select.
+     */
+    select: function(value) {
+      this.selected = value;
+    },
+
+    /**
+     * Selects the previous item.
+     *
+     * @method selectPrevious
+     */
+    selectPrevious: function() {
+      var length = this.items.length;
+      var index = (Number(this._valueToIndex(this.selected)) - 1 + length) % length;
+      this.selected = this._indexToValue(index);
+    },
+
+    /**
+     * Selects the next item.
+     *
+     * @method selectNext
+     */
+    selectNext: function() {
+      var index = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
+      this.selected = this._indexToValue(index);
+    },
+
+    /**
+     * Selects the item at the given index.
+     *
+     * @method selectIndex
+     */
+    selectIndex: function(index) {
+      this.select(this._indexToValue(index));
+    },
+
+    /**
+     * Force a synchronous update of the `items` property.
+     *
+     * NOTE: Consider listening for the `iron-items-changed` event to respond to
+     * updates to the set of selectable items after updates to the DOM list and
+     * selection state have been made.
+     *
+     * WARNING: If you are using this method, you should probably consider an
+     * alternate approach. Synchronously querying for items is potentially
+     * slow for many use cases. The `items` property will update asynchronously
+     * on its own to reflect selectable items in the DOM.
+     */
+    forceSynchronousItemUpdate: function() {
+      this._updateItems();
+    },
+
+    get _shouldUpdateSelection() {
+      return this.selected != null;
+    },
+
+    _checkFallback: function() {
+      if (this._shouldUpdateSelection) {
+        this._updateSelected();
+      }
+    },
+
+    _addListener: function(eventName) {
+      this.listen(this, eventName, '_activateHandler');
+    },
+
+    _removeListener: function(eventName) {
+      this.unlisten(this, eventName, '_activateHandler');
+    },
+
+    _activateEventChanged: function(eventName, old) {
+      this._removeListener(old);
+      this._addListener(eventName);
+    },
+
+    _updateItems: function() {
+      var nodes = Polymer.dom(this).queryDistributedElements(this.selectable || '*');
+      nodes = Array.prototype.filter.call(nodes, this._bindFilterItem);
+      this._setItems(nodes);
+    },
+
+    _updateAttrForSelected: function() {
+      if (this._shouldUpdateSelection) {
+        this.selected = this._indexToValue(this.indexOf(this.selectedItem));
+      }
+    },
+
+    _updateSelected: function() {
+      this._selectSelected(this.selected);
+    },
+
+    _selectSelected: function(selected) {
+      this._selection.select(this._valueToItem(this.selected));
+      // Check for items, since this array is populated only when attached
+      // Since Number(0) is falsy, explicitly check for undefined
+      if (this.fallbackSelection && this.items.length && (this._selection.get() === undefined)) {
+        this.selected = this.fallbackSelection;
+      }
+    },
+
+    _filterItem: function(node) {
+      return !this._excludedLocalNames[node.localName];
+    },
+
+    _valueToItem: function(value) {
+      return (value == null) ? null : this.items[this._valueToIndex(value)];
+    },
+
+    _valueToIndex: function(value) {
+      if (this.attrForSelected) {
+        for (var i = 0, item; item = this.items[i]; i++) {
+          if (this._valueForItem(item) == value) {
+            return i;
+          }
+        }
+      } else {
+        return Number(value);
+      }
+    },
+
+    _indexToValue: function(index) {
+      if (this.attrForSelected) {
+        var item = this.items[index];
+        if (item) {
+          return this._valueForItem(item);
+        }
+      } else {
+        return index;
+      }
+    },
+
+    _valueForItem: function(item) {
+      var propValue = item[Polymer.CaseMap.dashToCamelCase(this.attrForSelected)];
+      return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
+    },
+
+    _applySelection: function(item, isSelected) {
+      if (this.selectedClass) {
+        this.toggleClass(this.selectedClass, isSelected, item);
+      }
+      if (this.selectedAttribute) {
+        this.toggleAttribute(this.selectedAttribute, isSelected, item);
+      }
+      this._selectionChange();
+      this.fire('iron-' + (isSelected ? 'select' : 'deselect'), {item: item});
+    },
+
+    _selectionChange: function() {
+      this._setSelectedItem(this._selection.get());
+    },
+
+    // observe items change under the given node.
+    _observeItems: function(node) {
+      return Polymer.dom(node).observeNodes(function(mutation) {
+        this._updateItems();
+
+        if (this._shouldUpdateSelection) {
+          this._updateSelected();
+        }
+
+        // Let other interested parties know about the change so that
+        // we don't have to recreate mutation observers everywhere.
+        this.fire('iron-items-changed', mutation, {
+          bubbles: false,
+          cancelable: false
+        });
+      });
+    },
+
+    _activateHandler: function(e) {
+      var t = e.target;
+      var items = this.items;
+      while (t && t != this) {
+        var i = items.indexOf(t);
+        if (i >= 0) {
+          var value = this._indexToValue(i);
+          this._itemActivate(value, t);
+          return;
+        }
+        t = t.parentNode;
+      }
+    },
+
+    _itemActivate: function(value, item) {
+      if (!this.fire('iron-activate',
+          {selected: value, item: item}, {cancelable: true}).defaultPrevented) {
+        this.select(value);
+      }
+    }
+
+  };
 (function() {
     'use strict'
 
@@ -10849,6 +11547,8 @@ Polymer({
        * with the item will be created by Firebase, and can be accessed via the
        * Firebase Query instance returned by this method.
        *
+       * If the query is not yet properly defined as it can be the case for bound location, the `query-error` event is fired.
+       *
        * @param {Object} data A value to add to the document.
        * @return {Object} A Firebase Query instance referring to the added item.
        */
@@ -10856,6 +11556,11 @@ Polymer({
         var query;
 
         this._log('Adding new item to collection with value:', data);
+
+        if (!this.query) {
+          this._fireQueryError('Query does not exist');
+          return;
+        }
 
         query = this.query.ref().push();
         query.set(data);
@@ -10930,6 +11635,12 @@ Polymer({
       },
 
       _applySubPathChange: function(change) {
+
+        if (!this.query) {
+          this._fireQueryError('Query does not exist');
+          return;
+        }
+
         var key = change.path.split('.')[1];
         var value = Polymer.Collection.get(change.base).getItem(key);
         var firebaseKey = value.__firebaseKey__;
@@ -10988,37 +11699,47 @@ Polymer({
 
         this._log('Recomputing query.', arguments);
 
-        query = new Firebase(location);
+        try {
+          query = new Firebase(location);
 
-        if (orderByMethodName) {
-          if (orderByMethodName === 'orderByChild') {
-            query = query[orderByMethodName](this.orderByChild);
-          } else {
-            query = query[orderByMethodName]();
+          if (orderByMethodName) {
+            if (orderByMethodName === 'orderByChild') {
+              query = query[orderByMethodName](this.orderByChild);
+            } else {
+              query = query[orderByMethodName]();
+            }
           }
+
+          if (startAt != null) {
+            query = query.startAt(startAt);
+          }
+
+          if (endAt != null) {
+            query = query.endAt(endAt);
+          }
+
+          if (equalTo != null) {
+            query = query.equalTo(equalTo);
+          }
+
+          if (limitToLast != null) {
+            query = query.limitToLast(limitToLast);
+          }
+
+          if (limitToFirst != null) {
+            query = query.limitToFirst(limitToFirst);
+          }
+
+        } catch(e) {
+
+          this._fireQueryError('Query cannot be instantiated with location ' + location + ' (' + e.toString() + ')');
+
+        } finally {
+
+          return query;
+
         }
 
-        if (startAt != null) {
-          query = query.startAt(startAt);
-        }
-
-        if (endAt != null) {
-          query = query.endAt(endAt);
-        }
-
-        if (equalTo != null) {
-          query = query.equalTo(equalTo);
-        }
-
-        if (limitToLast != null) {
-          query = query.limitToLast(limitToLast);
-        }
-
-        if (limitToFirst != null) {
-          query = query.limitToFirst(limitToFirst);
-        }
-
-        return query;
       },
 
       _queryChanged: function() {
@@ -11190,7 +11911,7 @@ Polymer({
 
           this._valueMap[oldValue.__firebaseKey__] = null;
           this._valueMap[value.__firebaseKey__] = value;
-          this.splice('data', this.data.indexOf(oldValue), 1, value);
+          this.set('data.' + this.data.indexOf(oldValue), value);
         });
       },
 
@@ -11228,18 +11949,8 @@ Polymer({
     };
   })();
 var data = {
-    dict: [
-        {solution: "Kugelschreiber", form:"stabförmig", inhalt:"mehrere Teile", ort:"jetzt mehr als früher", extra:"leicht"},
-        {solution: "Sonne", form:"kugelförmig", inhalt:"heiss", ort:"schon beiden römern", extra:"grösser als ein rehienhaus"},
-        {solution: "Lagerfeuer", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Kugel Vanille-Eis", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Skateboard", form:"", inhalt:"", ort:"", extra:""},
-        {solution: "Stinktier", form:"mit Haaren", inhalt:"stinkt", ort:"in freier Wildbahn", extra:"Katze"},
-        {solution: "Puzzle", form:"mehrere Teile", inhalt:"papier", ort:"", extra:""},
-        {solution: "Kartenspiel", form:"Rechteckig", inhalt:"papier", ort:"Gaststätte", extra:"weniger als 100g"},
-        {solution: "Plastiktier", form:"4 Beine", inhalt:"hart", ort:"zoo", extra:"weniger als 1kg"},
-        ],
     form: {
+        letter: "A",
         type: "Form",
         type2: "Oberfläche",
         desc: "Wie ist die Gestalt des Dings? Ist es eher rund oder eckig? Flach oder stabförmig? Ist seine Oberfläche glatt oder rauh? Hart oder elastisch? Fühlt es sich warm an? Hat es Haare? Steht es auf 4 Beinen? Besteht es aus mehreren Teilen?",
@@ -11250,78 +11961,60 @@ var data = {
             { name: "ist Kistenförmig oder rechteckig" },
             { name: "steht auf 4 Beinen" },
             { name: "besteht aus mehreren Teilen, die sich trennen lassen" },
-            { name: "Oberfläche ist warm oder heiss" },
-            { name: "Oberfläche teilweise mit Haaren oder Pelz" },
-            { name: "Oberfläche ist vorwiegend glatt" },
-            { name: "Oberfläche ist vorwiegend rauh" },
-            { name: "Oberfläche ist vorwiegend hart" },
-            { name: "Oberfläche ist vorwiegend elastisch" },
+        ],
+        cards2: [
+
         ]
     },
     inhalt: {
+        letter: "B",
         type: "Inhalt",
-        type2: "Bestandteil",
-        desc: "Welche Bestandteile hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig oder schwimmt es? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon? Enthält es Papier oder sind Symbole darauf? Kann es leicht kaputt gehen?",
+        type2: "Besonderheit",
+        desc: "Welche Besonderheiten oder Inhalte hat das Ding? Hat es Zähne, Räder oder Gelenke? Bewegt es sich selbständig oder schwimmt es? Hat es Symbole oder leuchtet es? Macht es Geräusche oder braucht es Elektrizität? Schmeckt es gut oder riecht es? Ist es teuer oder gibt es viele davon? Enthält es Papier oder sind Symbole darauf? Kann es leicht kaputt gehen?",
         cards: [
-            { name: "enthält Papier oder Karton" },
             { name: "hat Zähne oder spitze Teile" },
             { name: "mit Rad oder vollständig drehbarem Teil" },
-            { name: "mit Gelenk oder beweglichem Teil" },
             { name: "darauf sind Buchstaben, Zeichen oder Zahlen" },
             { name: "macht Geräusche, selbständig oder bei normalen Gebrauch" },
-            { name: "glänzt, strahlt oder leuchtet" },
-            { name: "tritt meist in größeren Mengen auf" },
-            { name: "geht kaputt, wenn man sich darauf setzt" },
-            { name: "riecht eher schlecht, stinkt" },
-            { name: "schmeckt gut" },
-            { name: "kostet mehr als 100 Euro" },
+        ],
+        cards2: [
             { name: "kann ohne Elektrizität kaum verwendet werden" },
-            { name: "bewegt sich selbständig" },
-            { name: "bewegt sich selbständig, aber eher langsam" },
-            { name: "schwimmt im Wasser oben" },
+            { name: "steht oder liegt, bewegt sich fast nicht" },
         ]
     },
     ort: {
+        letter: "C",
         type: "Ort",
         type2: "Zeit",
         desc: "Zu welcher Zeit gibt es das Ding häufiger? Im Winter oder Sommer? Früher oder Jetzt? An welchen Orten gibt es das Ding häufiger? Stadt oder Wald? In der Nähe oder weiter weg? Im Freibad oder Zoo? Im Büro oder zu Hause? Im Cafe?",
         cards: [
-            { name: "kann ich innerhalb von 5 Minuten hierherbringen" },
-            { name: "ist nicht im Umkreis von 100 Metern zu finden" },
-            { name: "gibt es eher im Wald als in der Stadt" },
-            { name: "gibt es eher in freier Wildbahn" },
-            { name: "gibt es im Zoo" },
-            { name: "gibt es im Büro" },
-            { name: "gibt es in der Gaststätte oder Cafe" },
-            { name: "gibt es zu Hause" },
-            { name: "gibt es Freibad" },
-            { name: "gibt es häufiger in der Stadt als auf dem Land" },
-            { name: "wird eher im Winter als im Sommer verwendet" },
-            { name: "wird eher im Sommer als im Winter verwendet" },
-            { name: "gab es schon bei den alten Griechen oder Römern" },
-            { name: "es gibt jetzt mehr als vor 100 Jahren" },
+            { name: "gibt es im Umkreis von 1km" },
+            { name: "gibt es nicht im Umkreis von 1km" },
+            { name: "gibt es fast nur drinnen" },
+            { name: "gibt es fast nur draussen" },
+        ],
+        cards2: [
+            { name: "es gibt erst in den letzten 150 Jahren" },
+            { name: "gab es schon vor dem Jahr 0 AD" },
+
         ]
     },
     extra: {
+        letter: "D",
         type: "Größe",
         type2: "Gewicht",
         desc: "Wie hoch oder lang ist es? Klein, Mittel, groß oder sehr groß? Wie schwer ist es? Leicht, mittel oder schwer? Passt es in eine grosse oder kleine Kiste?",
         cards: [
-            { name: "weniger als 1cm hoch" },
-            { name: "zwischen 1cm und 10cm hoch" },
-            { name: "zwischen 10cm und 1m hoch" },
-            { name: "zwischen 1m und 10m hoch" },
-            { name: "mehr als 10m hoch" },
-            { name: "weniger als 1m lang <-->" },
-            { name: "zwischen 1m und 5m lang <-->" },
-            { name: "mehr als 5 m lang <-->" },
-            { name: "passt in eine quadratische Kiste mit 1 Meter Seitenlänge" },
-            { name: "passt in einen Schuhkarton" },
-            { name: "leichter als 100gr" },
-            { name: "ist zwischen 100gr und 1kg schwer" },
+            { name: "weniger als 10cm hoch" },
+            { name: "zwischen 10cm und 1,2m hoch" },
+            { name: "höher als 1,2m hoch" },
+        ],
+        cards2: [
+            { name: "leichter als 1kg" },
             { name: "ist zwischen 1kg und 10kg schwer" },
-            { name: "ist zwischen 10kg und 100kg schwer" },
-            { name: "schwerer als 100kg" },
+            { name: "schwerer als 10kg" },
+            
+
         ]
     }
 };
@@ -11735,6 +12428,11 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
 
   })();
 /**
+   * Singleton IronMeta instance.
+   */
+  Polymer.IronValidatableBehaviorMeta = null;
+
+  /**
    * `Use Polymer.IronValidatableBehavior` to implement an element that validates user input.
    * Use the related `Polymer.IronValidatorBehavior` to add custom validation logic to an iron-input.
    *
@@ -11763,14 +12461,6 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
     properties: {
 
       /**
-       * Namespace for this validator.
-       */
-      validatorType: {
-        type: String,
-        value: 'validator'
-      },
-
-      /**
        * Name of the validator to use.
        */
       validator: {
@@ -11787,22 +12477,36 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
         value: false
       },
 
+      /**
+       * This property is deprecated and should not be used. Use the global
+       * validator meta singleton, `Polymer.IronValidatableBehaviorMeta` instead.
+       */
       _validatorMeta: {
         type: Object
-      }
+      },
 
+      /**
+       * Namespace for this validator. This property is deprecated and should
+       * not be used. For all intents and purposes, please consider it a
+       * read-only, config-time property.
+       */
+      validatorType: {
+        type: String,
+        value: 'validator'
+      },
+
+      _validator: {
+        type: Object,
+        computed: '__computeValidator(validator)'
+      }
     },
 
     observers: [
       '_invalidChanged(invalid)'
     ],
 
-    get _validator() {
-      return this._validatorMeta && this._validatorMeta.byKey(this.validator);
-    },
-
-    ready: function() {
-      this._validatorMeta = new Polymer.IronMeta({type: this.validatorType});
+    registered: function() {
+      Polymer.IronValidatableBehaviorMeta = new Polymer.IronMeta({type: 'validator'});
     },
 
     _invalidChanged: function() {
@@ -11849,6 +12553,11 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
         return this._validator.validate(value);
       }
       return true;
+    },
+
+    __computeValidator: function() {
+      return Polymer.IronValidatableBehaviorMeta &&
+          Polymer.IronValidatableBehaviorMeta.byKey(this.validator);
     }
   };
 /**
@@ -12194,7 +12903,7 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
       return transformKey(keyEvent.key, noSpecialChars) ||
         transformKeyIdentifier(keyEvent.keyIdentifier) ||
         transformKeyCode(keyEvent.keyCode) ||
-        transformKey(keyEvent.detail.key, noSpecialChars) || '';
+        transformKey(keyEvent.detail ? keyEvent.detail.key : keyEvent.detail, noSpecialChars) || '';
     }
 
     function keyComboMatchesEvent(keyCombo, event) {
@@ -12533,12 +13242,15 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
 
       if (event.target === this) {
         this._setFocused(event.type === 'focus');
-      } else if (!this.shadowRoot && !this.isLightDescendant(event.target)) {
-        this.fire(event.type, {sourceEvent: event}, {
-          node: this,
-          bubbles: event.bubbles,
-          cancelable: event.cancelable
-        });
+      } else if (!this.shadowRoot) {
+        var target = /** @type {Node} */(Polymer.dom(event).localTarget);
+        if (!this.isLightDescendant(target)) {
+          this.fire(event.type, {sourceEvent: event}, {
+            node: this,
+            bubbles: event.bubbles,
+            cancelable: event.cancelable
+          });
+        }
       }
     },
 
@@ -12547,7 +13259,7 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
       this.style.pointerEvents = disabled ? 'none' : '';
       if (disabled) {
         this._oldTabIndex = this.tabIndex;
-        this.focused = false;
+        this._setFocused(false);
         this.tabIndex = -1;
         this.blur();
       } else if (this._oldTabIndex !== undefined) {
@@ -12966,450 +13678,555 @@ g=a.indexOf(c.charAt(n++)),h=a.indexOf(c.charAt(n++)),l=a.indexOf(c.charAt(n++))
     Polymer.IronCheckedElementBehavior,
     Polymer.PaperCheckedElementBehaviorImpl
   ];
-/**
-   * @param {!Function} selectCallback
-   * @constructor
-   */
-  Polymer.IronSelection = function(selectCallback) {
-    this.selection = [];
-    this.selectCallback = selectCallback;
-  };
-
-  Polymer.IronSelection.prototype = {
-
-    /**
-     * Retrieves the selected item(s).
-     *
-     * @method get
-     * @returns Returns the selected item(s). If the multi property is true,
-     * `get` will return an array, otherwise it will return
-     * the selected item or undefined if there is no selection.
-     */
-    get: function() {
-      return this.multi ? this.selection.slice() : this.selection[0];
-    },
-
-    /**
-     * Clears all the selection except the ones indicated.
-     *
-     * @method clear
-     * @param {Array} excludes items to be excluded.
-     */
-    clear: function(excludes) {
-      this.selection.slice().forEach(function(item) {
-        if (!excludes || excludes.indexOf(item) < 0) {
-          this.setItemSelected(item, false);
-        }
-      }, this);
-    },
-
-    /**
-     * Indicates if a given item is selected.
-     *
-     * @method isSelected
-     * @param {*} item The item whose selection state should be checked.
-     * @returns Returns true if `item` is selected.
-     */
-    isSelected: function(item) {
-      return this.selection.indexOf(item) >= 0;
-    },
-
-    /**
-     * Sets the selection state for a given item to either selected or deselected.
-     *
-     * @method setItemSelected
-     * @param {*} item The item to select.
-     * @param {boolean} isSelected True for selected, false for deselected.
-     */
-    setItemSelected: function(item, isSelected) {
-      if (item != null) {
-        if (isSelected !== this.isSelected(item)) {
-          // proceed to update selection only if requested state differs from current
-          if (isSelected) {
-            this.selection.push(item);
-          } else {
-            var i = this.selection.indexOf(item);
-            if (i >= 0) {
-              this.selection.splice(i, 1);
-            }
-          }
-          if (this.selectCallback) {
-            this.selectCallback(item, isSelected);
-          }
-        }
-      }
-    },
-
-    /**
-     * Sets the selection state for a given item. If the `multi` property
-     * is true, then the selected state of `item` will be toggled; otherwise
-     * the `item` will be selected.
-     *
-     * @method select
-     * @param {*} item The item to select.
-     */
-    select: function(item) {
-      if (this.multi) {
-        this.toggle(item);
-      } else if (this.get() !== item) {
-        this.setItemSelected(this.get(), false);
-        this.setItemSelected(item, true);
-      }
-    },
-
-    /**
-     * Toggles the selection state for `item`.
-     *
-     * @method toggle
-     * @param {*} item The item to toggle.
-     */
-    toggle: function(item) {
-      this.setItemSelected(item, !this.isSelected(item));
-    }
-
-  };
-/** @polymerBehavior */
-  Polymer.IronSelectableBehavior = {
-
-      /**
-       * Fired when iron-selector is activated (selected or deselected).
-       * It is fired before the selected items are changed.
-       * Cancel the event to abort selection.
-       *
-       * @event iron-activate
-       */
-
-      /**
-       * Fired when an item is selected
-       *
-       * @event iron-select
-       */
-
-      /**
-       * Fired when an item is deselected
-       *
-       * @event iron-deselect
-       */
-
-      /**
-       * Fired when the list of selectable items changes (e.g., items are
-       * added or removed). The detail of the event is a list of mutation
-       * records that describe what changed.
-       *
-       * @event iron-items-changed
-       */
-
+/** @polymerBehavior Polymer.IronMultiSelectableBehavior */
+  Polymer.IronMultiSelectableBehaviorImpl = {
     properties: {
 
       /**
-       * If you want to use an attribute value or property of an element for
-       * `selected` instead of the index, set this to the name of the attribute
-       * or property. Hyphenated values are converted to camel case when used to
-       * look up the property of a selectable element. Camel cased values are
-       * *not* converted to hyphenated values for attribute lookup. It's
-       * recommended that you provide the hyphenated form of the name so that
-       * selection works in both cases. (Use `attr-or-property-name` instead of
-       * `attrOrPropertyName`.)
+       * If true, multiple selections are allowed.
        */
-      attrForSelected: {
-        type: String,
-        value: null
+      multi: {
+        type: Boolean,
+        value: false,
+        observer: 'multiChanged'
       },
 
       /**
-       * Gets or sets the selected element. The default is to use the index of the item.
-       * @type {string|number}
+       * Gets or sets the selected elements. This is used instead of `selected` when `multi`
+       * is true.
        */
-      selected: {
-        type: String,
+      selectedValues: {
+        type: Array,
         notify: true
       },
 
       /**
-       * Returns the currently selected item.
-       *
-       * @type {?Object}
+       * Returns an array of currently selected items.
        */
-      selectedItem: {
-        type: Object,
-        readOnly: true,
-        notify: true
-      },
-
-      /**
-       * The event that fires from items when they are selected. Selectable
-       * will listen for this event from items and update the selection state.
-       * Set to empty string to listen to no events.
-       */
-      activateEvent: {
-        type: String,
-        value: 'tap',
-        observer: '_activateEventChanged'
-      },
-
-      /**
-       * This is a CSS selector string.  If this is set, only items that match the CSS selector
-       * are selectable.
-       */
-      selectable: String,
-
-      /**
-       * The class to set on elements when selected.
-       */
-      selectedClass: {
-        type: String,
-        value: 'iron-selected'
-      },
-
-      /**
-       * The attribute to set on elements when selected.
-       */
-      selectedAttribute: {
-        type: String,
-        value: null
-      },
-
-      /**
-       * The list of items from which a selection can be made.
-       */
-      items: {
+      selectedItems: {
         type: Array,
         readOnly: true,
-        notify: true,
-        value: function() {
-          return [];
-        }
+        notify: true
       },
 
-      /**
-       * The set of excluded elements where the key is the `localName`
-       * of the element that will be ignored from the item list.
-       *
-       * @default {template: 1}
-       */
-      _excludedLocalNames: {
-        type: Object,
-        value: function() {
-          return {
-            'template': 1
-          };
-        }
-      }
     },
 
     observers: [
-      '_updateAttrForSelected(attrForSelected)',
-      '_updateSelected(selected)'
+      '_updateSelected(selectedValues.splices)'
     ],
 
-    created: function() {
-      this._bindFilterItem = this._filterItem.bind(this);
-      this._selection = new Polymer.IronSelection(this._applySelection.bind(this));
-    },
-
-    attached: function() {
-      this._observer = this._observeItems(this);
-      this._updateItems();
-      if (!this._shouldUpdateSelection) {
-        this._updateSelected();
-      }
-      this._addListener(this.activateEvent);
-    },
-
-    detached: function() {
-      if (this._observer) {
-        Polymer.dom(this).unobserveNodes(this._observer);
-      }
-      this._removeListener(this.activateEvent);
-    },
-
     /**
-     * Returns the index of the given item.
-     *
-     * @method indexOf
-     * @param {Object} item
-     * @returns Returns the index of the item
-     */
-    indexOf: function(item) {
-      return this.items.indexOf(item);
-    },
-
-    /**
-     * Selects the given value.
+     * Selects the given value. If the `multi` property is true, then the selected state of the
+     * `value` will be toggled; otherwise the `value` will be selected.
      *
      * @method select
      * @param {string|number} value the value to select.
      */
     select: function(value) {
-      this.selected = value;
+      if (this.multi) {
+        if (this.selectedValues) {
+          this._toggleSelected(value);
+        } else {
+          this.selectedValues = [value];
+        }
+      } else {
+        this.selected = value;
+      }
     },
 
-    /**
-     * Selects the previous item.
-     *
-     * @method selectPrevious
-     */
-    selectPrevious: function() {
-      var length = this.items.length;
-      var index = (Number(this._valueToIndex(this.selected)) - 1 + length) % length;
-      this.selected = this._indexToValue(index);
-    },
-
-    /**
-     * Selects the next item.
-     *
-     * @method selectNext
-     */
-    selectNext: function() {
-      var index = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
-      this.selected = this._indexToValue(index);
-    },
-
-    /**
-     * Force a synchronous update of the `items` property.
-     *
-     * NOTE: Consider listening for the `iron-items-changed` event to respond to
-     * updates to the set of selectable items after updates to the DOM list and
-     * selection state have been made.
-     *
-     * WARNING: If you are using this method, you should probably consider an
-     * alternate approach. Synchronously querying for items is potentially
-     * slow for many use cases. The `items` property will update asynchronously
-     * on its own to reflect selectable items in the DOM.
-     */
-    forceSynchronousItemUpdate: function() {
-      this._updateItems();
+    multiChanged: function(multi) {
+      this._selection.multi = multi;
     },
 
     get _shouldUpdateSelection() {
-      return this.selected != null;
-    },
-
-    _addListener: function(eventName) {
-      this.listen(this, eventName, '_activateHandler');
-    },
-
-    _removeListener: function(eventName) {
-      this.unlisten(this, eventName, '_activateHandler');
-    },
-
-    _activateEventChanged: function(eventName, old) {
-      this._removeListener(old);
-      this._addListener(eventName);
-    },
-
-    _updateItems: function() {
-      var nodes = Polymer.dom(this).queryDistributedElements(this.selectable || '*');
-      nodes = Array.prototype.filter.call(nodes, this._bindFilterItem);
-      this._setItems(nodes);
+      return this.selected != null ||
+        (this.selectedValues != null && this.selectedValues.length);
     },
 
     _updateAttrForSelected: function() {
-      if (this._shouldUpdateSelection) {
-        this.selected = this._indexToValue(this.indexOf(this.selectedItem));        
+      if (!this.multi) {
+        Polymer.IronSelectableBehavior._updateAttrForSelected.apply(this);
+      } else if (this._shouldUpdateSelection) {
+        this.selectedValues = this.selectedItems.map(function(selectedItem) {
+          return this._indexToValue(this.indexOf(selectedItem));
+        }, this).filter(function(unfilteredValue) {
+          return unfilteredValue != null;
+        }, this);
       }
     },
 
     _updateSelected: function() {
-      this._selectSelected(this.selected);
+      if (this.multi) {
+        this._selectMulti(this.selectedValues);
+      } else {
+        this._selectSelected(this.selected);
+      }
     },
 
-    _selectSelected: function(selected) {
-      this._selection.select(this._valueToItem(this.selected));
-    },
-
-    _filterItem: function(node) {
-      return !this._excludedLocalNames[node.localName];
-    },
-
-    _valueToItem: function(value) {
-      return (value == null) ? null : this.items[this._valueToIndex(value)];
-    },
-
-    _valueToIndex: function(value) {
-      if (this.attrForSelected) {
-        for (var i = 0, item; item = this.items[i]; i++) {
-          if (this._valueForItem(item) == value) {
-            return i;
+    _selectMulti: function(values) {
+      if (values) {
+        var selectedItems = this._valuesToItems(values);
+        // clear all but the current selected items
+        this._selection.clear(selectedItems);
+        // select only those not selected yet
+        for (var i = 0; i < selectedItems.length; i++) {
+          this._selection.setItemSelected(selectedItems[i], true);
+        }
+        // Check for items, since this array is populated only when attached
+        if (this.fallbackSelection && this.items.length && !this._selection.get().length) {
+          var fallback = this._valueToItem(this.fallbackSelection);
+          if (fallback) {
+            this.selectedValues = [this.fallbackSelection];
           }
         }
       } else {
-        return Number(value);
+        this._selection.clear();
       }
-    },
-
-    _indexToValue: function(index) {
-      if (this.attrForSelected) {
-        var item = this.items[index];
-        if (item) {
-          return this._valueForItem(item);
-        }
-      } else {
-        return index;
-      }
-    },
-
-    _valueForItem: function(item) {
-      var propValue = item[Polymer.CaseMap.dashToCamelCase(this.attrForSelected)];
-      return propValue != undefined ? propValue : item.getAttribute(this.attrForSelected);
-    },
-
-    _applySelection: function(item, isSelected) {
-      if (this.selectedClass) {
-        this.toggleClass(this.selectedClass, isSelected, item);
-      }
-      if (this.selectedAttribute) {
-        this.toggleAttribute(this.selectedAttribute, isSelected, item);
-      }
-      this._selectionChange();
-      this.fire('iron-' + (isSelected ? 'select' : 'deselect'), {item: item});
     },
 
     _selectionChange: function() {
-      this._setSelectedItem(this._selection.get());
+      var s = this._selection.get();
+      if (this.multi) {
+        this._setSelectedItems(s);
+      } else {
+        this._setSelectedItems([s]);
+        this._setSelectedItem(s);
+      }
     },
 
-    // observe items change under the given node.
-    _observeItems: function(node) {
-      return Polymer.dom(node).observeNodes(function(mutations) {
-        this._updateItems();
+    _toggleSelected: function(value) {
+      var i = this.selectedValues.indexOf(value);
+      var unselected = i < 0;
+      if (unselected) {
+        this.push('selectedValues',value);
+      } else {
+        this.splice('selectedValues',i,1);
+      }
+    },
 
-        if (this._shouldUpdateSelection) {
-          this._updateSelected();
+    _valuesToItems: function(values) {
+      return (values == null) ? null : values.map(function(value) {
+        return this._valueToItem(value);
+      }, this);
+    }
+  };
+
+  /** @polymerBehavior */
+  Polymer.IronMultiSelectableBehavior = [
+    Polymer.IronSelectableBehavior,
+    Polymer.IronMultiSelectableBehaviorImpl
+  ];
+/**
+   * `Polymer.IronMenuBehavior` implements accessible menu behavior.
+   *
+   * @demo demo/index.html
+   * @polymerBehavior Polymer.IronMenuBehavior
+   */
+  Polymer.IronMenuBehaviorImpl = {
+
+    properties: {
+
+      /**
+       * Returns the currently focused item.
+       * @type {?Object}
+       */
+      focusedItem: {
+        observer: '_focusedItemChanged',
+        readOnly: true,
+        type: Object
+      },
+
+      /**
+       * The attribute to use on menu items to look up the item title. Typing the first
+       * letter of an item when the menu is open focuses that item. If unset, `textContent`
+       * will be used.
+       */
+      attrForItemTitle: {
+        type: String
+      }
+    },
+
+    hostAttributes: {
+      'role': 'menu',
+      'tabindex': '0'
+    },
+
+    observers: [
+      '_updateMultiselectable(multi)'
+    ],
+
+    listeners: {
+      'focus': '_onFocus',
+      'keydown': '_onKeydown',
+      'iron-items-changed': '_onIronItemsChanged'
+    },
+
+    keyBindings: {
+      'up': '_onUpKey',
+      'down': '_onDownKey',
+      'esc': '_onEscKey',
+      'shift+tab:keydown': '_onShiftTabDown'
+    },
+
+    attached: function() {
+      this._resetTabindices();
+    },
+
+    /**
+     * Selects the given value. If the `multi` property is true, then the selected state of the
+     * `value` will be toggled; otherwise the `value` will be selected.
+     *
+     * @param {string|number} value the value to select.
+     */
+    select: function(value) {
+      // Cancel automatically focusing a default item if the menu received focus
+      // through a user action selecting a particular item.
+      if (this._defaultFocusAsync) {
+        this.cancelAsync(this._defaultFocusAsync);
+        this._defaultFocusAsync = null;
+      }
+      var item = this._valueToItem(value);
+      if (item && item.hasAttribute('disabled')) return;
+      this._setFocusedItem(item);
+      Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, arguments);
+    },
+
+    /**
+     * Resets all tabindex attributes to the appropriate value based on the
+     * current selection state. The appropriate value is `0` (focusable) for
+     * the default selected item, and `-1` (not keyboard focusable) for all
+     * other items.
+     */
+    _resetTabindices: function() {
+      var selectedItem = this.multi ? (this.selectedItems && this.selectedItems[0]) : this.selectedItem;
+
+      this.items.forEach(function(item) {
+        item.setAttribute('tabindex', item === selectedItem ? '0' : '-1');
+      }, this);
+    },
+
+    /**
+     * Sets appropriate ARIA based on whether or not the menu is meant to be
+     * multi-selectable.
+     *
+     * @param {boolean} multi True if the menu should be multi-selectable.
+     */
+    _updateMultiselectable: function(multi) {
+      if (multi) {
+        this.setAttribute('aria-multiselectable', 'true');
+      } else {
+        this.removeAttribute('aria-multiselectable');
+      }
+    },
+
+    /**
+     * Given a KeyboardEvent, this method will focus the appropriate item in the
+     * menu (if there is a relevant item, and it is possible to focus it).
+     *
+     * @param {KeyboardEvent} event A KeyboardEvent.
+     */
+    _focusWithKeyboardEvent: function(event) {
+      for (var i = 0, item; item = this.items[i]; i++) {
+        var attr = this.attrForItemTitle || 'textContent';
+        var title = item[attr] || item.getAttribute(attr);
+
+        if (!item.hasAttribute('disabled') && title &&
+            title.trim().charAt(0).toLowerCase() === String.fromCharCode(event.keyCode).toLowerCase()) {
+          this._setFocusedItem(item);
+          break;
         }
+      }
+    },
 
-        // Let other interested parties know about the change so that
-        // we don't have to recreate mutation observers everywhere.
-        this.fire('iron-items-changed', mutations, {
-          bubbles: false,
-          cancelable: false
-        });
+    /**
+     * Focuses the previous item (relative to the currently focused item) in the
+     * menu, disabled items will be skipped.
+     */
+    _focusPrevious: function() {
+      var length = this.items.length;
+      var curFocusIndex = Number(this.indexOf(this.focusedItem));
+      for (var i = 1; i < length; i++) {
+        var item = this.items[(curFocusIndex - i + length) % length];
+        if (!item.hasAttribute('disabled')) {
+          this._setFocusedItem(item);
+          return;
+        }
+      }
+    },
+
+    /**
+     * Focuses the next item (relative to the currently focused item) in the
+     * menu, disabled items will be skipped.
+     */
+    _focusNext: function() {
+      var length = this.items.length;
+      var curFocusIndex = Number(this.indexOf(this.focusedItem));
+      for (var i = 1; i < length; i++) {
+        var item = this.items[(curFocusIndex + i) % length];
+        if (!item.hasAttribute('disabled')) {
+          this._setFocusedItem(item);
+          return;
+        }
+      }
+    },
+
+    /**
+     * Mutates items in the menu based on provided selection details, so that
+     * all items correctly reflect selection state.
+     *
+     * @param {Element} item An item in the menu.
+     * @param {boolean} isSelected True if the item should be shown in a
+     * selected state, otherwise false.
+     */
+    _applySelection: function(item, isSelected) {
+      if (isSelected) {
+        item.setAttribute('aria-selected', 'true');
+      } else {
+        item.removeAttribute('aria-selected');
+      }
+      Polymer.IronSelectableBehavior._applySelection.apply(this, arguments);
+    },
+
+    /**
+     * Discretely updates tabindex values among menu items as the focused item
+     * changes.
+     *
+     * @param {Element} focusedItem The element that is currently focused.
+     * @param {?Element} old The last element that was considered focused, if
+     * applicable.
+     */
+    _focusedItemChanged: function(focusedItem, old) {
+      old && old.setAttribute('tabindex', '-1');
+      if (focusedItem) {
+        focusedItem.setAttribute('tabindex', '0');
+        focusedItem.focus();
+      }
+    },
+
+    /**
+     * A handler that responds to mutation changes related to the list of items
+     * in the menu.
+     *
+     * @param {CustomEvent} event An event containing mutation records as its
+     * detail.
+     */
+    _onIronItemsChanged: function(event) {
+      if (event.detail.addedNodes.length) {
+        this._resetTabindices();
+      }
+    },
+
+    /**
+     * Handler that is called when a shift+tab keypress is detected by the menu.
+     *
+     * @param {CustomEvent} event A key combination event.
+     */
+    _onShiftTabDown: function(event) {
+      var oldTabIndex = this.getAttribute('tabindex');
+
+      Polymer.IronMenuBehaviorImpl._shiftTabPressed = true;
+
+      this._setFocusedItem(null);
+
+      this.setAttribute('tabindex', '-1');
+
+      this.async(function() {
+        this.setAttribute('tabindex', oldTabIndex);
+        Polymer.IronMenuBehaviorImpl._shiftTabPressed = false;
+        // NOTE(cdata): polymer/polymer#1305
+      }, 1);
+    },
+
+    /**
+     * Handler that is called when the menu receives focus.
+     *
+     * @param {FocusEvent} event A focus event.
+     */
+    _onFocus: function(event) {
+      if (Polymer.IronMenuBehaviorImpl._shiftTabPressed) {
+        // do not focus the menu itself
+        return;
+      }
+
+      // Do not focus the selected tab if the deepest target is part of the
+      // menu element's local DOM and is focusable.
+      var rootTarget = /** @type {?HTMLElement} */(
+          Polymer.dom(event).rootTarget);
+      if (rootTarget !== this && typeof rootTarget.tabIndex !== "undefined" && !this.isLightDescendant(rootTarget)) {
+        return;
+      }
+
+      // clear the cached focus item
+      this._defaultFocusAsync = this.async(function() {
+        // focus the selected item when the menu receives focus, or the first item
+        // if no item is selected
+        var selectedItem = this.multi ? (this.selectedItems && this.selectedItems[0]) : this.selectedItem;
+
+        this._setFocusedItem(null);
+
+        if (selectedItem) {
+          this._setFocusedItem(selectedItem);
+        } else if (this.items[0]) {
+          // We find the first none-disabled item (if one exists)
+          this._focusNext();
+        }
       });
     },
 
-    _activateHandler: function(e) {
-      var t = e.target;
-      var items = this.items;
-      while (t && t != this) {
-        var i = items.indexOf(t);
-        if (i >= 0) {
-          var value = this._indexToValue(i);
-          this._itemActivate(value, t);
-          return;
-        }
-        t = t.parentNode;
-      }
+    /**
+     * Handler that is called when the up key is pressed.
+     *
+     * @param {CustomEvent} event A key combination event.
+     */
+    _onUpKey: function(event) {
+      // up and down arrows moves the focus
+      this._focusPrevious();
+      event.detail.keyboardEvent.preventDefault();
     },
 
-    _itemActivate: function(value, item) {
-      if (!this.fire('iron-activate',
-          {selected: value, item: item}, {cancelable: true}).defaultPrevented) {
-        this.select(value);
+    /**
+     * Handler that is called when the down key is pressed.
+     *
+     * @param {CustomEvent} event A key combination event.
+     */
+    _onDownKey: function(event) {
+      this._focusNext();
+      event.detail.keyboardEvent.preventDefault();
+    },
+
+    /**
+     * Handler that is called when the esc key is pressed.
+     *
+     * @param {CustomEvent} event A key combination event.
+     */
+    _onEscKey: function(event) {
+      // esc blurs the control
+      this.focusedItem.blur();
+    },
+
+    /**
+     * Handler that is called when a keydown event is detected.
+     *
+     * @param {KeyboardEvent} event A keyboard event.
+     */
+    _onKeydown: function(event) {
+      if (!this.keyboardEventMatchesKeys(event, 'up down esc')) {
+        // all other keys focus the menu item starting with that character
+        this._focusWithKeyboardEvent(event);
       }
+      event.stopPropagation();
+    },
+
+    // override _activateHandler
+    _activateHandler: function(event) {
+      Polymer.IronSelectableBehavior._activateHandler.call(this, event);
+      event.stopPropagation();
+    }
+  };
+
+  Polymer.IronMenuBehaviorImpl._shiftTabPressed = false;
+
+  /** @polymerBehavior Polymer.IronMenuBehavior */
+  Polymer.IronMenuBehavior = [
+    Polymer.IronMultiSelectableBehavior,
+    Polymer.IronA11yKeysBehavior,
+    Polymer.IronMenuBehaviorImpl
+  ];
+/**
+   * `Polymer.IronMenubarBehavior` implements accessible menubar behavior.
+   *
+   * @polymerBehavior Polymer.IronMenubarBehavior
+   */
+  Polymer.IronMenubarBehaviorImpl = {
+
+    hostAttributes: {
+      'role': 'menubar'
+    },
+
+    keyBindings: {
+      'left': '_onLeftKey',
+      'right': '_onRightKey'
+    },
+
+    _onUpKey: function(event) {
+      this.focusedItem.click();
+      event.detail.keyboardEvent.preventDefault();
+    },
+
+    _onDownKey: function(event) {
+      this.focusedItem.click();
+      event.detail.keyboardEvent.preventDefault();
+    },
+
+    get _isRTL() {
+      return window.getComputedStyle(this)['direction'] === 'rtl';
+    },
+
+    _onLeftKey: function(event) {
+      if (this._isRTL) {
+        this._focusNext();
+      } else {
+        this._focusPrevious();
+      }
+      event.detail.keyboardEvent.preventDefault();
+    },
+
+    _onRightKey: function(event) {
+      if (this._isRTL) {
+        this._focusPrevious();
+      } else {
+        this._focusNext();
+      }
+      event.detail.keyboardEvent.preventDefault();
+    },
+
+    _onKeydown: function(event) {
+      if (this.keyboardEventMatchesKeys(event, 'up down left right esc')) {
+        return;
+      }
+
+      // all other keys focus the menu item starting with that character
+      this._focusWithKeyboardEvent(event);
     }
 
   };
+
+  /** @polymerBehavior Polymer.IronMenubarBehavior */
+  Polymer.IronMenubarBehavior = [
+    Polymer.IronMenuBehavior,
+    Polymer.IronMenubarBehaviorImpl
+  ];
 if (window.location.host.indexOf('github.io') > -1 && window.location.protocol != "https:"){ window.location.protocol = "https";};
+Polymer({
+
+      is: 'iron-pages',
+
+      behaviors: [
+        Polymer.IronResizableBehavior,
+        Polymer.IronSelectableBehavior
+      ],
+
+      properties: {
+
+        // as the selected page is the only one visible, activateEvent
+        // is both non-sensical and problematic; e.g. in cases where a user
+        // handler attempts to change the page and the activateEvent
+        // handler immediately changes it back
+        activateEvent: {
+          type: String,
+          value: null
+        }
+
+      },
+
+      observers: [
+        '_selectedPageChanged(selected)'
+      ],
+
+      _selectedPageChanged: function(selected, old) {
+        this.async(this.notifyResize);
+      }
+    });
 Polymer({
             is: 'zenmaster-game',
             properties: {
@@ -13421,6 +14238,10 @@ Polymer({
                     type: Array,
                     notify: true
                 },
+                selected: {
+                    type: Number,
+                    value: 0
+                },
                 data: Object,
                 key: String
             },
@@ -13429,6 +14250,7 @@ Polymer({
                 return o;
             },
             startGame: function () {
+                this.selected = 2;
                 this.set("data.started", true);
             },
             saveGame: function () {
@@ -13443,6 +14265,11 @@ Polymer({
                 this.set('data', item);
             },
             newCards: function () {
+                data.form.cards = data.form.cards.concat(data.form.cards2);
+                data.inhalt.cards = data.inhalt.cards.concat(data.inhalt.cards2);
+                data.ort.cards = data.ort.cards.concat(data.ort.cards2);
+                data.extra.cards = data.extra.cards.concat(data.extra.cards2);
+
                 this.shuffle(data.form.cards);
                 this.shuffle(data.inhalt.cards);
                 this.shuffle(data.ort.cards);
@@ -13452,6 +14279,9 @@ Polymer({
                 this.push('data.cards', this.getCard(data.inhalt));
                 this.push('data.cards', this.getCard(data.ort));
                 this.push('data.cards', this.getCard(data.extra));
+            },
+            switch: function () {
+                this.selected = 1;
             },
             newGame: function () {
                 this.data = {};
@@ -14171,8 +15001,7 @@ Polymer({
     is: 'paper-radio-group',
 
     behaviors: [
-      Polymer.IronA11yKeysBehavior,
-      Polymer.IronSelectableBehavior
+      Polymer.IronMenubarBehavior
     ],
 
     hostAttributes: {
@@ -14220,15 +15049,15 @@ Polymer({
       }
     },
 
-    keyBindings: {
-      'left up': 'selectPrevious',
-      'right down': 'selectNext',
-    },
-
     /**
      * Selects the given value.
      */
      select: function(value) {
+      var newItem = this._valueToItem(value);
+      if (newItem && newItem.hasAttribute('disabled')) {
+        return;
+      }
+
       if (this.selected) {
         var oldItem = this._valueToItem(this.selected);
 
@@ -14253,35 +15082,31 @@ Polymer({
       this.fire('paper-radio-group-changed');
     },
 
-    /**
-     * Selects the previous item. If the previous item is disabled, then it is
-     * skipped, and its previous item is selected
-     */
-    selectPrevious: function() {
-      var length = this.items.length;
-      var newIndex = Number(this._valueToIndex(this.selected));
-
-      do {
-        newIndex = (newIndex - 1 + length) % length;
-      } while (this.items[newIndex].disabled)
-
-      this._itemActivate(this._indexToValue(newIndex), this.items[newIndex]);
+    _activateFocusedItem: function() {
+      this._itemActivate(this._valueForItem(this.focusedItem), this.focusedItem);
     },
 
-    /**
-     * Selects the next item. If the next item is disabled, then it is
-     * skipped, and the next item after it is selected.
-     */
-    selectNext: function() {
-      var length = this.items.length;
-      var newIndex = Number(this._valueToIndex(this.selected));
-
-      do {
-        newIndex = (newIndex + 1 + length) % length;
-      } while (this.items[newIndex].disabled)
-
-      this._itemActivate(this._indexToValue(newIndex), this.items[newIndex]);
+    _onUpKey: function(event) {
+      this._focusPrevious();
+      event.preventDefault();
+      this._activateFocusedItem();
     },
+
+    _onDownKey: function(event) {
+      this._focusNext();
+      event.preventDefault();
+      this._activateFocusedItem();
+    },
+
+    _onLeftKey: function(event) {
+      Polymer.IronMenubarBehaviorImpl._onLeftKey.apply(this, arguments);
+      this._activateFocusedItem();
+    },
+
+    _onRightKey: function(event) {
+      Polymer.IronMenubarBehaviorImpl._onRightKey.apply(this, arguments);
+      this._activateFocusedItem();
+    }
   });
 Polymer({
             is: 'zenmaster-tipps',

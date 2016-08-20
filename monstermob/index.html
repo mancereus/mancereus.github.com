@@ -2542,7 +2542,7 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         padding: 15px 0;
         width: 100%;
         background-color: var(--paper-slider-bar-color, transparent);
-        --paper-progress-container-color: var(--paper-grey-400);
+        --paper-progress-container-color: var(--paper-slider-container-color, --paper-grey-400);
         --paper-progress-height: var(--paper-slider-height, 2px);
       }
 
@@ -2711,7 +2711,6 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
     </style>
 
     <div id="sliderContainer" class$="[[_getClassNames(disabled, pin, snaps, immediateValue, min, expand, dragging, transiting, editable)]]">
-
       <div class="bar-container">
         <paper-progress disabled$="[[disabled]]" id="sliderBar" aria-hidden="true" min="[[min]]" max="[[max]]" step="[[step]]" value="[[immediateValue]]" secondary-progress="[[secondaryProgress]]" on-down="_bardown" on-up="_resetKnob" on-track="_onTrack">
         </paper-progress>
@@ -2739,16 +2738,17 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
   </dom-module>
 <dom-module id="paper-button" assetpath="../../bower_components/paper-button/">
   <template strip-whitespace="">
-
     <style include="paper-material">
       :host {
-        display: inline-block;
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
         position: relative;
         box-sizing: border-box;
         min-width: 5.14em;
         margin: 0 0.29em;
         background: transparent;
-        text-align: center;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-tap-highlight-color: transparent;
         font: inherit;
         text-transform: uppercase;
         outline-width: 0;
@@ -2761,6 +2761,7 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
         z-index: 0;
         padding: 0.7em 0.57em;
 
+        @apply(--paper-font-common-base);
         @apply(--paper-button);
       }
 
@@ -2786,44 +2787,37 @@ paper-tabs { background-color: #3d6868; color: #ffffff; }
       paper-ripple {
         color: var(--paper-button-ink-color);
       }
-
-      :host > ::content * {
-        text-transform: inherit;
-      }
     </style>
+
     <content></content>
   </template>
-</dom-module>
 
+  </dom-module>
 <dom-module id="iron-localstorage" assetpath="../../bower_components/iron-localstorage/"></dom-module>
 <dom-module id="iron-overlay-backdrop" assetpath="../../bower_components/iron-overlay-behavior/">
 
-  <style>
-
-    :host {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: var(--iron-overlay-backdrop-background-color, #000);
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-
-      @apply(--iron-overlay-backdrop);
-    }
-
-    :host([opened]) {
-      opacity: var(--iron-overlay-backdrop-opacity, 0.6);
-      pointer-events: auto;
-
-      @apply(--iron-overlay-backdrop-opened);
-    }
-
-  </style>
-
   <template>
+    <style>
+      :host {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--iron-overlay-backdrop-background-color, #000);
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+        @apply(--iron-overlay-backdrop);
+      }
+
+      :host(.opened) {
+        opacity: var(--iron-overlay-backdrop-opacity, 0.6);
+        pointer-events: auto;
+        @apply(--iron-overlay-backdrop-opened);
+      }
+    </style>
+
     <content></content>
   </template>
 

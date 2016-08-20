@@ -1,0 +1,43 @@
+{
+    "title": "gamedata",
+    "type": "array",
+    "minItems": 5,
+    "maxItems": 8,
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "$ref": "#/definitions/positiveInt"
+            },
+            "birthday": {
+                "type": "date",
+                "faker": "date.past"
+            },
+            "connection": {
+                "pattern": "liebt | hasst"
+            },
+            "name": {
+                "type": "string",
+                "faker": {
+                    "fake": "{{name.firstName}} {{name.lastName}}"
+                }
+            }
+        },
+        "uniqueItems ": [
+            "id"
+        ],
+        "required": [
+            "id",
+            "id2",
+            "connection"
+        ]
+    },
+    "definitions": {
+        "positiveInt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10,
+            "exclusiveMinimum": false
+        }
+    }
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><head><script src="index.js" defer=""></script><meta charset="UTF-8"><!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+    <title>Krimi Story generator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
+<style>
+        body {
+            font-family: Roboto, 'Noto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+    </style>
+    </head>
+
+<body><div hidden="" by-vulcanize=""><dom-module id="random-user" assetpath="/">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <iron-ajax auto="" url="https://randomuser.me/api/" params="{{options}}" handle-as="json" on-response="handleResponse" debounce-duration="300"></iron-ajax>
+    </template>
+    </dom-module><dom-module id="schema-fake" assetpath="/">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+          <iron-ajax auto="" url="{{schema}}" params="{{options}}" handle-as="json" on-response="handleResponse" debounce-duration="300"></iron-ajax>
+    </template>
+    </dom-module>
+<dom-module id="krimi-story" assetpath="/">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .frame {
+                border-radius: 30%;
+                border: 3px solid gray;
+                display: flex;
+            }
+            .card {
+                display: flex;
+                border: 1px solid black;
+                margin: 2px;
+                width: 200px;
+            }
+            .container {
+                border: 1px solid black;
+                display: flex;
+                flex-wrap: wrap;
+                width: 680px;
+            }
+        </style>
+            <h2>Personen</h2>
+        <div class="container">
+            <random-user count="12" data="{{persons}}"></random-user>
+            <template is="dom-repeat" items="{{persons}}">
+                <div class="card">
+                    <img src="{{item.picture.thumbnail}}" class="frame"><span>{{index}}. {{item.name.first}} {{item.name.last}} </span>
+                </div>
+            </template>
+            <schema-fake schema="schema.json" data="{{data}}"></schema-fake>
+            <template is="dom-repeat" items="{{data}}">
+                <div class="card">
+                    <span>{{item.id}} {{item.connection}} {{item.id2}}</span>
+                </div>
+            </template>
+        </div>
+    </template>
+    </dom-module><dom-module id="krimi-graph" assetpath="/">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <div id="graph" style="border: solid 1px black; width:400px; height:400px"></div>
+    </template>
+    </dom-module></div>
+    <h1>Krimi</h1>
+    <krimi-story></krimi-story>
+
+
+</body></html>

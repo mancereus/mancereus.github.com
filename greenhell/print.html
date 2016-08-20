@@ -2091,11 +2091,97 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: inline-block;
             position: relative;
             background-color: white;
-            border: 1px solid lightslategray;
-            border-radius: 1%;
+            background-image: url("img/borders.png");
+            background-size: 100% 100%;
             padding: 0;
-            width: 42mm;
-            height: 63mm;
+            width: 50mm;
+            height: 71mm;
+            font-size: 1.3em;
+        }
+
+        .card-header .picture {
+            width: 30mm;
+            border: 1px dotted black;
+            margin: 4px 2px;
+            height: 18mm;
+        }
+
+        .card-header .picture.symbol {
+            border-radius: 50%;
+            border: 2px solid green;
+            opacity: 0.5;
+            height: 24mm;
+        }
+
+        .info {
+            background-color: #DAEAF8;
+        }
+
+        .warn {
+            background-color: #FFF09D;
+        }
+
+        .problem {
+            background-color: #FFDC97;
+        }
+
+        .text {
+            font-size: 11pt;
+            line-height: 1em;
+        }
+    </style>
+    <style is="custom-style">
+        .big {
+            color: gray;
+            --iron-icon-height: 16px;
+            --iron-icon-width: 16px;
+        }
+    </style>
+    <template>
+        <div class="card-header">
+            <div class$="layout vertical center {{carddata.info}}" style="min-height: 71mm;">
+                <span>{{carddata.name}}</span>
+                <div class="fit" style="left: 1mm;top: 1mm">
+                    <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:15px;height: 15px;" alt="">
+                    </template>
+                </div>
+                <div class="fit" style="left: 42mm;top: 0mm">
+                    <template is="dom-if" if="{{carddata.order}}">
+                        <iron-icon class="big" icon="{{carddata.order}}"></iron-icon>
+                    </template>
+                </div>
+                <img src$="img/{{carddata.name}}.png" class$="picture {{carddata.imgclass}}">
+
+                <div class="handle text" style="width:90%; margin: 1px 18px 1px 7px;">{{carddata.Aktion}}</div>
+                <template is="dom-if" if="{{carddata.flavour}}">
+                    <div class="handle text" style="width:90%; margin: 1px 16px 1px 7px;font-style:italic;">{{carddata.flavour}}</div>
+                </template>
+                <div class="handle" style="width:90%; font-size: 9px;margin: 1px 16px 1px 7px;"><span>{{carddata.type}}</span> (Akt {{carddata.akt}}<span>{{carddata.level}}</span>)</div>
+                <template is="dom-if" if="{{carddata.ver}}">
+                    <img class="fit " src="img/vertic.jpg" style="top: 0;left: 46mm;width:4mm;height: 100%;" alt="">
+                </template>
+                <template is="dom-if" if="{{carddata.hor}}">
+                    <img src="img/horiz.jpg" class="fit" style="top: 67mm;height:4mm; width: 100%;" alt="">
+                </template>
+            </div>
+    </div></template>
+    </dom-module><dom-module id="game-print-back-card" assetpath="/">
+    <style>
+        :host {
+            margin: 0;
+            padding: 0;
+        }
+
+        .card-header {
+            margin: 0.3mm 0;
+            display: inline-block;
+            position: relative;
+            background-color: white;
+            background-image: url("img/borders.png");
+            background-size: 100% 100%;
+            padding: 0;
+            width: 50mm;
+            height: 71mm;
             font-size: 1em;
         }
 
@@ -2134,38 +2220,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style is="custom-style">
         .big {
             color: gray;
-            --iron-icon-height: 16px;
-            --iron-icon-width: 16px;
+            margin-top: 10px;
+            --iron-icon-height: 64px;
+            --iron-icon-width: 64px;
         }
     </style>
     <template>
         <div class="card-header">
-            <div class$="layout vertical center {{carddata.info}}" style="min-height: 63mm;">
-                <span>{{carddata.name}}</span>
-                <div class="fit" style="left: 1mm;top: 1mm">
-                    <template is="dom-if" if="{{carddata.task}}"><img src="img/Stern.png" style="width:15px;height: 15px;" alt="">
-                    </template>
-                </div>
-                <div class="fit" style="left: 36mm;top: 0mm">
-                    <template is="dom-if" if="{{carddata.order}}">
+            <div class="layout vertical center" style="margin: 0;width: 40mm;min-height: 63mm;">
+                    <template is="dom-if" if="{{carddata.task}}">
+                        <h2 style="margin-top: 40px;">Aktion</h2>
                         <iron-icon class="big" icon="{{carddata.order}}"></iron-icon>
+                        <h2 style="margin-top: 40px;">{{carddata.orderText}}</h2>
                     </template>
-                </div>
-                <img src$="img/{{carddata.name}}.png" class$="picture {{carddata.imgclass}}">
-
-                <div class="handle text" style="width:90%; margin: 1px 18px 1px 7px;">{{carddata.Aktion}}</div>
-                <template is="dom-if" if="{{carddata.flavour}}">
-                    <div class="handle text" style="width:90%; margin: 1px 16px 1px 7px;font-style:italic;">{{carddata.flavour}}</div>
-                </template>
-                <div class="handle" style="width:90%; font-size: 9px;margin: 1px 16px 1px 7px;"><span>{{carddata.type}}</span> (Akt {{carddata.akt}}<span>{{carddata.level}}</span>)</div>
-                <template is="dom-if" if="{{carddata.ver}}">
-                    <img class="fit " src="img/vertic.jpg" style="top: 0;left: 38mm;width:4mm;height: 100%;" alt="">
-                </template>
-                <template is="dom-if" if="{{carddata.hor}}">
-                    <img src="img/horiz.jpg" class="fit" style="top: 59mm;height:4mm; width: 100%;" alt="">
-                </template>
             </div>
-    </div></template>
+        </div>
+    </template>
     </dom-module><dom-module id="page-break-div" assetpath="../components/page-break-div/">
     <style>
         :host {
@@ -2194,7 +2264,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         #gameTable {
-            width: 180mm;
+            width: 210mm;
         }
     </style>
     <template>
@@ -2205,7 +2275,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <page-break-div nmbr="{{cardIndex}}" max="16"></page-break-div>
             </template>
             <br>
-             <div style="page-break-before: always; width: 800px;">symbols</div>
+           <template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
+                <template is="dom-if" if="{{ card.task}}">
+                    <game-print-back-card carddata="{{card}}"></game-print-back-card>
+                </template>
+            </template>
+            <br>
+            <br>
+            <br>
             <template is="dom-repeat" items="{{cards}}" as="card" index-as="cardIndex">
                 <template is="dom-if" if="{{ card.imgclass}}">
                     <game-piece print="" style="margin: 2px;" img="{{card.name}}" imgclass="{{card.imgclass}}"></game-piece>

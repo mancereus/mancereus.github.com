@@ -436,6 +436,359 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
 
 <style>
+  /* IE 10 support for HTML5 hidden attr */
+  [hidden] {
+    display: none !important;
+  }
+</style>
+
+<style is="custom-style">
+  :root {
+
+    --layout: {
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+    };
+
+    --layout-inline: {
+      display: -ms-inline-flexbox;
+      display: -webkit-inline-flex;
+      display: inline-flex;
+    };
+
+    --layout-horizontal: {
+      @apply(--layout);
+
+      -ms-flex-direction: row;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+    };
+
+    --layout-horizontal-reverse: {
+      @apply(--layout);
+
+      -ms-flex-direction: row-reverse;
+      -webkit-flex-direction: row-reverse;
+      flex-direction: row-reverse;
+    };
+
+    --layout-vertical: {
+      @apply(--layout);
+
+      -ms-flex-direction: column;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    };
+
+    --layout-vertical-reverse: {
+      @apply(--layout);
+
+      -ms-flex-direction: column-reverse;
+      -webkit-flex-direction: column-reverse;
+      flex-direction: column-reverse;
+    };
+
+    --layout-wrap: {
+      -ms-flex-wrap: wrap;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+    };
+
+    --layout-wrap-reverse: {
+      -ms-flex-wrap: wrap-reverse;
+      -webkit-flex-wrap: wrap-reverse;
+      flex-wrap: wrap-reverse;
+    };
+
+    --layout-flex-auto: {
+      -ms-flex: 1 1 auto;
+      -webkit-flex: 1 1 auto;
+      flex: 1 1 auto;
+    };
+
+    --layout-flex-none: {
+      -ms-flex: none;
+      -webkit-flex: none;
+      flex: none;
+    };
+
+    --layout-flex: {
+      -ms-flex: 1 1 0.000000001px;
+      -webkit-flex: 1;
+      flex: 1;
+      -webkit-flex-basis: 0.000000001px;
+      flex-basis: 0.000000001px;
+    };
+
+    --layout-flex-2: {
+      -ms-flex: 2;
+      -webkit-flex: 2;
+      flex: 2;
+    };
+
+    --layout-flex-3: {
+      -ms-flex: 3;
+      -webkit-flex: 3;
+      flex: 3;
+    };
+
+    --layout-flex-4: {
+      -ms-flex: 4;
+      -webkit-flex: 4;
+      flex: 4;
+    };
+
+    --layout-flex-5: {
+      -ms-flex: 5;
+      -webkit-flex: 5;
+      flex: 5;
+    };
+
+    --layout-flex-6: {
+      -ms-flex: 6;
+      -webkit-flex: 6;
+      flex: 6;
+    };
+
+    --layout-flex-7: {
+      -ms-flex: 7;
+      -webkit-flex: 7;
+      flex: 7;
+    };
+
+    --layout-flex-8: {
+      -ms-flex: 8;
+      -webkit-flex: 8;
+      flex: 8;
+    };
+
+    --layout-flex-9: {
+      -ms-flex: 9;
+      -webkit-flex: 9;
+      flex: 9;
+    };
+
+    --layout-flex-10: {
+      -ms-flex: 10;
+      -webkit-flex: 10;
+      flex: 10;
+    };
+
+    --layout-flex-11: {
+      -ms-flex: 11;
+      -webkit-flex: 11;
+      flex: 11;
+    };
+
+    --layout-flex-12: {
+      -ms-flex: 12;
+      -webkit-flex: 12;
+      flex: 12;
+    };
+
+    /* alignment in cross axis */
+
+    --layout-start: {
+      -ms-flex-align: start;
+      -webkit-align-items: flex-start;
+      align-items: flex-start;
+    };
+
+    --layout-center: {
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+    };
+
+    --layout-end: {
+      -ms-flex-align: end;
+      -webkit-align-items: flex-end;
+      align-items: flex-end;
+    };
+
+    --layout-baseline: {
+      -ms-flex-align: baseline;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+    };
+
+    /* alignment in main axis */
+
+    --layout-start-justified: {
+      -ms-flex-pack: start;
+      -webkit-justify-content: flex-start;
+      justify-content: flex-start;
+    };
+
+    --layout-center-justified: {
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+    };
+
+    --layout-end-justified: {
+      -ms-flex-pack: end;
+      -webkit-justify-content: flex-end;
+      justify-content: flex-end;
+    };
+
+    --layout-around-justified: {
+      -ms-flex-pack: distribute;
+      -webkit-justify-content: space-around;
+      justify-content: space-around;
+    };
+
+    --layout-justified: {
+      -ms-flex-pack: justify;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+    };
+
+    --layout-center-center: {
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
+    };
+
+    /* self alignment */
+
+    --layout-self-start: {
+      -ms-align-self: flex-start;
+      -webkit-align-self: flex-start;
+      align-self: flex-start;
+    };
+
+    --layout-self-center: {
+      -ms-align-self: center;
+      -webkit-align-self: center;
+      align-self: center;
+    };
+
+    --layout-self-end: {
+      -ms-align-self: flex-end;
+      -webkit-align-self: flex-end;
+      align-self: flex-end;
+    };
+
+    --layout-self-stretch: {
+      -ms-align-self: stretch;
+      -webkit-align-self: stretch;
+      align-self: stretch;
+    };
+
+    --layout-self-baseline: {
+      -ms-align-self: baseline;
+      -webkit-align-self: baseline;
+      align-self: baseline;
+    };
+
+    /* multi-line alignment in main axis */
+
+    --layout-start-aligned: {
+      -ms-flex-line-pack: start;  /* IE10 */
+      -ms-align-content: flex-start;
+      -webkit-align-content: flex-start;
+      align-content: flex-start;
+    };
+
+    --layout-end-aligned: {
+      -ms-flex-line-pack: end;  /* IE10 */
+      -ms-align-content: flex-end;
+      -webkit-align-content: flex-end;
+      align-content: flex-end;
+    };
+
+    --layout-center-aligned: {
+      -ms-flex-line-pack: center;  /* IE10 */
+      -ms-align-content: center;
+      -webkit-align-content: center;
+      align-content: center;
+    };
+
+    --layout-between-aligned: {
+      -ms-flex-line-pack: justify;  /* IE10 */
+      -ms-align-content: space-between;
+      -webkit-align-content: space-between;
+      align-content: space-between;
+    };
+
+    --layout-around-aligned: {
+      -ms-flex-line-pack: distribute;  /* IE10 */
+      -ms-align-content: space-around;
+      -webkit-align-content: space-around;
+      align-content: space-around;
+    };
+
+    /*******************************
+              Other Layout
+    *******************************/
+
+    --layout-block: {
+      display: block;
+    };
+
+    --layout-invisible: {
+      visibility: hidden !important;
+    };
+
+    --layout-relative: {
+      position: relative;
+    };
+
+    --layout-fit: {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+    --layout-scroll: {
+      -webkit-overflow-scrolling: touch;
+      overflow: auto;
+    };
+
+    --layout-fullbleed: {
+      margin: 0;
+      height: 100vh;
+    };
+
+    /* fixed position */
+
+    --layout-fixed-top: {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+    };
+
+    --layout-fixed-right: {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    };
+
+    --layout-fixed-bottom: {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+    --layout-fixed-left: {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+  }
+
+</style>
+
+
+<style>
 body {margin: 0; padding: 1px}
 body,h5,h6,p{font-size:13px;line-height:20px}
 a,body,paper-toolbar{color:#424242}
@@ -471,7 +824,24 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 	</style>
 </head>
 
-<body><div hidden="" by-vulcanize=""><dom-module id="zenmaster-game" assetpath="/">
+<body><div hidden="" by-vulcanize=""><dom-module id="iron-pages" assetpath="../../bower_components/iron-pages/">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host > ::content > :not(.iron-selected) {
+        display: none !important;
+      }
+    </style>
+
+    <content></content>
+  </template>
+
+  </dom-module>
+<dom-module id="zenmaster-game" assetpath="/">
 
     <template>
         <style>
@@ -522,10 +892,27 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                 margin: 0;
                 padding: 0;
             }
+            section {
+                display: flex;
+                flex-direction: column;
+                align-content: center;
+            }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
-        <input type="button" on-click="newGame" value="Neues Spiel"> <a href="tipps.html" target="_blank">Tipps Seite</a>
+        
+        <iron-pages selected="{{selected}}">
+            <section>
+                <h2>Starte eine neue Partie als Meister...</h2>
+                <input style="width: 100px;" type="button" on-tap="switch" value="Ich bin Meister"> 
+                <br>
+                <h2>Trete als Schüler einer Partie bei...</h2>
+                <a href="tipps.html" target="_blank"><input style="width: 100px;" type="button" value="Ich bin Schüler"></a>
+            </section>
+            <section>
         <div class="cards">
+            <input style="width: 100px;" type="button" on-tap="newGame" value="Neue Karten"> 
+                <br>
+            <h2>Finde ein Ding oder Lebewesen mit den folgenden Eigenschaften..</h2>   
             <template is="dom-repeat" items="{{data.cards}}">
                 <div class$="{{item.type}} card">
                     <span class="header">{{item.type}} / {{item.type2}}</span>
@@ -533,21 +920,34 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
                     <span>{{item.name}}</span>
                 </div>
             </template>
-
-        </div>
-        <br>
-        <h3>Schreibe deine Lösung auf:</h3>
-        <input style="width: 250px;" class="try inp" value="{{data.solution::input}}">
-        <button on-tap="startGame">Fertig</button>
-        <firebase-collection id="col" limit-to-last="10" location="https://protogames.firebaseio.com/zenmaster/games" data="{{games}}"></firebase-collection>
-        <input type="button" on-tap="saveGame" value="Speichere Spiel">
-        <br>
-        <b>Lade Spiel:</b>
-        <select id="game" on-change="loadGame">
+    <h2>oder Lade ein altes Spiel..</h2>
+    <firebase-collection id="col" limit-to-last="20" location="https://protogames.firebaseio.com/zenmaster/games" data="{{games}}"></firebase-collection>
+    <select id="game" on-change="loadGame">
             <template is="dom-repeat" items="{{games}}">
                 <option value="{{item.solution}}">{{item.solution}}</option>
             </template>
         </select>
+    <br>
+    <h3>Schreibe deine Lösung auf:</h3>
+    <input style="width: 250px;" class="try inp" value="{{data.solution::input}}">
+    <button on-tap="startGame">Fertig</button>
+    </div></section>
+    <section>
+            <template is="dom-repeat" items="{{data.cards}}">
+                <div class$="{{item.type}} " style="width: 250px;font-size: 120%">
+                    <span>{{item.type}} / {{item.type2}}</span>
+                    <br>
+                    <span>{{item.name}}</span>
+                </div>
+            </template>
+
+        <zenmaster-tipps master=""></zenmaster-tipps>
+        <input style="width: 120px" type="button" on-tap="saveGame" value="Speichere Spiel">
+
+    </section>
+    </iron-pages>
+
+
     </template>
 
     </dom-module><dom-module id="paper-ripple" assetpath="../../bower_components/paper-ripple/">
@@ -652,7 +1052,8 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         width: var(--calculated-paper-checkbox-size);
         height: var(--calculated-paper-checkbox-size);
         min-width: var(--calculated-paper-checkbox-size);
-        vertical-align: middle;
+        margin: var(--paper-checkbox-margin, initial);
+        vertical-align: var(--paper-checkbox-vertical-align, middle);
         background-color: var(--paper-checkbox-unchecked-background-color, transparent);
       }
 
@@ -751,6 +1152,10 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
         color: var(--paper-checkbox-label-color, --primary-text-color);
       }
 
+      :host([checked]) #checkboxLabel {
+        color: var(--paper-checkbox-label-checked-color, --paper-checkbox-label-color);
+      }
+
       :host-context([dir="rtl"]) #checkboxLabel {
         padding-right: var(--paper-checkbox-label-spacing, 8px);
         padding-left: 0;
@@ -797,9 +1202,11 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
     <style>
       :host {
         display: inline-block;
+        line-height: 0;
         white-space: nowrap;
         cursor: pointer;
         @apply(--paper-font-common-base);
+        --calculated-paper-radio-button-size: var(--paper-radio-button-size, 16px);
       }
 
       :host(:focus) {
@@ -807,27 +1214,26 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #radioContainer {
-        display: inline-block;
+        @apply(--layout-inline);
+        @apply(--layout-center-center);
         position: relative;
-        width: 16px;
-        height: 16px;
+        width: var(--calculated-paper-radio-button-size);
+        height: var(--calculated-paper-radio-button-size);
         vertical-align: middle;
       }
 
       #ink {
         position: absolute;
-        top: -16px;
-        left: -16px;
-        width: 48px;
-        height: 48px;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        width: calc(3 * var(--calculated-paper-radio-button-size));
+        height: calc(3 * var(--calculated-paper-radio-button-size));
         color: var(--paper-radio-button-unchecked-ink-color, --primary-text-color);
         opacity: 0.6;
         pointer-events: none;
-      }
-
-      :host-context([dir="rtl"]) #ink {
-        right: -15px;
-        left: auto;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
       }
 
       #ink[checked] {
@@ -836,12 +1242,12 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 
       #offRadio {
         position: absolute;
-        box-sizing: content-box;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        width: 12px;
-        height: 12px;
+        box-sizing: border-box;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         border: solid 2px;
         background-color: var(--paper-radio-button-unchecked-background-color, transparent);
@@ -850,13 +1256,9 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #onRadio {
-        position: absolute;
         box-sizing: content-box;
-        top: 4px;
-        left: 4px;
-        right: 4px;
-        width: 8px;
-        height: 8px;
+        width: 50%;
+        height: 50%;
         border-radius: 50%;
         background-color: var(--paper-radio-button-checked-color, --primary-color);
         -webkit-transform: scale(0);
@@ -876,6 +1278,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       #radioLabel {
+        line-height: normal;
         position: relative;
         display: inline-block;
         vertical-align: middle;
@@ -885,7 +1288,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host-context([dir="rtl"]) #radioLabel {
-        margin-left: 0px;
+        margin-left: 0;
         margin-right: var(--paper-radio-button-label-spacing, 10px);
       }
 
@@ -928,7 +1331,7 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
       }
 
       :host ::content > * {
-        padding: 12px;
+        padding: var(--paper-radio-group-item-padding, 12px);
       }
     </style>
 
@@ -963,15 +1366,17 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
             }
         </style>
         <firebase-document location="https://protogames.firebaseio.com/zenmaster/data" data="{{data}}" log=""></firebase-document>
+        <template is="dom-if" if="{{!master}}">
         <template is="dom-if" if="{{data.started}}">
             <h3 style="color:green;background-color: lightgray;width:400px;">Der Zenmeister ist bereit.</h3>
+        </template>
         </template>
         <table>
             <tbody><tr>
                 <th></th>
                 <th width="180px">Versuch</th>
                 <th width="40px">Form oder Oberfläche</th>
-                <th width="40px">Inhalt oder Bewegung</th>
+                <th width="40px">Inhalt oder Besonderheit</th>
                 <th width="40px">Ort oder Zeit</th>
                 <th width="40px">Größe oder Gewicht</th>
             </tr>
@@ -1053,7 +1458,6 @@ aside{margin:40px;padding:20px 40px;background-color:#fafafa;border:1px solid #e
 </div>
 	<h1>ZenMeister</h1>
 	<zenmaster-game></zenmaster-game>
-	<zenmaster-tipps master=""></zenmaster-tipps>
     <google-tracking></google-tracking>
 
 

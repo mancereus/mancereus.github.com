@@ -16,6 +16,13 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
     <title>polymer array properties</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
+<style>
+        body {
+            font-family: Roboto, 'Noto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+    </style>
     <style>
   /* IE 10 support for HTML5 hidden attr */
   [hidden] {
@@ -749,8 +756,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700">
 <style is="custom-style">
 
   :root {
@@ -1558,17 +1563,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 
 </style>
-<style>
-        body {
-            font-family: Roboto, 'Noto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        }
-    </style>
-    
-
-
-
-
-
 </head>
 
 <body><div hidden="" by-vulcanize=""><dom-module id="paper-drawer-panel" assetpath="../../bower_components/paper-drawer-panel/">
@@ -2811,13 +2805,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 background-color: lightyellow;
             }
         </style>
-        <div draggable="true" class$="{{color}} layout vertical center" id="front">{{val}}</div>
+        <div draggable="true" class$="{{color}} layout vertical center" id="front">{{valx}}</div>
 
     </template>
 
 </dom-module>
 
-<dom-module id="iron-image" assetpath="../../bower_components/iron-image/">
+<dom-module id="hotdice-engine" assetpath="/">
+    </dom-module><dom-module id="iron-image" assetpath="../../bower_components/iron-image/">
   <template>
     <style>
       :host {
@@ -2986,7 +2981,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   </dom-module>
-<dom-module id="hotdice-container" assetpath="/">
+<dom-module id="hotdice-dice" assetpath="/">
+    <template>
+        <style>
+            :host {
+                display: inline-block;
+            }
+            #front {
+                color: black;
+                border: 1px solid black;
+                border-radius: 20%;
+                padding: 3px;
+                cursor: pointer;
+                text-align: center;
+                display: table-cell;
+                vertical-align: middle;
+                font-size: 200%;
+                font-weight: bold;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            #front.dark {
+                color: white;
+                background-color: black;
+                border: 1px solid white;
+            }
+            .lightgreen {
+                background-color: lightgreen;
+            }
+            .lightblue {
+                background-color: lightblue;
+            }
+            .orange {
+                background-color: orange
+            }
+            .lightyellow {
+                background-color: lightyellow;
+            }
+        </style>
+        <div draggable="true" on-click="reroll" class$="{{data.color}} layout vertical center" id="front">{{valx}}</div>
+
+    </template>
+    </dom-module><dom-module id="hotdice-container" assetpath="/">
 
     <template>
         <style>
@@ -3009,8 +3048,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <paper-card heading="{{container}}" container="{{container}}">
             <div class="card-content">
-                <template is="dom-repeat" id="tmpl">
-                    <board-game-dice on-track="trackElement" draggable="true" color="{{item.color}}" items="{{item.items}}"></board-game-dice>
+                <template is="dom-repeat" items="{{data}}">
+                    <hotdice-dice on-track="trackElement" draggable="true" data="{{item}}" valx="{{item.val}}"></hotdice-dice>
                 </template>
             </div>
             <template is="dom-if" if="{{notStack(container)}}">
@@ -3054,66 +3093,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </paper-card>
     </template>
 
+    </dom-module><dom-module id="hotdice-game" assetpath="/">
+    <style>
+        .container {
+            display: flex;
+            cursor: pointer;
+            max-width: 800px;
+            justify-content: space-around;
+            align-content: space-between;
+            padding: 4px;
+            background-color: lightgray;
+        }
+        
+        .item {
+            padding: 10px;
+            border-radius: 20%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 32px;
+            color: darkslategray;
+            text-shadow: 12px;
+            font-weight: bold;
+            vertical-align: baseline;
+            border: 1px solid darkslategray;
+            background-color: white;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+    <template>
+        <div class="container">
+            <hotdice-engine id="engine" model="{{data}}"></hotdice-engine>
+            <hotdice-container container="roll" data="{{data.roll}}">
+            </hotdice-container>
+            <hotdice-container container="stack" data="{{data.stack}}">
+            </hotdice-container>
+        </div>
+        <div class="container">
+            <div class="item field">2</div>
+            <div class="item field">3</div>
+            <div class="item field">4</div>
+            <div class="item field">5</div>
+            <div class="item field">6</div>
+            <div class="item field">7</div>
+            <div class="item field">8</div>
+            <div class="item field">9</div>
+            <div class="item field">10</div>
+            <div class="item field">11</div>
+            <div class="item field">12</div>
+        </div>
+
+    </template>
     </dom-module></div>
-<h1>Hot Dice</h1>
-<template is="dom-bind">
-    <tst-data data="{{data}}"></tst-data>
-    <div class="container">
-        <hotdice-container container="roll" data="{{data}}">
-        </hotdice-container>
-        <hotdice-container container="stack" data="{{data}}">
-        </hotdice-container>
-    </div>
-    <div class="container">
-        <div class="item field">2</div>
-        <div class="item field">3</div>
-        <div class="item field">4</div>
-        <div class="item field">5</div>
-        <div class="item field">6</div>
-        <div class="item field">7</div>
-        <div class="item field">8</div>
-        <div class="item field">9</div>
-        <div class="item field">10</div>
-        <div class="item field">11</div>
-        <div class="item field">12</div>
-    </div>
-</template>
-<style>
-    .container {
-        display: flex;
-        cursor: pointer;
-        max-width: 800px;
-        justify-content: space-around;
-        align-content: space-between;
-        padding: 4px;
-        background-color: lightgray;
-    }
-
-    .item {
-        padding: 10px;
-        border-radius: 20%;
-        width: 40px;
-        height: 40px;
-        text-align: center;
-        font-size: 32px;
-        color: darkslategray;
-        text-shadow: 12px;
-        font-weight: bold;
-        vertical-align: baseline;
-        border: 1px solid darkslategray;
-        background-color: white;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-</style>
-<dom-module id="tst-data">
-    </dom-module>
-
-
+    <h1>Hot Dice</h1>
+    <hotdice-game></hotdice-game>
 
 
 </body></html>
